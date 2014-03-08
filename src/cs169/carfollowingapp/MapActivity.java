@@ -51,6 +51,16 @@ public class MapActivity extends FragmentActivity {
     }
     
     public LatLng getLocation() {
+        String defaultUser = "";
+        return getLocation(defaultUser);
+    }
+    
+    // TODO: make sure non-authenticated users can't get anyone's location
+    /* 
+     * username: who to obtain the location point from
+     * returns the obtained latitude/longitude in the form of LatLng, or null otherwise
+     */
+    public LatLng getLocation(String username) {
         return new LatLng(-33.867, 151.206);   
     }
     
