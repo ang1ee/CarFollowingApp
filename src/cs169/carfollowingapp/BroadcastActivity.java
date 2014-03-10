@@ -1,14 +1,25 @@
+package cs169.carfollowingapp;
+
 import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import android.os.Bundle;
-import android.app.Activity;
-import android.view.Menu;
-
 public class BroadcastActivity extends MapActivity {
-
+    
+    // if it doesn't go through the try statement will not having a default be a problem?
+    private String username;
+    private String password;
+    
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +37,8 @@ public class BroadcastActivity extends MapActivity {
 	    String longitude = Double.toString(location.longitude);
 	    postData.put("username", username);
 	    postData.put("password", password);
+	    
+	    // ? did we intend to have the key be password for both of these?
 	    postData.put("password", latitude);
 	    postData.put("password", longitude);
 	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/broadcast", postData);
@@ -71,14 +84,16 @@ public class BroadcastActivity extends MapActivity {
     }
     
     public void stopBroadcasting() {
-	try {
-	    postData.put("username", username);
-	    postData.put("password", password);
-	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/stop_broadcast", postData);
-	    int statusCode = obj.getInt("status code");
-	    if (statusCode != SUCCESS) {
-		CharSequence text = "Incorrect error code was returned";
-		showToast(text);
+    	try {
+    	    JSONObject postData = new JSONObject();
+    	    postData.put("username", username);
+    	    postData.put("password", password);
+    	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/stop_broadcast", postData);
+    	    int statusCode = obj.getInt("status code");
+    	    if (statusCode != SUCCESS) {
+        		CharSequence text = "Incorrect error code was returned";
+        		showToast(text);
+    	    }
 	    } catch (RuntimeException e) {
 		CharSequence text = "Connection Error";
 		showToast(text);
