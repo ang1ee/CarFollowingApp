@@ -2,12 +2,11 @@ package cs169.carfollowingapp;
 
 import java.util.ArrayList;
 
+import android.os.Bundle;
+import android.view.Menu;
+
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-
-import android.os.Bundle;
-import android.app.Activity;
-import android.view.Menu;
 
 public class FollowActivity extends MapActivity {
 
