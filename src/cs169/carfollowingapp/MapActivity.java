@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapActivity extends FragmentActivity {
 
     protected GoogleMap map;
+    protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
     protected static final int USER_NOT_BROADCASTING = -2;
     
@@ -118,5 +119,14 @@ public class MapActivity extends FragmentActivity {
 		}
 		return null; 
     }
+ 
+	// Displays toast showing the text argument.
+	protected void showToast(CharSequence text) {
+	    Context context = getApplicationContext();
+	    int duration = Toast.LENGTH_SHORT;
+	    
+	    Toast toast = Toast.makeText(context, text, duration);
+	    toast.show();
+	}
     
 }

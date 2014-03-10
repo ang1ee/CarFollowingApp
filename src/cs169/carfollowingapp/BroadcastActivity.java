@@ -15,8 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 public class BroadcastActivity extends MapActivity {
-    
-    // if it doesn't go through the try statement will not having a default be a problem?
+	// if it doesn't go through the try statement will not having a default be a problem?
     private String username;
     private String password;
     
@@ -95,26 +94,17 @@ public class BroadcastActivity extends MapActivity {
         		showToast(text);
     	    }
 	    } catch (RuntimeException e) {
-		CharSequence text = "Connection Error";
-		showToast(text);
+	    	CharSequence text = "Connection Error";
+	    	showToast(text);
 	    } catch (JSONException e) {
-		CharSequence text = "JSON Error";
-		showToast(text);
+	    	CharSequence text = "JSON Error";
+	    	showToast(text);
 	    } catch (Exception e) {
-		CharSequence text = "Error";
-		showToast(text);
+	    	CharSequence text = "Error";
+	    	showToast(text);
 	    }
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    startActivity(intent);
 	}
     
-	// Displays toast showing the text argument.
-	private void showToast(CharSequence text) {
-	    Context context = getApplicationContext();
-	    int duration = Toast.LENGTH_SHORT;
-	    
-	    Toast toast = Toast.makeText(context, text, duration);
-	    toast.show();
-	}
-
-    }
+}
