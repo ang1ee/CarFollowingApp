@@ -14,9 +14,15 @@
 	    android:layout_height="wrap_content"
 	    android:onClick="broadcast"
 	    android:text="@string/broadcast" />
-    <Button android:id="@+id/follow_button"
+    <EditText android:id="@+id/input_username"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/broadcast_button"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/input_hint" />
+    <Button android:id="@+id/follow_button"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/input_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="follow"
