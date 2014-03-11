@@ -3,6 +3,7 @@ package cs169.carfollowingapp;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -18,9 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapActivity extends FragmentActivity {
 
     protected GoogleMap map;
-    
-    
-    
+      
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +47,6 @@ public class MapActivity extends FragmentActivity {
         }
     }
     
-   
-    
-
- 
 	// Displays toast showing the text argument.
 	protected void showToast(CharSequence text) {
 	    Context context = getApplicationContext();
@@ -59,6 +54,17 @@ public class MapActivity extends FragmentActivity {
 	    
 	    Toast toast = Toast.makeText(context, text, duration);
 	    toast.show();
+	}
+	
+	/* -displays error using showToast
+	 * -uses intent to navigate back to FrontPageActivity
+	 * -finishes Broadcast/Follow activity
+	 */
+	protected void handleError(CharSequence text) {
+	    showToast(text);
+	    Intent intent = new Intent(this, FrontPageActivity.class);
+        startActivity(intent);
+        finish();
 	}
     
 }

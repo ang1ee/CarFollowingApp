@@ -32,50 +32,52 @@ public class BroadcastActivity extends MapActivity {
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         //this.map.setMyLocationEnabled(true);
 
-	try {
-	    JSONObject postData = new JSONObject();
-	    Intent intent = getIntent();
-	    String username = intent.getStringExtra("username");
-	    String password = intent.getStringExtra("password");
-	    String latitude = Double.toString(currentLocation.getLatitude());
-	    String longitude = Double.toString(currentLocation.getLongitude());
-	    postData.put("username", username);
-	    postData.put("password", password);
-	    postData.put("latitude", latitude);
-	    postData.put("longitude", longitude);
-	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/broadcast", postData); /*TODO: Real url*/
-	    
-	    int statusCode = obj.getInt("status code");
-	    if (statusCode == SUCCESS) {
-		return;
-	    } else if (statusCode == NO_SUCH_USER) {
-    		CharSequence text = "No such user!";
-    		showToast(text);
-    		return;
-	    } else if (statusCode == INCORRECT_PASSWORD) {
-    		CharSequence text = "Incorrect password!";
-    		showToast(text);
-    		return;
-	    } else if (statusCode == MALFORMED_LOCATION) {
-    		CharSequence text = "malformed location!";
-    		showToast(text);
-    		return;
-	    }
-	    LatLng location = new LatLng(new Double(latitude), new Double(longitude));
-	    ArrayList<LatLng> coords = new ArrayList<LatLng>();
-	    coords.add(location);
-	    this.plot(coords);
-    } catch (RuntimeException e) {
-	    CharSequence text = "Connection Error";
-	    showToast(text);
-	} catch (JSONException e) {
-	    CharSequence text = "JSON Error";
-	    showToast(text);
-	} catch (Exception e) {
-	    CharSequence text = "Error";
-	    showToast(text);
-	}
-	
+		try {
+		    JSONObject postData = new JSONObject();
+		    Intent intent = getIntent();
+		    String username = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
+		    String password = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
+		    String latitude = Double.toString(currentLocation.getLatitude());
+		    String longitude = Double.toString(currentLocation.getLongitude());
+		    postData.put("username", username);
+		    postData.put("password", password);
+		    postData.put("latitude", latitude);
+		    postData.put("longitude", longitude);
+		    
+		    /*TODO: Real url*/
+		    JSONObject obj = SimpleHTTPPOSTRequester
+		    		.makeHTTPPOSTRequest("base_url/api/broadcast", postData); 
+		    
+		    int statusCode = obj.getInt("status code");
+		    if (statusCode == SUCCESS) {
+		        LatLng location = new LatLng(
+                        Double.valueOf(latitude), 
+                        Double.valueOf(longitude)
+                );
+                
+                ArrayList<LatLng> coords = new ArrayList<LatLng>();
+                coords.add(location);
+                this.plot(coords);
+		    } else if (statusCode == NO_SUCH_USER) {
+	    		CharSequence text = "No such user!";
+	    		handleError(text);
+		    } else if (statusCode == INCORRECT_PASSWORD) {
+	    		CharSequence text = "Incorrect password!";
+	    		handleError(text);
+		    } else if (statusCode == MALFORMED_LOCATION) {
+	    		CharSequence text = "malformed location!";
+	    		handleError(text);
+		    }
+	    } catch (RuntimeException e) {
+		    CharSequence text = "Connection Error";
+		    handleError(text);
+		} catch (JSONException e) {
+		    CharSequence text = "JSON Error";
+		    handleError(text);
+		} catch (Exception e) {
+		    CharSequence text = "Error";
+		    handleError(text);
+		}
     }
 
     @Override
@@ -94,20 +96,21 @@ public class BroadcastActivity extends MapActivity {
     	    int statusCode = obj.getInt("status code");
     	    if (statusCode != SUCCESS) {
         		CharSequence text = "Incorrect error code was returned";
-        		showToast(text);
+        		handleError(text);
     	    }
 	    } catch (RuntimeException e) {
 	    	CharSequence text = "Connection Error";
-	    	showToast(text);
+	    	handleError(text);
 	    } catch (JSONException e) {
 	    	CharSequence text = "JSON Error";
-	    	showToast(text);
+	    	handleError(text);
 	    } catch (Exception e) {
 	    	CharSequence text = "Error";
-	    	showToast(text);
+	    	handleError(text);
 	    }
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    startActivity(intent);
+	    finish();
 	}
     
 }
