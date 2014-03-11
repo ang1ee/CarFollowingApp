@@ -30,7 +30,7 @@ public class FollowActivity extends MapActivity {
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         this.map.setMyLocationEnabled(true);
         Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
+        String username = intent.getStringExtra(FrontPageActivity.U_KEY);
         LatLng location = this.getLocation(username);
         ArrayList<LatLng> coords = new ArrayList<LatLng>();
         coords.add(location);

@@ -43,7 +43,7 @@ public class BroadcastActivity extends MapActivity {
 	    postData.put("password", password);
 	    postData.put("latitude", latitude);
 	    postData.put("longitude", longitude);
-	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/broadcast", postData);
+	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/broadcast", postData); /*TODO: Real url*/
 	    
 	    int statusCode = obj.getInt("status code");
 	    if (statusCode == SUCCESS) {
