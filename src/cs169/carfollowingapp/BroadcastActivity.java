@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import android.location.Location;
 
 public class BroadcastActivity extends MapActivity {
-
+    
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
     protected static final int INCORRECT_PASSWORD = -2;
@@ -28,10 +28,23 @@ public class BroadcastActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
-        final Location currentLocation = this.map.getMyLocation();
+        final Location currentLocation = new Location("Saratoga");
+        //final Location currentLocation = this.map.getMyLocation();
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         //this.map.setMyLocationEnabled(true);
 
+        if (FrontPageActivity.DEBUG) {
+            LatLng location = new LatLng(
+                    Double.valueOf(90), 
+                    Double.valueOf(90)
+            );
+            
+            ArrayList<LatLng> coords = new ArrayList<LatLng>();
+            coords.add(location);
+            this.plot(coords);
+            return;
+        }
+        
 		try {
 		    JSONObject postData = new JSONObject();
 		    Intent intent = getIntent();
@@ -88,6 +101,13 @@ public class BroadcastActivity extends MapActivity {
     }
     
     public void stopBroadcasting() {
+        
+        if (FrontPageActivity.DEBUG) {
+            Intent intent = new Intent(this, FrontPageActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        
     	try {
     	    JSONObject postData = new JSONObject();
     	    postData.put("username", username);
