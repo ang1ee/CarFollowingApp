@@ -8,6 +8,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".FollowActivity" >
 
+    <Button
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_following"
+        android:onClick="Stop Following" /> 
+    
     <fragment
         class="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/map"

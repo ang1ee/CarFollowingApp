@@ -6,15 +6,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
-
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -22,6 +16,8 @@ public class FollowActivity extends MapActivity {
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
     protected static final int USER_NOT_BROADCASTING = -2;
+    
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +27,17 @@ public class FollowActivity extends MapActivity {
         this.map.setMyLocationEnabled(true);
         Intent intent = getIntent();
         String username = intent.getStringExtra(FrontPageActivity.U_KEY);
-        LatLng location = this.getLocation(username);
-        ArrayList<LatLng> coords = new ArrayList<LatLng>();
-        coords.add(location);
-        this.plot(coords);
+        try {
+        	LatLng location = this.getLocation(username);
+        	ArrayList<LatLng> coords = new ArrayList<LatLng>();
+            coords.add(location);
+            this.plot(coords);
+        } catch (Exception e) {
+        	Intent intent2 = new Intent(this, FrontPageActivity.class);
+    	    startActivity(intent2);
+    	    finish();
+        }
+        
     }
 
     @Override
@@ -52,54 +55,50 @@ public class FollowActivity extends MapActivity {
      * returns the obtained latitude/longitude in the form of LatLng, or null otherwise
      * Code snipet from: http://stackoverflow.com/questions/11213594/how-to-make-http-get-request-in-android
      */
-    public LatLng getLocation(String username) {
+    public LatLng getLocation(String username) throws Exception {
     	try { 
     		JSONObject obj = SimpleHTTPGETRequester.makeHTTPGETRequest("http://our-server.com?username="+username);//TODO:use the real url
     		if(obj.get("status code").toString().equals("1")){
     			return new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude")); 
     		} else if(obj.getInt("status code") == NO_SUCH_USER) {
-    			Context context = getApplicationContext();
-    			CharSequence text = "No such user!";
-    			int duration = Toast.LENGTH_SHORT;
-
-    			Toast toast = Toast.makeText(context, text, duration);
-    			toast.show();
-    			return null;
-    		} else if(obj.getInt("status code") == USER_NOT_BROADCASTING) {
-    			Context context = getApplicationContext();
-    			CharSequence text = "User not broadcasting!";
-    			int duration = Toast.LENGTH_SHORT;
     			
-    			Toast toast = Toast.makeText(context, text, duration);
-    			toast.show();
-    			return null;
+    			throw new RuntimeException("No such user!");
+    		} else if(obj.getInt("status code") == USER_NOT_BROADCASTING) {
+    			
+    			throw new RuntimeException("User not broadcasting!");
+    			
+    			
     		} 
     	} catch (RuntimeException e) {
 			
-			Context context = getApplicationContext();
-			CharSequence text = "Connection Error";
-			int duration = Toast.LENGTH_SHORT;
-			
-			Toast toast = Toast.makeText(context, text, duration);
-			toast.show();
+			CharSequence text = e.getMessage();
+			showToast(text);
 			throw e;
+			
+			
+			
 		} catch (JSONException e) {
-			Context context = getApplicationContext();
+			
 			CharSequence text = "JSON Error";
-			int duration = Toast.LENGTH_SHORT;
+			showToast(text);
+			throw e;
 			
-			Toast toast = Toast.makeText(context, text, duration);
-			toast.show();
+			
 		} catch (Exception e) {
-			Context context = getApplicationContext();
 			CharSequence text = "Error";
-			int duration = Toast.LENGTH_SHORT;
+			showToast(text);
+			throw e;
 			
-			Toast toast = Toast.makeText(context, text, duration);
-			toast.show();
+			
 		}
 		return null; 
     }
+    
+    public void stopFollowing() {
+	    Intent intent = new Intent(this, FrontPageActivity.class);
+	    startActivity(intent);
+	    finish();
+	}
     /*
     private class DisplayCurrentLocation extends AsyncTask<GoogleMap, Integer, Long> {
         protected Long doInBackground(GoogleMap... maps) {
