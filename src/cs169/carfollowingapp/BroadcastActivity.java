@@ -5,17 +5,16 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 public class BroadcastActivity extends MapActivity {
-	// if it doesn't go through the try statement will not having a default be a problem?
+
+    // default value?
     private String username;
     private String password;
     
@@ -36,33 +35,31 @@ public class BroadcastActivity extends MapActivity {
 	    String longitude = Double.toString(location.longitude);
 	    postData.put("username", username);
 	    postData.put("password", password);
-	    
-	    // ? did we intend to have the key be password for both of these?
-	    postData.put("password", latitude);
-	    postData.put("password", longitude);
+	    postData.put("latitude", latitude);
+	    postData.put("longitude", longitude);
 	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/broadcast", postData);
 	    
 	    int statusCode = obj.getInt("status code");
 	    if (statusCode == SUCCESS) {
 		return;
 	    } else if (statusCode == NO_SUCH_USER) {
-		CharSequence text = "No such user!";
-		showToast(text);
-		return;
+    		CharSequence text = "No such user!";
+    		showToast(text);
+    		return;
 	    } else if (statusCode == INCORRECT_PASSWORD) {
-		CharSequence text = "Incorrect password!";
-		showToast(text);
-		return;
+    		CharSequence text = "Incorrect password!";
+    		showToast(text);
+    		return;
 	    } else if (statusCode == MALFORMED_LOCATION) {
-		CharSequence text = "malformed location!";
-		showToast(text);
-		return;
+    		CharSequence text = "malformed location!";
+    		showToast(text);
+    		return;
 	    }
 	    //LatLng location = this.getLocation();
-	    ArrayList<LatLng> coords = new ArrayList<LatLng>();
-	    coords.add(location);
-	    this.plot(coords);
-        } catch (RuntimeException e) {
+        ArrayList<LatLng> coords = new ArrayList<LatLng>();
+        coords.add(location);
+        this.plot(coords);
+    } catch (RuntimeException e) {
 	    CharSequence text = "Connection Error";
 	    showToast(text);
 	} catch (JSONException e) {
