@@ -13,7 +13,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 public class SimpleHTTPGETRequester {
-	public static JSONObject makeHTTPPOSTRequest(String url) {
+	public static JSONObject makeHTTPGETRequest(String url) {
 		try {
 			HttpClient client = new DefaultHttpClient();
 			HttpGet request = new HttpGet(url);

@@ -14,7 +14,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class BroadcastActivity extends MapActivity {
 
-    // default value?
+	protected static final int SUCCESS = 1;
+    protected static final int NO_SUCH_USER = -1;
+    protected static final int INCORRECT_PASSWORD = -2;
+    protected static final int MALFORMED_LOCATION = -3;
+    
+	// if it doesn't go through the try statement will not having a default be a problem?
     private String username;
     private String password;
     
