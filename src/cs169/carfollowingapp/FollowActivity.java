@@ -54,10 +54,10 @@ public class FollowActivity extends MapActivity {
      */
     public LatLng getLocation(String username) {
     	try { 
-    		JSONObject obj = SimpleHTTPGETRequester.makeHTTPPOSTRequest("http://our-server.com?username="+username);//TODO:use the real url
-    		if(obj.get("errCode").toString().equals("1")){
+    		JSONObject obj = SimpleHTTPGETRequester.makeHTTPGETRequest("http://our-server.com?username="+username);//TODO:use the real url
+    		if(obj.get("status code").toString().equals("1")){
     			return new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude")); 
-    		} else if(obj.getInt("errCode") == NO_SUCH_USER) {
+    		} else if(obj.getInt("status code") == NO_SUCH_USER) {
     			Context context = getApplicationContext();
     			CharSequence text = "No such user!";
     			int duration = Toast.LENGTH_SHORT;
@@ -65,7 +65,7 @@ public class FollowActivity extends MapActivity {
     			Toast toast = Toast.makeText(context, text, duration);
     			toast.show();
     			return null;
-    		} else if(obj.getInt("errCode") == USER_NOT_BROADCASTING) {
+    		} else if(obj.getInt("status code") == USER_NOT_BROADCASTING) {
     			Context context = getApplicationContext();
     			CharSequence text = "User not broadcasting!";
     			int duration = Toast.LENGTH_SHORT;

@@ -18,7 +18,6 @@ public class BroadcastActivity extends MapActivity {
 	
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
-    protected static final int USER_NOT_BROADCASTING = -2;
     protected static final int INCORRECT_PASSWORD = -2;
     protected static final int MALFORMED_LOCATION = -3;
     
