@@ -13,7 +13,7 @@
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stop_broadcasting"
-        android:onClick="Stop Broadcasting" /> 
+        android:onClick="stopBroadcasting" /> 
     	    
     <fragment
         class="com.google.android.gms.maps.SupportMapFragment"
