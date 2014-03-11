@@ -2,12 +2,14 @@ package cs169.carfollowingapp;
 
 import java.util.ArrayList;
 
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 
 import com.google.android.gms.maps.GoogleMap;
+
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
