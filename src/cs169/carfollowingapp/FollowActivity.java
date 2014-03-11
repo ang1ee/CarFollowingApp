@@ -29,9 +29,13 @@ public class FollowActivity extends MapActivity {
         setContentView(R.layout.activity_follow);
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         this.map.setMyLocationEnabled(true);
-        Intent intent = getIntent();
-        String username = intent.getStringExtra(FrontPageActivity.U_KEY);
-        LatLng location = this.getLocation(username);
+        
+        LatLng location = new LatLng(Double.valueOf(90), Double.valueOf(90));
+        if (!FrontPageActivity.DEBUG) {
+            Intent intent = getIntent();
+            String username = intent.getStringExtra(FrontPageActivity.U_KEY);
+            location = this.getLocation(username);
+        }
         ArrayList<LatLng> coords = new ArrayList<LatLng>();
         coords.add(location);
         this.plot(coords);
