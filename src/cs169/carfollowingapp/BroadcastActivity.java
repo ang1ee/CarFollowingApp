@@ -50,39 +50,34 @@ public class BroadcastActivity extends MapActivity {
 		    
 		    int statusCode = obj.getInt("status code");
 		    if (statusCode == SUCCESS) {
-		    	return;
+		        LatLng location = new LatLng(
+                        Double.valueOf(latitude), 
+                        Double.valueOf(longitude)
+                );
+                
+                ArrayList<LatLng> coords = new ArrayList<LatLng>();
+                coords.add(location);
+                this.plot(coords);
 		    } else if (statusCode == NO_SUCH_USER) {
 	    		CharSequence text = "No such user!";
-	    		showToast(text);
-	    		return;
+	    		handleError(text);
 		    } else if (statusCode == INCORRECT_PASSWORD) {
 	    		CharSequence text = "Incorrect password!";
-	    		showToast(text);
-	    		return;
+	    		handleError(text);
 		    } else if (statusCode == MALFORMED_LOCATION) {
 	    		CharSequence text = "malformed location!";
-	    		showToast(text);
-	    		return;
+	    		handleError(text);
 		    }
-		    LatLng location = new LatLng(
-		    		Double.valueOf(latitude), 
-		    		Double.valueOf(longitude)
-		    );
-		    
-		    ArrayList<LatLng> coords = new ArrayList<LatLng>();
-		    coords.add(location);
-		    this.plot(coords);
 	    } catch (RuntimeException e) {
 		    CharSequence text = "Connection Error";
-		    showToast(text);
+		    handleError(text);
 		} catch (JSONException e) {
 		    CharSequence text = "JSON Error";
-		    showToast(text);
+		    handleError(text);
 		} catch (Exception e) {
 		    CharSequence text = "Error";
-		    showToast(text);
+		    handleError(text);
 		}
-	
     }
 
     @Override
@@ -101,20 +96,21 @@ public class BroadcastActivity extends MapActivity {
     	    int statusCode = obj.getInt("status code");
     	    if (statusCode != SUCCESS) {
         		CharSequence text = "Incorrect error code was returned";
-        		showToast(text);
+        		handleError(text);
     	    }
 	    } catch (RuntimeException e) {
 	    	CharSequence text = "Connection Error";
-	    	showToast(text);
+	    	handleError(text);
 	    } catch (JSONException e) {
 	    	CharSequence text = "JSON Error";
-	    	showToast(text);
+	    	handleError(text);
 	    } catch (Exception e) {
 	    	CharSequence text = "Error";
-	    	showToast(text);
+	    	handleError(text);
 	    }
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    startActivity(intent);
+	    finish();
 	}
     
 }
