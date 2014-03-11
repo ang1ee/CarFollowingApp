@@ -10,12 +10,20 @@ import android.widget.EditText;
 
 public class FrontPageActivity extends Activity {
     
+    final public static String MY_U_KEY = "myUsername";
+    final public static String MY_P_KEY = "myPassword";
     final public static String U_KEY = "username";
+    
+    private String myUsername;
+    private String myPassword;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_front_page);
+        Intent intent = getIntent();
+        myUsername = intent.getStringExtra(MY_U_KEY);
+        myPassword = intent.getStringExtra(MY_P_KEY);
     }
 
     @Override
@@ -26,11 +34,14 @@ public class FrontPageActivity extends Activity {
     }
     
     public void broadcast(View view) {
-        Intent intent = new Intent(getApplicationContext(), MapActivity.class);
+        // Get username and password from Login.
+        Intent intent = new Intent(getApplicationContext(), BroadcastActivity.class);
+        intent.putExtra(MY_U_KEY, myUsername);
+        intent.putExtra(MY_P_KEY, myPassword);
         startActivity(intent);
     }
     
-    public void follow(View view ) {
+    public void follow(View view) {
         EditText usernameEditText = (EditText) findViewById(R.id.input_username);
         String username = usernameEditText.getText().toString();
         
