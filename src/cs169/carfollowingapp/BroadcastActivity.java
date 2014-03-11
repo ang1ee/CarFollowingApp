@@ -11,6 +11,7 @@ import android.view.Menu;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import android.location.Location;
 
 public class BroadcastActivity extends MapActivity {
 
@@ -27,6 +28,7 @@ public class BroadcastActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
+        final Location currentLocation = this.map.getMyLocation();
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         //this.map.setMyLocationEnabled(true);
 
@@ -35,9 +37,8 @@ public class BroadcastActivity extends MapActivity {
 	    Intent intent = getIntent();
 	    String username = intent.getStringExtra("username");
 	    String password = intent.getStringExtra("password");
-	    LatLng location = this.getLocation();
-	    String latitude = Double.toString(location.latitude);
-	    String longitude = Double.toString(location.longitude);
+	    String latitude = Double.toString(currentLocation.getLatitude());
+	    String longitude = Double.toString(currentLocation.getLongitude());
 	    postData.put("username", username);
 	    postData.put("password", password);
 	    postData.put("latitude", latitude);
@@ -60,10 +61,10 @@ public class BroadcastActivity extends MapActivity {
     		showToast(text);
     		return;
 	    }
-	    //LatLng location = this.getLocation();
-        ArrayList<LatLng> coords = new ArrayList<LatLng>();
-        coords.add(location);
-        this.plot(coords);
+	    LatLng location = new LatLng(new Double(latitude), new Double(longitude));
+	    ArrayList<LatLng> coords = new ArrayList<LatLng>();
+	    coords.add(location);
+	    this.plot(coords);
     } catch (RuntimeException e) {
 	    CharSequence text = "Connection Error";
 	    showToast(text);
