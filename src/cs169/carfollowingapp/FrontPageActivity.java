@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 public class FrontPageActivity extends Activity {
     
-    final public static boolean DEBUG = true;
+    final public static boolean DEBUG = false;
     final public static String MY_U_KEY = "myUsername";
     final public static String MY_P_KEY = "myPassword";
     final public static String U_KEY = "username";

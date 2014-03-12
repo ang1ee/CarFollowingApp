@@ -17,8 +17,6 @@ public class FollowActivity extends MapActivity {
     protected static final int NO_SUCH_USER = -1;
     protected static final int USER_NOT_BROADCASTING = -2;
     
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +52,6 @@ public class FollowActivity extends MapActivity {
         getMenuInflater().inflate(R.menu.follow, menu);
         return true;
     }
-
-    
     
     // TODO: make sure non-authenticated users can't get anyone's location
     /* 
@@ -74,30 +70,20 @@ public class FollowActivity extends MapActivity {
     		} else if(obj.getInt("status code") == USER_NOT_BROADCASTING) {
     			
     			throw new RuntimeException("User not broadcasting!");
-    			
-    			
     		} 
     	} catch (RuntimeException e) {
 			
 			CharSequence text = e.getMessage();
 			showToast(text);
 			throw e;
-			
-			
-			
 		} catch (JSONException e) {
-			
 			CharSequence text = "JSON Error";
 			showToast(text);
 			throw e;
-			
-			
 		} catch (Exception e) {
 			CharSequence text = "Error";
 			showToast(text);
 			throw e;
-			
-			
 		}
 		return null; 
     }
