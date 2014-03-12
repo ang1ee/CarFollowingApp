@@ -41,9 +41,7 @@ public class FollowActivity extends MapActivity {
             coords.add(location);
             this.plot(coords);
         } catch (Exception e) {
-        	Intent intent2 = new Intent(this, FrontPageActivity.class);
-    	    startActivity(intent2);
-    	    finish();
+        	handleError(e.getMessage());
         }
     }
 
@@ -63,7 +61,7 @@ public class FollowActivity extends MapActivity {
     public LatLng getLocation(String username) throws Exception {
     	try { 
     		JSONObject obj = SimpleHTTPGETRequester.makeHTTPGETRequest("http://our-server.com?username="+username);//TODO:use the real url
-    		if(obj.get("status code").toString().equals("1")){
+    		if(obj.getInt("status code") == SUCCESS){
     			return new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude")); 
     		} else if(obj.getInt("status code") == NO_SUCH_USER) {
     			
@@ -74,17 +72,15 @@ public class FollowActivity extends MapActivity {
     		} 
     	} catch (RuntimeException e) {
 			
-			CharSequence text = e.getMessage();
-			showToast(text);
+			
 			throw e;
 		} catch (JSONException e) {
-			CharSequence text = "JSON Error";
-			showToast(text);
-			throw e;
+			
+			throw new JSONException("JSON Error");
+			
 		} catch (Exception e) {
-			CharSequence text = "Error";
-			showToast(text);
-			throw e;
+			
+			throw new Exception("Error");;
 		}
 		return null; 
     }
