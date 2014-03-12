@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -88,7 +89,7 @@ public class FollowActivity extends MapActivity {
 		return null; 
     }
     
-    public void stopFollowing() {
+    public void stopFollowing(View view) {
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    startActivity(intent);
 	    finish();

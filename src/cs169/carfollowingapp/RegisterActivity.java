@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,11 +112,11 @@ public class RegisterActivity extends Activity {
                 Log.d("InputStream", e.getLocalizedMessage());
             }
 
-            if (errCode == 1) { //Opens a new page in response to a successful add user.
-                //Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                //intent.putExtra("username", etUsername.getText().toString());
-                //intent.putExtra("password", etPassword.getText().toString());
-                //startActivity(intent);
+            if (errCode == 1 || FrontPageActivity.DEBUG) { //Opens a new page in response to a successful add user.
+                Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
+                intent.putExtra("username", etUsername.getText().toString());
+                intent.putExtra("password", etPassword.getText().toString());
+                startActivity(intent);
                 finish();
             }
         }

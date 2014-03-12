@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 public class FrontPageActivity extends Activity {
     
-    final public static boolean DEBUG = false;
+    final public static boolean DEBUG = true;
     final public static String MY_U_KEY = "myUsername";
     final public static String MY_P_KEY = "myPassword";
     final public static String U_KEY = "username";
@@ -51,6 +51,12 @@ public class FrontPageActivity extends Activity {
         Intent intent = new Intent(getApplicationContext(), FollowActivity.class);
         intent.putExtra(U_KEY, username);
         startActivity(intent);
+    }
+    
+    public void logout(View view) {
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
     
 

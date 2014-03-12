@@ -27,5 +27,12 @@
         android:layout_height="wrap_content"
         android:onClick="follow"
         android:text="@string/follow" />
+    <Button android:id="@+id/logout_button"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/follow_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="logout"
+        android:text="@string/logout" />
 
 </RelativeLayout>

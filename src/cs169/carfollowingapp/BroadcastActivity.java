@@ -6,12 +6,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import android.location.Location;
 
 public class BroadcastActivity extends MapActivity {
     
@@ -100,7 +101,7 @@ public class BroadcastActivity extends MapActivity {
         return true;
     }
     
-    public void stopBroadcasting() {
+    public void stopBroadcasting(View view) {
         
         if (FrontPageActivity.DEBUG) {
             Intent intent = new Intent(this, FrontPageActivity.class);

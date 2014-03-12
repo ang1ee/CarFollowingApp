@@ -120,15 +120,11 @@ public class LoginActivity extends Activity {
             }
 
             if (errCode == 1) { //Opens a new page in response to a successful log in/add user.
-                //Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                //intent.putExtra("username", etUsername.getText().toString());
-                //intent.putExtra("password", etPassword.getText().toString());
-                //startActivity(intent);
-                Context context = getApplicationContext();
-                CharSequence text = "Login successful";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast.makeText(context, text, duration).show();
+                Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
+                intent.putExtra("username", etUsername.getText().toString());
+                intent.putExtra("password", etPassword.getText().toString());
+                startActivity(intent);
+                finish();
             }
         }
     }
