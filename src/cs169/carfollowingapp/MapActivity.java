@@ -19,7 +19,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapActivity extends FragmentActivity {
 
     protected GoogleMap map;
-      
+    /* Chris: I moved this from BradcastActivity to here since handleError
+       needs these variables */
+    protected String myUsername;
+    protected String myPassword;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +67,8 @@ public class MapActivity extends FragmentActivity {
 	protected void handleError(CharSequence text) {
 	    showToast(text);
 	    Intent intent = new Intent(this, FrontPageActivity.class);
+	    intent.putExtra(FrontPageActivity.MY_U_KEY, myUsername);
+	    intent.putExtra(FrontPageActivity.MY_P_KEY, myPassword);
         startActivity(intent);
         finish();
 	}

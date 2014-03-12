@@ -22,8 +22,6 @@ public class BroadcastActivity extends MapActivity {
     protected static final int MALFORMED_LOCATION = -3;
     
 	// if it doesn't go through the try statement will not having a default be a problem?
-    private String username;
-    private String password;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +47,12 @@ public class BroadcastActivity extends MapActivity {
 		try {
 		    JSONObject postData = new JSONObject();
 		    Intent intent = getIntent();
-		    String username = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
-		    String password = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
+		    String myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
+		    String myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
 		    String latitude = Double.toString(currentLocation.getLatitude());
 		    String longitude = Double.toString(currentLocation.getLongitude());
-		    postData.put("username", username);
-		    postData.put("password", password);
+		    postData.put("username", myUsername);
+		    postData.put("password", myPassword);
 		    postData.put("latitude", latitude);
 		    postData.put("longitude", longitude);
 		    
@@ -111,8 +109,8 @@ public class BroadcastActivity extends MapActivity {
         
     	try {
     	    JSONObject postData = new JSONObject();
-    	    postData.put("username", username);
-    	    postData.put("password", password);
+    	    postData.put("username", myUsername);
+    	    postData.put("password", myPassword);
     	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/stop_broadcast", postData);
     	    int statusCode = obj.getInt("status code");
     	    if (statusCode != SUCCESS) {
@@ -130,6 +128,8 @@ public class BroadcastActivity extends MapActivity {
 	    	handleError(text);
 	    }
 	    Intent intent = new Intent(this, FrontPageActivity.class);
+	    intent.putExtra(FrontPageActivity.MY_U_KEY, myUsername);
+	    intent.putExtra(FrontPageActivity.MY_P_KEY, myPassword);
 	    startActivity(intent);
 	    finish();
 	}
