@@ -28,8 +28,6 @@ public class BroadcastActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
-        final Location currentLocation = new Location("Saratoga");
-        //final Location currentLocation = this.map.getMyLocation();
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         //this.map.setMyLocationEnabled(true);
 
@@ -44,6 +42,8 @@ public class BroadcastActivity extends MapActivity {
             this.plot(coords);
             return;
         }
+        
+        final Location currentLocation = this.map.getMyLocation();
         
 		try {
 		    JSONObject postData = new JSONObject();
