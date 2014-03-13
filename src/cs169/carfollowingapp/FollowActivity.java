@@ -25,6 +25,8 @@ public class FollowActivity extends MapActivity {
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
     protected static final int USER_NOT_BROADCASTING = -2;
+    protected static final int JSON_EXCEPTION = -3;
+    protected static final int CONNECTION_ERROR = -4;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,29 +57,38 @@ public class FollowActivity extends MapActivity {
         return true;
     }
     
-    private class HttpAsyncTask extends AsyncTask<String, Void, JSONObject> {
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override
-        protected JSONObject doInBackground(String... urls) {
+        protected String doInBackground(String... urls) {
 
         		JSONObject postData = new JSONObject();
         		try {
 					postData.put("username", username);
 					JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/follow", postData);
-					return obj;
+					return obj.toString();
         		} catch (JSONException e) {
-					handleError(e.getMessage());
+        			return "JSON_EXCEPTION";
 				} catch (RuntimeException e) {
-					handleError(e.getMessage());
+					return "RUNTIME_EXCEPTION";
+				} catch (Exception e) {
+					return "ERROR";
 				}
-        		return null;
+        		
         	
         }
         @Override
-        protected void onPostExecute(JSONObject result) {
+        protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
             JSONObject fin;
             try {
-                fin = result;
+            	if (result == "JSON_EXCEPTION") {
+            		handleError("JSON Error");
+            	} else if (result == "RUNTIME_EXCEPTION") {
+            		handleError("Connection Error");
+            	} else if (result == "ERROR") {
+            		handleError("Error");
+            	}
+                fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:

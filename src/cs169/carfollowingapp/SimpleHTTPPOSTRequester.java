@@ -52,7 +52,7 @@ public class SimpleHTTPPOSTRequester {
 			return jsonResult;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("I should not see this.");
+			throw new RuntimeException("Connection Error.");
 		}
 		
 	}
