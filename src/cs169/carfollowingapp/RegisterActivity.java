@@ -31,7 +31,7 @@ public class RegisterActivity extends Activity {
     Button btnRegister;
 
     //Destination addresses for the login and add location of the server
-    String registerUrl = "http://192.168.188.4:3000/api/create_user";
+    String registerUrl = Constants.BASE_SERVER_URL + "api/create_user";
 
     //the errCode and count returned in the JSON response by the database.
     int errCode;

@@ -36,7 +36,7 @@ public class LoginActivity extends Activity {
     Button btnLogin, btnRegister;
 
     //Destination addresses for the login and add location of the server
-    String loginUrl = "http://192.168.188.4:3000/api/login";
+    String loginUrl = Constants.BASE_SERVER_URL + "api/login";
 
     //the errCode and count returned in the JSON response by the database.
     int errCode;
