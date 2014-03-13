@@ -7,7 +7,9 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -42,54 +44,7 @@ public class BroadcastActivity extends MapActivity {
             return;
         }
         
-        final Location currentLocation = this.map.getMyLocation();
-        
-		try {
-		    JSONObject postData = new JSONObject();
-		    Intent intent = getIntent();
-		    String myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
-		    String myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
-		    String latitude = Double.toString(currentLocation.getLatitude());
-		    String longitude = Double.toString(currentLocation.getLongitude());
-		    postData.put("username", myUsername);
-		    postData.put("password", myPassword);
-		    postData.put("latitude", latitude);
-		    postData.put("longitude", longitude);
-		    
-
-		    JSONObject obj = SimpleHTTPPOSTRequester
-		    		.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData); 
-		    
-		    int statusCode = obj.getInt("status code");
-		    if (statusCode == SUCCESS) {
-		        LatLng location = new LatLng(
-                        Double.valueOf(latitude), 
-                        Double.valueOf(longitude)
-                );
-                
-                ArrayList<LatLng> coords = new ArrayList<LatLng>();
-                coords.add(location);
-                this.plot(coords);
-		    } else if (statusCode == NO_SUCH_USER) {
-	    		CharSequence text = "No such user!";
-	    		handleError(text);
-		    } else if (statusCode == INCORRECT_PASSWORD) {
-	    		CharSequence text = "Incorrect password!";
-	    		handleError(text);
-		    } else if (statusCode == MALFORMED_LOCATION) {
-	    		CharSequence text = "malformed location!";
-	    		handleError(text);
-		    }
-	    } catch (RuntimeException e) {
-		    CharSequence text = "Connection Error";
-		    handleError(text);
-		} catch (JSONException e) {
-		    CharSequence text = "JSON Error";
-		    handleError(text);
-		} catch (Exception e) {
-		    CharSequence text = "Error";
-		    handleError(text);
-		}
+        new HttpBroadcastAsyncTask().execute(this);
     }
 
     @Override
@@ -133,5 +88,96 @@ public class BroadcastActivity extends MapActivity {
 	    startActivity(intent);
 	    finish();
 	}
+    
+    /* Finds the current location of the application user and updates
+     * the database.
+     */
+    private class HttpBroadcastAsyncTask extends AsyncTask<BroadcastActivity, Void, JSONObject> {
+    	
+    	@Override
+        protected JSONObject doInBackground(BroadcastActivity... broadcastActivities) {
+        	BroadcastActivity broadcastActivity = broadcastActivities[0];
+        	
+        	Location currentLocation = null;
+            try {
+            	currentLocation = broadcastActivity.map.getMyLocation();
+            } catch (IllegalStateException e) {
+            	CharSequence text = "Cannot obtain current location!";
+            	handleError(text);
+            }
+        	
+            String latitude = Double.toString(currentLocation.getLatitude());
+    		String longitude = Double.toString(currentLocation.getLongitude());
+    		
+    		LatLng location = new LatLng(
+                    Double.valueOf(latitude), 
+                    Double.valueOf(longitude)
+            );
+            
+            ArrayList<LatLng> coords = new ArrayList<LatLng>();
+            coords.add(location);
+            broadcastActivity.plot(coords);
+            
+        	try {
+        		JSONObject postData = new JSONObject();
+        		Intent intent = getIntent();
+        		String myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
+        		String myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
+        		latitude = Double.toString(currentLocation.getLatitude());
+        		longitude = Double.toString(currentLocation.getLongitude());
+        		postData.put("username", myUsername);
+        		postData.put("password", myPassword);
+        		postData.put("latitude", latitude);
+        		postData.put("longitude", longitude);
+        		JSONObject obj = SimpleHTTPPOSTRequester
+        				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
+        		return obj;
+        	} catch (RuntimeException e) {
+    		    CharSequence text = "Connection Error";
+    		    handleError(text);
+    		} catch (JSONException e) {
+    		    CharSequence text = "JSON Error";
+    		    handleError(text);
+    		} catch (Exception e) {
+    		    CharSequence text = "Error";
+    		    handleError(text);
+    		}
+        	return null;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject result) {
+        	if (result == null) {
+        		CharSequence text = "Unable to update database with current location";
+    		    handleError(text);
+        	}
+        	
+        	try {
+        		int statusCode = result.getInt("status code");
+        		if (statusCode == SUCCESS) {
+    		        return;
+    		    } else if (statusCode == NO_SUCH_USER) {
+    	    		CharSequence text = "No such user!";
+    	    		handleError(text);
+    		    } else if (statusCode == INCORRECT_PASSWORD) {
+    	    		CharSequence text = "Incorrect password!";
+    	    		handleError(text);
+    		    } else if (statusCode == MALFORMED_LOCATION) {
+    	    		CharSequence text = "malformed location!";
+    	    		handleError(text);
+    		    }
+        	} catch (RuntimeException e) {
+    		    CharSequence text = "Connection Error";
+    		    handleError(text);
+    		} catch (JSONException e) {
+    		    CharSequence text = "JSON Error";
+    		    handleError(text);
+    		} catch (Exception e) {
+    		    CharSequence text = "Error";
+    		    handleError(text);
+    		}
+        	
+        }
+    }
     
 }
