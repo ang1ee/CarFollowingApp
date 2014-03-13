@@ -56,6 +56,7 @@ public class BroadcastActivity extends MapActivity {
         if (currentLocation == null) {
         	CharSequence text = "Cannot get current location";
 		    handleError(text);
+		    return;
         }
         
         LatLng location = new LatLng(
@@ -94,6 +95,7 @@ public class BroadcastActivity extends MapActivity {
     	    if (statusCode != SUCCESS) {
         		CharSequence text = "Incorrect error code was returned";
         		handleError(text);
+        		return;
     	    }
 	    } catch (RuntimeException e) {
 	    	CharSequence text = "Connection Error";
@@ -161,6 +163,7 @@ public class BroadcastActivity extends MapActivity {
         	if (result == null) {
         		CharSequence text = "Unable to update database with current location";
     		    handleError(text);
+    		    return;
         	} else if (result == CANNOT_FIND_CURR_LOCATION) {
         		CharSequence text = "No such user!";
     			handleError(text);
@@ -187,12 +190,15 @@ public class BroadcastActivity extends MapActivity {
     		    } else if (statusCode == NO_SUCH_USER) {
     	    		CharSequence text = "No such user!";
     	    		handleError(text);
+    	    		return;
     		    } else if (statusCode == INCORRECT_PASSWORD) {
     	    		CharSequence text = "Incorrect password!";
     	    		handleError(text);
+    	    		return;
     		    } else if (statusCode == MALFORMED_LOCATION) {
     	    		CharSequence text = "malformed location!";
     	    		handleError(text);
+    	    		return;
     		    }
         	} catch (RuntimeException e) {
     		    CharSequence text = "Connection Error";
