@@ -30,7 +30,7 @@ public class BroadcastActivity extends MapActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-        //this.map.setMyLocationEnabled(true);
+        this.map.setMyLocationEnabled(true);
 
         if (Constants.DEBUG) {
             LatLng location = new LatLng(
@@ -49,7 +49,12 @@ public class BroadcastActivity extends MapActivity {
         try {
         	currentLocation = this.map.getMyLocation();
         } catch (IllegalStateException e) {
-        	CharSequence text = "Unable to update database with current location";
+        	CharSequence text = "my-location layer not enabled";
+		    handleError(text);
+        }
+        
+        if (currentLocation == null) {
+        	CharSequence text = "Cannot get current location";
 		    handleError(text);
         }
         
