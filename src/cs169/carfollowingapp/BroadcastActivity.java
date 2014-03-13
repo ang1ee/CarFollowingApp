@@ -58,7 +58,6 @@ public class BroadcastActivity extends MapActivity {
 		    handleError(text);
         }
         
-        /*
         LatLng location = new LatLng(
                 currentLocation.getLatitude(), 
                 currentLocation.getLongitude()
@@ -67,7 +66,6 @@ public class BroadcastActivity extends MapActivity {
         ArrayList<LatLng> coords = new ArrayList<LatLng>();
         coords.add(location);
         plot(coords);
-        */
         
         new HttpBroadcastAsyncTask().execute(currentLocation);
     }
