@@ -44,7 +44,25 @@ public class BroadcastActivity extends MapActivity {
             return;
         }
         
-        new HttpBroadcastAsyncTask().execute(this);
+        Location currentLocation = null;
+
+        try {
+        	currentLocation = this.map.getMyLocation();
+        } catch (IllegalStateException e) {
+        	CharSequence text = "Unable to update database with current location";
+		    handleError(text);
+        }
+        
+        LatLng location = new LatLng(
+                currentLocation.getLatitude(), 
+                currentLocation.getLongitude()
+        );
+        
+        ArrayList<LatLng> coords = new ArrayList<LatLng>();
+        coords.add(location);
+        plot(coords);
+        
+        new HttpBroadcastAsyncTask().execute(currentLocation);
     }
 
     @Override
@@ -92,36 +110,24 @@ public class BroadcastActivity extends MapActivity {
     /* Finds the current location of the application user and updates
      * the database.
      */
-    private class HttpBroadcastAsyncTask extends AsyncTask<BroadcastActivity, Void, String> {
+    private class HttpBroadcastAsyncTask extends AsyncTask<Location, Void, String> {
     	static final String CANNOT_FIND_CURR_LOCATION = "Cannot get current location";
     	static final String CONNECTION_ERROR = "Connection Error";
     	static final String JSON_ERROR = "JSON Error";
     	static final String ERROR = "Error";
     	
+    	private Double latitude;
+    	private Double longitude;
+    	
     	@Override
-        protected String doInBackground(BroadcastActivity... broadcastActivities) {
-        	BroadcastActivity broadcastActivity = broadcastActivities[0];
+        protected String doInBackground(Location... locations) {
+        	Location currentLocation = locations[0];
         	
         	JSONObject postData = new JSONObject();
         	
-        	Location currentLocation = null;
-            try {
-            	currentLocation = broadcastActivity.map.getMyLocation();
-            } catch (IllegalStateException e) {
-            	return CANNOT_FIND_CURR_LOCATION;
-            }
-        	
+     
             String latitude = Double.toString(currentLocation.getLatitude());
     		String longitude = Double.toString(currentLocation.getLongitude());
-    		
-    		LatLng location = new LatLng(
-                    Double.valueOf(latitude), 
-                    Double.valueOf(longitude)
-            );
-            
-            ArrayList<LatLng> coords = new ArrayList<LatLng>();
-            coords.add(location);
-            broadcastActivity.plot(coords);
             
         	try {
         		Intent intent = getIntent();
