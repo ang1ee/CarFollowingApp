@@ -92,18 +92,23 @@ public class BroadcastActivity extends MapActivity {
     /* Finds the current location of the application user and updates
      * the database.
      */
-    private class HttpBroadcastAsyncTask extends AsyncTask<BroadcastActivity, Void, JSONObject> {
+    private class HttpBroadcastAsyncTask extends AsyncTask<BroadcastActivity, Void, String> {
+    	static final String CANNOT_FIND_CURR_LOCATION = "Cannot get current location";
+    	static final String CONNECTION_ERROR = "Connection Error";
+    	static final String JSON_ERROR = "JSON Error";
+    	static final String ERROR = "Error";
     	
     	@Override
-        protected JSONObject doInBackground(BroadcastActivity... broadcastActivities) {
+        protected String doInBackground(BroadcastActivity... broadcastActivities) {
         	BroadcastActivity broadcastActivity = broadcastActivities[0];
+        	
+        	JSONObject postData = new JSONObject();
         	
         	Location currentLocation = null;
             try {
             	currentLocation = broadcastActivity.map.getMyLocation();
             } catch (IllegalStateException e) {
-            	CharSequence text = "Cannot obtain current location!";
-            	handleError(text);
+            	return CANNOT_FIND_CURR_LOCATION;
             }
         	
             String latitude = Double.toString(currentLocation.getLatitude());
@@ -119,7 +124,6 @@ public class BroadcastActivity extends MapActivity {
             broadcastActivity.plot(coords);
             
         	try {
-        		JSONObject postData = new JSONObject();
         		Intent intent = getIntent();
         		String myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
         		String myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
@@ -131,29 +135,42 @@ public class BroadcastActivity extends MapActivity {
         		postData.put("longitude", longitude);
         		JSONObject obj = SimpleHTTPPOSTRequester
         				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
-        		return obj;
+        		return obj.toString();
         	} catch (RuntimeException e) {
-    		    CharSequence text = "Connection Error";
-    		    handleError(text);
+    		    return CONNECTION_ERROR;
     		} catch (JSONException e) {
-    		    CharSequence text = "JSON Error";
-    		    handleError(text);
+    		    return JSON_ERROR;
     		} catch (Exception e) {
-    		    CharSequence text = "Error";
-    		    handleError(text);
+    		    return ERROR;
     		}
-        	return null;
         }
 
         @Override
-        protected void onPostExecute(JSONObject result) {
+        protected void onPostExecute(String result) {
         	if (result == null) {
         		CharSequence text = "Unable to update database with current location";
     		    handleError(text);
+        	} else if (result == CANNOT_FIND_CURR_LOCATION) {
+        		CharSequence text = "No such user!";
+    			handleError(text);
+    			return;
+        	} else if (result == CONNECTION_ERROR) {
+        		CharSequence text = "Connection Error";
+    			handleError(text);
+    			return;
+        	} else if (result == JSON_ERROR) {
+        		CharSequence text = "JSON Error";
+    			handleError(text);
+    			return;
+        	} else if (result == ERROR) {
+        		CharSequence text = "Error";
+    			handleError(text);
+    			return;
         	}
         	
         	try {
-        		int statusCode = result.getInt("status code");
+        		JSONObject jsonResult = new JSONObject(result);
+        		int statusCode = jsonResult.getInt("status code");
         		if (statusCode == SUCCESS) {
     		        return;
     		    } else if (statusCode == NO_SUCH_USER) {
