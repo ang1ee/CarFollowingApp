@@ -30,7 +30,7 @@ public class BroadcastActivity extends MapActivity {
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         //this.map.setMyLocationEnabled(true);
 
-        if (FrontPageActivity.DEBUG) {
+        if (Constants.DEBUG) {
             LatLng location = new LatLng(
                     Double.valueOf(90), 
                     Double.valueOf(90)
@@ -56,9 +56,9 @@ public class BroadcastActivity extends MapActivity {
 		    postData.put("latitude", latitude);
 		    postData.put("longitude", longitude);
 		    
-		    /*TODO: Real url*/
+
 		    JSONObject obj = SimpleHTTPPOSTRequester
-		    		.makeHTTPPOSTRequest("base_url/api/broadcast", postData); 
+		    		.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData); 
 		    
 		    int statusCode = obj.getInt("status code");
 		    if (statusCode == SUCCESS) {
@@ -101,7 +101,7 @@ public class BroadcastActivity extends MapActivity {
     
     public void stopBroadcasting(View view) {
         
-        if (FrontPageActivity.DEBUG) {
+        if (Constants.DEBUG) {
             Intent intent = new Intent(this, FrontPageActivity.class);
             startActivity(intent);
             finish();
@@ -111,7 +111,7 @@ public class BroadcastActivity extends MapActivity {
     	    JSONObject postData = new JSONObject();
     	    postData.put("username", myUsername);
     	    postData.put("password", myPassword);
-    	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest("base_url/api/stop_broadcast", postData);
+    	    JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
     	    int statusCode = obj.getInt("status code");
     	    if (statusCode != SUCCESS) {
         		CharSequence text = "Incorrect error code was returned";

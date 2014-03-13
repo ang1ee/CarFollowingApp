@@ -112,7 +112,7 @@ public class RegisterActivity extends Activity {
                 Log.d("InputStream", e.getLocalizedMessage());
             }
 
-            if (errCode == 1 || FrontPageActivity.DEBUG) { //Opens a new page in response to a successful add user.
+            if (errCode == 1 || Constants.DEBUG) { //Opens a new page in response to a successful add user.
                 Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
                 intent.putExtra("username", etUsername.getText().toString());
                 intent.putExtra("password", etPassword.getText().toString());

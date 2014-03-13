@@ -25,7 +25,7 @@ public class FollowActivity extends MapActivity {
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         this.map.setMyLocationEnabled(true);
 
-        if (FrontPageActivity.DEBUG) {
+        if (Constants.DEBUG) {
             LatLng location = new LatLng(Double.valueOf(90), Double.valueOf(90));
             ArrayList<LatLng> coords = new ArrayList<LatLng>();
             coords.add(location);
@@ -60,7 +60,9 @@ public class FollowActivity extends MapActivity {
      */
     public LatLng getLocation(String username) throws Exception {
     	try { 
-    		JSONObject obj = SimpleHTTPGETRequester.makeHTTPGETRequest("http://our-server.com?username="+username);//TODO:use the real url
+    		JSONObject postData = new JSONObject();
+    		postData.put("username", username);
+    		JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/follow", postData);
     		if(obj.getInt("status code") == SUCCESS){
     			return new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude")); 
     		} else if(obj.getInt("status code") == NO_SUCH_USER) {
@@ -80,7 +82,7 @@ public class FollowActivity extends MapActivity {
 			
 		} catch (Exception e) {
 			
-			throw new Exception("Error");;
+			throw new Exception("Error");
 		}
 		return null; 
     }

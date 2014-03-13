@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 public class FrontPageActivity extends Activity {
     
-    final public static boolean DEBUG = true;
+
     final public static String MY_U_KEY = "myUsername";
     final public static String MY_P_KEY = "myPassword";
     final public static String U_KEY = "username";
@@ -37,7 +37,7 @@ public class FrontPageActivity extends Activity {
     public void broadcast(View view) {
         // Get username and password from Login.
         Intent intent = new Intent(getApplicationContext(), BroadcastActivity.class);
-        if (!DEBUG) {
+        if (!Constants.DEBUG) {
             intent.putExtra(MY_U_KEY, myUsername);
             intent.putExtra(MY_P_KEY, myPassword);
         }
