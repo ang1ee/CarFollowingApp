@@ -15,6 +15,8 @@ public abstract class HTTPPOSTAsyncTask extends AsyncTask<JSONObject, Void, Stri
     protected String doInBackground(JSONObject... jsonObjects) {
 		JSONObject postData = jsonObjects[0];
 		String actionURL = null;
+		String postDataString = postData.toString();
+		
 		try {
 			actionURL = postData.getString(Constants.ACTION_URL);
 		} catch (JSONException e) {
