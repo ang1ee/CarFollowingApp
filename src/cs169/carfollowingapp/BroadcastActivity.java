@@ -112,7 +112,25 @@ public class BroadcastActivity extends MapActivity {
         return true;
     }
     
+    @Override
+    public void onPause() {
+        // TODO: in future iterations, pause any ongoing broadcast updates
+        super.onPause();
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Before this activity dies, tell the server 
+        // to stop broadcasting will that take too much time?
+        stopBroadcasting();
+    }
+    
     public void stopBroadcasting(View view) {
+        stopBroadcasting();
+    }
+    
+    public void stopBroadcasting() {
         
         // To test UI, just navigate user back to front page
         if (Constants.DEBUG) {
