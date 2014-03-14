@@ -33,6 +33,10 @@ public class BroadcastActivity extends MapActivity {
         setContentView(R.layout.activity_broadcast);
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         this.map.setMyLocationEnabled(true);
+        
+        Intent intent = getIntent();
+        myUsername = intent.getStringExtra(Constants.MY_U_KEY);
+        myPassword = intent.getStringExtra(Constants.MY_P_KEY);
 
         if (Constants.DEBUG) {
             LatLng location = new LatLng(
