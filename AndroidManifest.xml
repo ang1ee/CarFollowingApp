@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- API Keys: 
+angeline: AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U
+david: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
+-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cs169.carfollowingapp"
     android:versionCode="1"
@@ -36,7 +42,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U" />
+            android:value="AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA" />
 
         <activity
             android:name="cs169.carfollowingapp.FollowActivity"
