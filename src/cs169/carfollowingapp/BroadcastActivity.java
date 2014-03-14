@@ -74,15 +74,13 @@ public class BroadcastActivity extends MapActivity {
     	try {
     		String myUsername = intent.getStringExtra(Constants.MY_U_KEY);
     		String myPassword = intent.getStringExtra(Constants.MY_P_KEY);
-    		Float latitudeFloat = new Float(currentLocation.getLatitude());
-    		Float longitudeFloat = new Float(currentLocation.getLongitude());
-    		String latitude = latitudeFloat.toString();
-    		String longitude = longitudeFloat.toString();
+    		String latitude = Double.toString(currentLocation.getLatitude());
+    		String longitude = Double.toString(currentLocation.getLongitude());
     		postData.put("username", myUsername);
     		postData.put("password", myPassword);
     		postData.put("latitude", latitude);
     		postData.put("longitude", longitude);
-    		postData.put(Constants.ACTION_URL, "api/stop_broadcast");
+    		postData.put(Constants.ACTION_URL, "api/broadcast");
     		/*
     		JSONObject obj = SimpleHTTPPOSTRequester
     				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
