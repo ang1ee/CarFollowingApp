@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,42 +24,29 @@ public class BroadcastActivity extends MapActivity {
     protected static final int INCORRECT_PASSWORD = -2;
     protected static final int MALFORMED_LOCATION = -3;
     
-	// if it doesn't go through the try statement will not having a default be a problem?
-    
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
-        this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.broadcast_map)).getMap();
+        this.map = ((SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.broadcast_map)).getMap();
         this.map.setMyLocationEnabled(true);
         
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
 
+        // If running on emulator, hardcode the location to test UI
         if (Constants.DEBUG) {
-            LatLng location = new LatLng(
-                    Double.valueOf(90), 
-                    Double.valueOf(90)
-            );
+            LatLng location = new LatLng(90, 90);
             
             ArrayList<LatLng> coords = new ArrayList<LatLng>();
             coords.add(location);
             this.plot(coords);
             return;
         }
-/*        
-        Location currentLocation = null;
-
-        try {
-        	currentLocation = this.map.getMyLocation();
-        } catch (IllegalStateException e) {
-        	CharSequence text = "my-location layer not enabled";
-		    handleError(text);
-        }
- */       
-
         
+        // Getting the location of user
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String provider = service.getBestProvider(criteria, false);
@@ -72,20 +58,17 @@ public class BroadcastActivity extends MapActivity {
 		    return;
         }
         
-        LatLng userLocation = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
-/*        
-        LatLng location = new LatLng(
-                currentLocation.getLatitude(), 
+        // Plot user location
+        LatLng userLocation = new LatLng(
+                currentLocation.getLatitude(),
                 currentLocation.getLongitude()
         );
- */       
         ArrayList<LatLng> coords = new ArrayList<LatLng>();
         coords.add(userLocation);
         plot(coords);
         
+        // Preparing information to store in database
         JSONObject postData = new JSONObject();
-    	
-        
         String latitude = Double.toString(currentLocation.getLatitude());
 		String longitude = Double.toString(currentLocation.getLongitude());
         
@@ -98,10 +81,7 @@ public class BroadcastActivity extends MapActivity {
     		postData.put("password", myPassword);
     		postData.put("latitude", latitude);
     		postData.put("longitude", longitude);
-    		Log.e("=========username==========", "" + myUsername);
-    		Log.e("=========password==========", "" + myPassword);
-    		Log.e("=========latitude==========", "" + latitude);
-    		Log.e("=========longitude=========", "" + longitude);
+    		postData.put(Constants.ACTION_URL, "api/broadcast");
     		/*
     		JSONObject obj = SimpleHTTPPOSTRequester
     				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
@@ -145,16 +125,12 @@ public class BroadcastActivity extends MapActivity {
     	try {
     	    postData.put("username", myUsername);
     	    postData.put("password", myPassword);
-	    } catch (RuntimeException e) {
-	    	CharSequence text = "Connection Error";
-	    	handleError(text);
+    	    postData.put(Constants.ACTION_URL, "api/stop_broadcast");
 	    } catch (JSONException e) {
 	    	CharSequence text = "JSON Error";
 	    	handleError(text);
-	    } catch (Exception e) {
-	    	CharSequence text = "Error";
-	    	handleError(text);
 	    }
+    	
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    intent.putExtra(Constants.MY_U_KEY, myUsername);
 	    intent.putExtra(Constants.MY_P_KEY, myPassword);
@@ -169,7 +145,6 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HTTPPOSTBroadcastAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
     	
         @Override
         protected void onPostExecute(String result) {
@@ -180,6 +155,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -277,7 +254,6 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HTTPPOSTStopBroadcastingAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
 
         @Override
         protected void onPostExecute(String result) {
@@ -288,6 +264,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -305,9 +283,9 @@ public class BroadcastActivity extends MapActivity {
         }
         
     }
-    
+ 
+    /*
     private class HTTPPOSTFollowAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
 
         @Override
         protected void onPostExecute(String result) {
@@ -318,6 +296,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -341,7 +321,7 @@ public class BroadcastActivity extends MapActivity {
     		    handleError(text);
         	}
         }
-    	
     }
+    */
     
 }

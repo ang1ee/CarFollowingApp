@@ -1,16 +1,33 @@
 package cs169.carfollowingapp;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 /* Send an HTTP POST request through AsyncTask. */
 public abstract class HTTPPOSTAsyncTask extends AsyncTask<JSONObject, Void, String> {
-
+	static final String CONNECTION_ERROR = "Connection Error";
+	protected static final String JSON_ERROR = "json error";
+	
 	@Override
     protected String doInBackground(JSONObject... jsonObjects) {
 		JSONObject postData = jsonObjects[0];
-		JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
+		String actionURL = null;
+		try {
+			actionURL = postData.getString(Constants.ACTION_URL);
+		} catch (JSONException e) {
+		    Log.e("BroadcastActivity", e.getMessage());
+		    return JSON_ERROR;
+		}
+		
+		JSONObject obj = null;
+		try {
+			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData);
+		} catch (RuntimeException e) {
+			return CONNECTION_ERROR;
+		}
 		return obj.toString();
 		
 		/*
