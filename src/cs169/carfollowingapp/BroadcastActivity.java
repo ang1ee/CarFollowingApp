@@ -79,6 +79,7 @@ public class BroadcastActivity extends MapActivity {
     		postData.put("password", myPassword);
     		postData.put("latitude", latitude);
     		postData.put("longitude", longitude);
+    		postData.put(Constants.ACTION_URL, "api/broadcast");
     		/*
     		JSONObject obj = SimpleHTTPPOSTRequester
     				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
