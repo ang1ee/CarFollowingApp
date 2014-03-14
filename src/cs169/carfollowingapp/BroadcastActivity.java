@@ -98,6 +98,7 @@ public class BroadcastActivity extends MapActivity {
     		postData.put("password", myPassword);
     		postData.put("latitude", latitude);
     		postData.put("longitude", longitude);
+    		postData.put(Constants.ACTION_URL, "api/broadcast");
     		Log.e("=========username==========", "" + myUsername);
     		Log.e("=========password==========", "" + myPassword);
     		Log.e("=========latitude==========", "" + latitude);
@@ -145,16 +146,12 @@ public class BroadcastActivity extends MapActivity {
     	try {
     	    postData.put("username", myUsername);
     	    postData.put("password", myPassword);
-	    } catch (RuntimeException e) {
-	    	CharSequence text = "Connection Error";
-	    	handleError(text);
+    	    postData.put(Constants.ACTION_URL, "api/stop_broadcast");
 	    } catch (JSONException e) {
 	    	CharSequence text = "JSON Error";
 	    	handleError(text);
-	    } catch (Exception e) {
-	    	CharSequence text = "Error";
-	    	handleError(text);
 	    }
+    	
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    intent.putExtra(Constants.MY_U_KEY, myUsername);
 	    intent.putExtra(Constants.MY_P_KEY, myPassword);
@@ -169,7 +166,6 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HTTPPOSTBroadcastAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
     	
         @Override
         protected void onPostExecute(String result) {
@@ -180,6 +176,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -277,7 +275,6 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HTTPPOSTStopBroadcastingAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
 
         @Override
         protected void onPostExecute(String result) {
@@ -288,6 +285,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -305,9 +304,9 @@ public class BroadcastActivity extends MapActivity {
         }
         
     }
-    
+ 
+    /*
     private class HTTPPOSTFollowAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
 
         @Override
         protected void onPostExecute(String result) {
@@ -318,6 +317,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -341,7 +342,7 @@ public class BroadcastActivity extends MapActivity {
     		    handleError(text);
         	}
         }
-    	
     }
+    */
     
 }
