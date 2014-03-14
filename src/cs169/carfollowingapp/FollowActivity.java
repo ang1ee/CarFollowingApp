@@ -156,6 +156,8 @@ public class FollowActivity extends MapActivity {
     */
     public void stopFollowing(View view) {
 	    Intent intent = new Intent(this, FrontPageActivity.class);
+	    intent.putExtra(Constants.MY_U_KEY, myUsername);
+        intent.putExtra(Constants.MY_P_KEY, myPassword);
 	    startActivity(intent);
 	    finish();
 	}
