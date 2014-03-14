@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 
 public class FollowActivity extends MapActivity {
-	private String loginUrl = Constants.BASE_SERVER_URL + "api/login";
+	private String loginUrl = Constants.BASE_SERVER_URL + "api/follow";
 	private int errCode;
 	private ArrayList<LatLng> coords = new ArrayList<LatLng>();
 	private String username;
