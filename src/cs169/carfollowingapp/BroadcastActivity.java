@@ -124,16 +124,12 @@ public class BroadcastActivity extends MapActivity {
     	try {
     	    postData.put("username", myUsername);
     	    postData.put("password", myPassword);
-	    } catch (RuntimeException e) {
-	    	CharSequence text = "Connection Error";
-	    	handleError(text);
+    	    postData.put(Constants.ACTION_URL, "api/stop_broadcast");
 	    } catch (JSONException e) {
 	    	CharSequence text = "JSON Error";
 	    	handleError(text);
-	    } catch (Exception e) {
-	    	CharSequence text = "Error";
-	    	handleError(text);
 	    }
+    	
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    intent.putExtra(Constants.MY_U_KEY, myUsername);
 	    intent.putExtra(Constants.MY_P_KEY, myPassword);
@@ -148,57 +144,7 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HTTPPOSTBroadcastAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
     	
-    	@Override
-        protected String doInBackground(JSONObject... jsonObjects) {
-    		JSONObject postData = jsonObjects[0];
-    		JSONObject obj = null;
-    		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
-    		} catch (RuntimeException e) {
-    	    	return CONNECTION_ERROR;
-    	    } 
-    		return obj.toString();
-    		/*
-        	Location currentLocation = locations[0];
-        	
-        	JSONObject postData = new JSONObject();
-        	
-     
-            String latitude = Double.toString(currentLocation.getLatitude());
-    		String longitude = Double.toString(currentLocation.getLongitude());
-            
-        	try {
-        		Intent intent = getIntent();
-        		String myUsername = intent.getStringExtra(Constants.MY_U_KEY);
-        		String myPassword = intent.getStringExtra(Constants.MY_P_KEY);
-        		latitude = Double.toString(currentLocation.getLatitude());
-        		longitude = Double.toString(currentLocation.getLongitude());
-        		postData.put("username", myUsername);
-        		postData.put("password", myPassword);
-        		postData.put("latitude", latitude);
-        		postData.put("longitude", longitude);
-        		Log.e("=========username==========", "" + myUsername);
-        		Log.e("=========password==========", "" + myPassword);
-        		Log.e("=========latitude==========", "" + latitude);
-        		Log.e("=========longitude=========", "" + longitude);
-        		JSONObject obj = SimpleHTTPPOSTRequester
-        				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
-        		return obj.toString();
-        	} catch (RuntimeException e) {
-        	    Log.e("BroadcastActivity", e.getMessage());
-    		    return CONNECTION_ERROR;
-    		} catch (JSONException e) {
-    		    Log.e("BroadcastActivity", e.getMessage());
-    		    return JSON_ERROR;
-    		} catch (Exception e) {
-    		    Log.e("BroadcastActivity", e.getMessage());
-    		    return ERROR;
-    		}
-    		*/
-        }
-
         @Override
         protected void onPostExecute(String result) {
         	if (result == null) {
@@ -208,6 +154,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -231,7 +179,20 @@ public class BroadcastActivity extends MapActivity {
         	} catch (JSONException e) {
     		    CharSequence text = "JSON Error";
     		    handleError(text);
-    		}	
+        	}
+        	
+        	/*
+        	JSONObject newPostData = new JSONObject();
+            try {
+            	newPostData.put("username", myUsername);
+            } catch (JSONException e) {
+            	Log.e("BroadcastActivity", e.getMessage());
+    		    CharSequence text = "JSON Error for follow request";
+        		handleError(text);
+        		return;
+            }
+            new HTTPPOSTFollowAsyncTask().execute(newPostData);
+            */
         }
         
         /*
@@ -292,19 +253,6 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HTTPPOSTStopBroadcastingAsyncTask extends HTTPPOSTAsyncTask {
-    	static final String CONNECTION_ERROR = "Connection Error";
-    	
-    	@Override
-        protected String doInBackground(JSONObject... jsonObjects) {
-    		JSONObject postData = jsonObjects[0];
-    		JSONObject obj = null;
-    		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
-    		} catch (RuntimeException e) {
-    	    	return CONNECTION_ERROR;
-    	    } 
-    		return obj.toString();
-        }
 
         @Override
         protected void onPostExecute(String result) {
@@ -315,6 +263,8 @@ public class BroadcastActivity extends MapActivity {
         		CharSequence text = "Connection Error";
     			handleError(text);
     			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
         	}
         	
         	try {
@@ -331,6 +281,46 @@ public class BroadcastActivity extends MapActivity {
         	}
         }
         
-    }   
+    }
+ 
+    /*
+    private class HTTPPOSTFollowAsyncTask extends HTTPPOSTAsyncTask {
+
+        @Override
+        protected void onPostExecute(String result) {
+        	if (result == null) {
+        		CharSequence text = "Unable to update database with current location";
+    		    handleError(text);
+        	} else if (result == CONNECTION_ERROR) {
+        		CharSequence text = "Connection Error";
+    			handleError(text);
+    			return;
+        	} else if (result == "JSON_EXCEPTION") {
+        		handleError("JSON Error");
+        	}
+        	
+        	try {
+        		JSONObject jsonResult = new JSONObject(result);
+        		int statusCode = jsonResult.getInt("status code");
+        		if (statusCode == SUCCESS) {
+        			System.out.println(jsonResult.getDouble("latitude"));
+        			System.out.println(jsonResult.getDouble("longitude"));
+        			return;
+        		} else if (statusCode != -1) {
+        			CharSequence text = "No such user for follow";
+        			handleError(text);
+        			return;
+        		} else if (statusCode != -2) {
+        			CharSequence text = "user not broadcasting for follow";
+        			handleError(text);
+        			return;
+        		}
+        	} catch (JSONException e) {
+    		    CharSequence text = "JSON Error";
+    		    handleError(text);
+        	}
+        }
+    }
+    */
     
 }
