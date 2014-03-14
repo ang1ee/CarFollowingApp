@@ -19,9 +19,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class FollowActivity extends MapActivity {
 	private String loginUrl = Constants.BASE_SERVER_URL + "api/login";
-	private String username;
 	private int errCode;
 	private ArrayList<LatLng> coords = new ArrayList<LatLng>();
+	private String username;
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
     protected static final int USER_NOT_BROADCASTING = -2;
@@ -44,6 +44,8 @@ public class FollowActivity extends MapActivity {
         }
         
         Intent intent = getIntent();
+        myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
+        myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
         username = intent.getStringExtra(FrontPageActivity.U_KEY);
 
         new HttpAsyncTask().execute(loginUrl);
