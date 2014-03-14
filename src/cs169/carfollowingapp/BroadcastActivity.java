@@ -31,7 +31,7 @@ public class BroadcastActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
-        this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.broadcast_map)).getMap();
         this.map.setMyLocationEnabled(true);
         
         Intent intent = getIntent();
