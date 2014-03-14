@@ -69,14 +69,12 @@ public class BroadcastActivity extends MapActivity {
         
         // Preparing information to store in database
         JSONObject postData = new JSONObject();
-        String latitude = Double.toString(currentLocation.getLatitude());
-		String longitude = Double.toString(currentLocation.getLongitude());
         
     	try {
     		String myUsername = intent.getStringExtra(Constants.MY_U_KEY);
     		String myPassword = intent.getStringExtra(Constants.MY_P_KEY);
-    		latitude = Double.toString(currentLocation.getLatitude());
-    		longitude = Double.toString(currentLocation.getLongitude());
+    		String latitude = Double.toString(currentLocation.getLatitude());
+    		String longitude = Double.toString(currentLocation.getLongitude());
     		postData.put("username", myUsername);
     		postData.put("password", myPassword);
     		postData.put("latitude", latitude);
@@ -115,11 +113,13 @@ public class BroadcastActivity extends MapActivity {
     
     public void stopBroadcasting(View view) {
         
+        // To test UI, just navigate user back to front page
         if (Constants.DEBUG) {
             Intent intent = new Intent(this, FrontPageActivity.class);
             startActivity(intent);
             finish();
         }
+        
         
         JSONObject postData = new JSONObject();
     	try {
