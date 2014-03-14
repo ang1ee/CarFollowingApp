@@ -39,9 +39,10 @@ public class BroadcastActivity extends MapActivity {
         // If running on emulator, hardcode the location to test UI
         if (Constants.DEBUG) {
             LatLng location = new LatLng(90, 90);
-            
+            LatLng location1 = new LatLng(90, 90);
             ArrayList<LatLng> coords = new ArrayList<LatLng>();
             coords.add(location);
+            coords.add(location1);
             this.plot(coords);
             return;
         }
@@ -73,13 +74,15 @@ public class BroadcastActivity extends MapActivity {
     	try {
     		String myUsername = intent.getStringExtra(Constants.MY_U_KEY);
     		String myPassword = intent.getStringExtra(Constants.MY_P_KEY);
-    		String latitude = Double.toString(currentLocation.getLatitude());
-    		String longitude = Double.toString(currentLocation.getLongitude());
+    		Float latitudeFloat = new Float(currentLocation.getLatitude());
+    		Float longitudeFloat = new Float(currentLocation.getLongitude());
+    		String latitude = latitudeFloat.toString();
+    		String longitude = longitudeFloat.toString();
     		postData.put("username", myUsername);
     		postData.put("password", myPassword);
     		postData.put("latitude", latitude);
     		postData.put("longitude", longitude);
-    		postData.put(Constants.ACTION_URL, "api/broadcast");
+    		postData.put(Constants.ACTION_URL, "api/stop_broadcast");
     		/*
     		JSONObject obj = SimpleHTTPPOSTRequester
     				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
