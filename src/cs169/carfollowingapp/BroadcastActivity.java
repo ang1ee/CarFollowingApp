@@ -6,7 +6,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,7 +32,7 @@ public class BroadcastActivity extends MapActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-        //this.map.setMyLocationEnabled(true);
+        this.map.setMyLocationEnabled(true);
 
         if (Constants.DEBUG) {
             LatLng location = new LatLng(
@@ -43,8 +45,41 @@ public class BroadcastActivity extends MapActivity {
             this.plot(coords);
             return;
         }
+/*        
+        Location currentLocation = null;
+
+        try {
+        	currentLocation = this.map.getMyLocation();
+        } catch (IllegalStateException e) {
+        	CharSequence text = "my-location layer not enabled";
+		    handleError(text);
+        }
+ */       
+
         
-        new HttpBroadcastAsyncTask().execute(this);
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String provider = service.getBestProvider(criteria, false);
+        Location currentLocation = service.getLastKnownLocation(provider);
+        
+        if (currentLocation == null) {
+        	CharSequence text = "Cannot get current location";
+		    handleError(text);
+		    return;
+        }
+        
+        LatLng userLocation = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+/*        
+        LatLng location = new LatLng(
+                currentLocation.getLatitude(), 
+                currentLocation.getLongitude()
+        );
+ */       
+        ArrayList<LatLng> coords = new ArrayList<LatLng>();
+        coords.add(userLocation);
+        plot(coords);
+        
+        new HttpBroadcastAsyncTask().execute(currentLocation);
     }
 
     @Override
@@ -71,6 +106,7 @@ public class BroadcastActivity extends MapActivity {
     	    if (statusCode != SUCCESS) {
         		CharSequence text = "Incorrect error code was returned";
         		handleError(text);
+        		return;
     	    }
 	    } catch (RuntimeException e) {
 	    	CharSequence text = "Connection Error";
@@ -92,34 +128,25 @@ public class BroadcastActivity extends MapActivity {
     /* Finds the current location of the application user and updates
      * the database.
      */
-    private class HttpBroadcastAsyncTask extends AsyncTask<BroadcastActivity, Void, JSONObject> {
+    private class HttpBroadcastAsyncTask extends AsyncTask<Location, Void, String> {
+    	static final String CONNECTION_ERROR = "Connection Error";
+    	static final String JSON_ERROR = "JSON Error";
+    	static final String ERROR = "Error";
+    	
+    	private Double latitude;
+    	private Double longitude;
     	
     	@Override
-        protected JSONObject doInBackground(BroadcastActivity... broadcastActivities) {
-        	BroadcastActivity broadcastActivity = broadcastActivities[0];
+        protected String doInBackground(Location... locations) {
+        	Location currentLocation = locations[0];
         	
-        	Location currentLocation = null;
-            try {
-            	currentLocation = broadcastActivity.map.getMyLocation();
-            } catch (IllegalStateException e) {
-            	CharSequence text = "Cannot obtain current location!";
-            	handleError(text);
-            }
+        	JSONObject postData = new JSONObject();
         	
+     
             String latitude = Double.toString(currentLocation.getLatitude());
     		String longitude = Double.toString(currentLocation.getLongitude());
-    		
-    		LatLng location = new LatLng(
-                    Double.valueOf(latitude), 
-                    Double.valueOf(longitude)
-            );
-            
-            ArrayList<LatLng> coords = new ArrayList<LatLng>();
-            coords.add(location);
-            broadcastActivity.plot(coords);
             
         	try {
-        		JSONObject postData = new JSONObject();
         		Intent intent = getIntent();
         		String myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
         		String myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
@@ -129,42 +156,61 @@ public class BroadcastActivity extends MapActivity {
         		postData.put("password", myPassword);
         		postData.put("latitude", latitude);
         		postData.put("longitude", longitude);
+        		Log.e("=========username==========", "" + myUsername);
+        		Log.e("=========password==========", "" + myPassword);
+        		Log.e("=========latitude==========", "" + latitude);
+        		Log.e("=========longitude=========", "" + longitude);
         		JSONObject obj = SimpleHTTPPOSTRequester
         				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
-        		return obj;
+        		return obj.toString();
         	} catch (RuntimeException e) {
-    		    CharSequence text = "Connection Error";
-    		    handleError(text);
+        	    Log.e("BroadcastActivity", e.getMessage());
+    		    return CONNECTION_ERROR;
     		} catch (JSONException e) {
-    		    CharSequence text = "JSON Error";
-    		    handleError(text);
+    		    Log.e("BroadcastActivity", e.getMessage());
+    		    return JSON_ERROR;
     		} catch (Exception e) {
-    		    CharSequence text = "Error";
-    		    handleError(text);
+    		    Log.e("BroadcastActivity", e.getMessage());
+    		    return ERROR;
     		}
-        	return null;
         }
 
         @Override
-        protected void onPostExecute(JSONObject result) {
+        protected void onPostExecute(String result) {
         	if (result == null) {
         		CharSequence text = "Unable to update database with current location";
     		    handleError(text);
+        	} else if (result == CONNECTION_ERROR) {
+        		CharSequence text = "Connection Error";
+    			handleError(text);
+    			return;
+        	} else if (result == JSON_ERROR) {
+        		CharSequence text = "JSON Error";
+    			handleError(text);
+    			return;
+        	} else if (result == ERROR) {
+        		CharSequence text = "Error";
+    			handleError(text);
+    			return;
         	}
         	
         	try {
-        		int statusCode = result.getInt("status code");
+        		JSONObject jsonResult = new JSONObject(result);
+        		int statusCode = jsonResult.getInt("status code");
         		if (statusCode == SUCCESS) {
     		        return;
     		    } else if (statusCode == NO_SUCH_USER) {
     	    		CharSequence text = "No such user!";
     	    		handleError(text);
+    	    		return;
     		    } else if (statusCode == INCORRECT_PASSWORD) {
     	    		CharSequence text = "Incorrect password!";
     	    		handleError(text);
+    	    		return;
     		    } else if (statusCode == MALFORMED_LOCATION) {
     	    		CharSequence text = "malformed location!";
     	    		handleError(text);
+    	    		return;
     		    }
         	} catch (RuntimeException e) {
     		    CharSequence text = "Connection Error";
