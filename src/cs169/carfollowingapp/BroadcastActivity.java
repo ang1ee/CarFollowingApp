@@ -6,7 +6,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,7 +45,7 @@ public class BroadcastActivity extends MapActivity {
             this.plot(coords);
             return;
         }
-        
+/*        
         Location currentLocation = null;
 
         try {
@@ -52,6 +54,13 @@ public class BroadcastActivity extends MapActivity {
         	CharSequence text = "my-location layer not enabled";
 		    handleError(text);
         }
+ */       
+
+        
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String provider = service.getBestProvider(criteria, false);
+        Location currentLocation = service.getLastKnownLocation(provider);
         
         if (currentLocation == null) {
         	CharSequence text = "Cannot get current location";
@@ -59,13 +68,15 @@ public class BroadcastActivity extends MapActivity {
 		    return;
         }
         
+        LatLng userLocation = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+/*        
         LatLng location = new LatLng(
                 currentLocation.getLatitude(), 
                 currentLocation.getLongitude()
         );
-        
+ */       
         ArrayList<LatLng> coords = new ArrayList<LatLng>();
-        coords.add(location);
+        coords.add(userLocation);
         plot(coords);
         
         new HttpBroadcastAsyncTask().execute(currentLocation);
@@ -118,7 +129,6 @@ public class BroadcastActivity extends MapActivity {
      * the database.
      */
     private class HttpBroadcastAsyncTask extends AsyncTask<Location, Void, String> {
-    	static final String CANNOT_FIND_CURR_LOCATION = "Cannot get current location";
     	static final String CONNECTION_ERROR = "Connection Error";
     	static final String JSON_ERROR = "JSON Error";
     	static final String ERROR = "Error";
@@ -146,14 +156,21 @@ public class BroadcastActivity extends MapActivity {
         		postData.put("password", myPassword);
         		postData.put("latitude", latitude);
         		postData.put("longitude", longitude);
+        		Log.e("=========username==========", "" + myUsername);
+        		Log.e("=========password==========", "" + myPassword);
+        		Log.e("=========latitude==========", "" + latitude);
+        		Log.e("=========longitude=========", "" + longitude);
         		JSONObject obj = SimpleHTTPPOSTRequester
         				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
         		return obj.toString();
         	} catch (RuntimeException e) {
+        	    Log.e("BroadcastActivity", e.getMessage());
     		    return CONNECTION_ERROR;
     		} catch (JSONException e) {
+    		    Log.e("BroadcastActivity", e.getMessage());
     		    return JSON_ERROR;
     		} catch (Exception e) {
+    		    Log.e("BroadcastActivity", e.getMessage());
     		    return ERROR;
     		}
         }
@@ -163,11 +180,6 @@ public class BroadcastActivity extends MapActivity {
         	if (result == null) {
         		CharSequence text = "Unable to update database with current location";
     		    handleError(text);
-    		    return;
-        	} else if (result == CANNOT_FIND_CURR_LOCATION) {
-        		CharSequence text = "No such user!";
-    			handleError(text);
-    			return;
         	} else if (result == CONNECTION_ERROR) {
         		CharSequence text = "Connection Error";
     			handleError(text);

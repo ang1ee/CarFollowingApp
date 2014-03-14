@@ -50,6 +50,8 @@ public class FrontPageActivity extends Activity {
         
         Intent intent = new Intent(getApplicationContext(), FollowActivity.class);
         intent.putExtra(U_KEY, username);
+        intent.putExtra(MY_U_KEY, myUsername);
+        intent.putExtra(MY_P_KEY, myPassword);
         startActivity(intent);
     }
     
