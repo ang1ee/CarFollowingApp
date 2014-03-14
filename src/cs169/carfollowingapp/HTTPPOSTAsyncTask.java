@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
+/* Send an HTTP POST request through AsyncTask. */
 public abstract class HTTPPOSTAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
 	@Override
