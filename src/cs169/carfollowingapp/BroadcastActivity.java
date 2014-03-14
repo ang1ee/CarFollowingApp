@@ -205,6 +205,7 @@ public class BroadcastActivity extends MapActivity {
     		    handleError(text);
         	}
         	
+        	/*
         	JSONObject newPostData = new JSONObject();
             try {
             	newPostData.put("username", myUsername);
@@ -215,6 +216,7 @@ public class BroadcastActivity extends MapActivity {
         		return;
             }
             new HTTPPOSTFollowAsyncTask().execute(newPostData);
+            */
         }
         
         /*
