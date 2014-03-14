@@ -14,8 +14,9 @@ public abstract class HTTPPOSTAsyncTask extends AsyncTask<JSONObject, Void, Stri
 	@Override
     protected String doInBackground(JSONObject... jsonObjects) {
 		JSONObject postData = jsonObjects[0];
+		String actionURL = null;
 		try {
-			String actionUrl = postData.getString(Constants.ACTION_URL);
+			actionURL = postData.getString(Constants.ACTION_URL);
 		} catch (JSONException e) {
 		    Log.e("BroadcastActivity", e.getMessage());
 		    return JSON_ERROR;
@@ -23,7 +24,7 @@ public abstract class HTTPPOSTAsyncTask extends AsyncTask<JSONObject, Void, Stri
 		
 		JSONObject obj = null;
 		try {
-			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
+			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData);
 		} catch (RuntimeException e) {
 			return CONNECTION_ERROR;
 		}
