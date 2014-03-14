@@ -67,8 +67,8 @@ public class MapActivity extends FragmentActivity {
 	protected void handleError(CharSequence text) {
 	    showToast(text);
 	    Intent intent = new Intent(this, FrontPageActivity.class);
-	    intent.putExtra(FrontPageActivity.MY_U_KEY, myUsername);
-	    intent.putExtra(FrontPageActivity.MY_P_KEY, myPassword);
+	    intent.putExtra(Constants.MY_U_KEY, myUsername);
+	    intent.putExtra(Constants.MY_P_KEY, myPassword);
         startActivity(intent);
         finish();
 	}

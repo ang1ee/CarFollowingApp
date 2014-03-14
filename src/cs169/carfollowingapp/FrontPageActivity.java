@@ -11,9 +11,6 @@ import android.widget.EditText;
 public class FrontPageActivity extends Activity {
     
 
-    final public static String MY_U_KEY = "myUsername";
-    final public static String MY_P_KEY = "myPassword";
-    final public static String U_KEY = "username";
     
     private String myUsername;
     private String myPassword;
@@ -23,8 +20,8 @@ public class FrontPageActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_front_page);
         Intent intent = getIntent();
-        myUsername = intent.getStringExtra(MY_U_KEY);
-        myPassword = intent.getStringExtra(MY_P_KEY);
+        myUsername = intent.getStringExtra(Constants.MY_U_KEY);
+        myPassword = intent.getStringExtra(Constants.MY_P_KEY);
     }
 
     @Override
@@ -38,8 +35,8 @@ public class FrontPageActivity extends Activity {
         // Get username and password from Login.
         Intent intent = new Intent(getApplicationContext(), BroadcastActivity.class);
         if (!Constants.DEBUG) {
-            intent.putExtra(MY_U_KEY, myUsername);
-            intent.putExtra(MY_P_KEY, myPassword);
+            intent.putExtra(Constants.MY_U_KEY, myUsername);
+            intent.putExtra(Constants.MY_P_KEY, myPassword);
         }
         startActivity(intent);
     }
@@ -49,9 +46,9 @@ public class FrontPageActivity extends Activity {
         String username = usernameEditText.getText().toString();
         
         Intent intent = new Intent(getApplicationContext(), FollowActivity.class);
-        intent.putExtra(U_KEY, username);
-        intent.putExtra(MY_U_KEY, myUsername);
-        intent.putExtra(MY_P_KEY, myPassword);
+        intent.putExtra(Constants.U_KEY, username);
+        intent.putExtra(Constants.MY_U_KEY, myUsername);
+        intent.putExtra(Constants.MY_P_KEY, myPassword);
         startActivity(intent);
     }
     

@@ -44,9 +44,9 @@ public class FollowActivity extends MapActivity {
         }
         
         Intent intent = getIntent();
-        myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
-        myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
-        username = intent.getStringExtra(FrontPageActivity.U_KEY);
+        myUsername = intent.getStringExtra(Constants.MY_U_KEY);
+        myPassword = intent.getStringExtra(Constants.MY_P_KEY);
+        username = intent.getStringExtra(Constants.U_KEY);
 
         new HttpAsyncTask().execute(loginUrl);
 

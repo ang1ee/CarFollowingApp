@@ -119,8 +119,8 @@ public class BroadcastActivity extends MapActivity {
 	    	handleError(text);
 	    }
 	    Intent intent = new Intent(this, FrontPageActivity.class);
-	    intent.putExtra(FrontPageActivity.MY_U_KEY, myUsername);
-	    intent.putExtra(FrontPageActivity.MY_P_KEY, myPassword);
+	    intent.putExtra(Constants.MY_U_KEY, myUsername);
+	    intent.putExtra(Constants.MY_P_KEY, myPassword);
 	    startActivity(intent);
 	    finish();
 	}
@@ -132,9 +132,7 @@ public class BroadcastActivity extends MapActivity {
     	static final String CONNECTION_ERROR = "Connection Error";
     	static final String JSON_ERROR = "JSON Error";
     	static final String ERROR = "Error";
-    	
-    	private Double latitude;
-    	private Double longitude;
+
     	
     	@Override
         protected String doInBackground(Location... locations) {
@@ -148,8 +146,8 @@ public class BroadcastActivity extends MapActivity {
             
         	try {
         		Intent intent = getIntent();
-        		String myUsername = intent.getStringExtra(FrontPageActivity.MY_U_KEY);
-        		String myPassword = intent.getStringExtra(FrontPageActivity.MY_P_KEY);
+        		String myUsername = intent.getStringExtra(Constants.MY_U_KEY);
+        		String myPassword = intent.getStringExtra(Constants.MY_P_KEY);
         		latitude = Double.toString(currentLocation.getLatitude());
         		longitude = Double.toString(currentLocation.getLongitude());
         		postData.put("username", myUsername);
