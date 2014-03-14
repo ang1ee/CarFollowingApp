@@ -121,8 +121,8 @@ public class LoginActivity extends Activity {
 
             if (errCode == 1) { //Opens a new page in response to a successful log in/add user.
                 Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                intent.putExtra("username", etUsername.getText().toString());
-                intent.putExtra("password", etPassword.getText().toString());
+                intent.putExtra(FrontPageActivity.MY_U_KEY, etUsername.getText().toString());
+                intent.putExtra(FrontPageActivity.MY_P_KEY, etPassword.getText().toString());
                 startActivity(intent);
                 finish();
             }
