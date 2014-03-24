@@ -1,5 +1,7 @@
 package cs169.carfollowingapp;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.json.JSONException;
@@ -36,22 +38,51 @@ public class BroadcastActivity extends MapActivity {
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
 
-        // If running on emulator, hardcode the location to test UI
-        if (Constants.DEBUG) {
-            LatLng location = new LatLng(90, 90);
-            LatLng location1 = new LatLng(90, 90);
-            ArrayList<LatLng> coords = new ArrayList<LatLng>();
-            coords.add(location);
-            coords.add(location1);
-            this.plot(coords);
-            return;
-        }
-        
         // Getting the location of user
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String provider = service.getBestProvider(criteria, false);
         Location currentLocation = service.getLastKnownLocation(provider);
+        
+        // If running on emulator, hardcode the location to test UI
+        if (Constants.DEBUG) {
+            String mocProvider = "testLocationProvider";
+            // add the fake service if it hasn't been added
+            if (!service.isProviderEnabled(mocProvider)) {
+                service.addTestProvider(mocProvider, false, false, false, false,
+                        true, true, true, 0, 5);
+                service.setTestProviderEnabled(mocProvider, true);
+            }
+            // create a new location (hardcoded coordinates)
+            currentLocation = new Location(provider);
+            currentLocation.setLatitude(37.0);
+            currentLocation.setLongitude(-122.0);
+            currentLocation.setTime(System.currentTimeMillis());
+            currentLocation.setAccuracy(3.0f);
+            
+            // Below is necessary fix for sdk's smaller than 17
+            Method locationJellyBeanFixMethod = null;
+            try {
+                locationJellyBeanFixMethod = Location.class.getMethod("makeComplete");
+                if (locationJellyBeanFixMethod != null) {
+                    locationJellyBeanFixMethod.invoke(currentLocation);
+                 }
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            service.setTestProviderLocation(provider, currentLocation);
+        }
         
         if (currentLocation == null) {
         	CharSequence text = "Cannot get current location";
@@ -72,8 +103,6 @@ public class BroadcastActivity extends MapActivity {
         JSONObject postData = new JSONObject();
         
     	try {
-    		String myUsername = intent.getStringExtra(Constants.MY_U_KEY);
-    		String myPassword = intent.getStringExtra(Constants.MY_P_KEY);
     		String latitude = Double.toString(currentLocation.getLatitude());
     		String longitude = Double.toString(currentLocation.getLongitude());
     		postData.put("username", myUsername);
@@ -81,6 +110,7 @@ public class BroadcastActivity extends MapActivity {
     		postData.put("latitude", latitude);
     		postData.put("longitude", longitude);
     		postData.put(Constants.ACTION_URL, "api/broadcast");
+    		
     		/*
     		JSONObject obj = SimpleHTTPPOSTRequester
     				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
@@ -131,15 +161,6 @@ public class BroadcastActivity extends MapActivity {
     }
     
     public void stopBroadcasting() {
-        
-        // To test UI, just navigate user back to front page
-        if (Constants.DEBUG) {
-            Intent intent = new Intent(this, FrontPageActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        
-        
         JSONObject postData = new JSONObject();
     	try {
     	    postData.put("username", myUsername);

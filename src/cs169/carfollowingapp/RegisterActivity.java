@@ -115,7 +115,7 @@ public class RegisterActivity extends Activity {
             }
 
           //Opens a new page in response to a successful add user.
-            if (errCode == 1 || Constants.DEBUG) { 
+            if (errCode == 1) { 
                 Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
                 intent.putExtra(Constants.MY_U_KEY, etUsername.getText().toString());
                 intent.putExtra(Constants.MY_P_KEY, etPassword.getText().toString());

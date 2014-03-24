@@ -34,10 +34,8 @@ public class FrontPageActivity extends Activity {
     public void broadcast(View view) {
         // Get username and password from Login.
         Intent intent = new Intent(getApplicationContext(), BroadcastActivity.class);
-        if (!Constants.DEBUG) {
-            intent.putExtra(Constants.MY_U_KEY, myUsername);
-            intent.putExtra(Constants.MY_P_KEY, myPassword);
-        }
+        intent.putExtra(Constants.MY_U_KEY, myUsername);
+        intent.putExtra(Constants.MY_P_KEY, myPassword);
         startActivity(intent);
     }
     
