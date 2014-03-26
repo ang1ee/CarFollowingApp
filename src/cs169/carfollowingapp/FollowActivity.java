@@ -153,6 +153,10 @@ public class FollowActivity extends MapActivity {
 	    finish();
 	}
 
+    @Override
+    public void onBackPressed() {
+    }
+
     /*
     private class DisplayCurrentLocation extends AsyncTask<GoogleMap, Integer, Long> {
         protected Long doInBackground(GoogleMap... maps) {

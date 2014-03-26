@@ -141,7 +141,11 @@ public class BroadcastActivity extends MapActivity {
         getMenuInflater().inflate(R.menu.follow, menu);
         return true;
     }
-    
+
+    @Override
+    public void onBackPressed() {
+    }
+
     @Override
     public void onPause() {
         // TODO: in future iterations, pause any ongoing broadcast updates

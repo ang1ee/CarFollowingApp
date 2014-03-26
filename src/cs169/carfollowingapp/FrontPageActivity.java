@@ -37,8 +37,13 @@ public class FrontPageActivity extends Activity {
         intent.putExtra(Constants.MY_U_KEY, myUsername);
         intent.putExtra(Constants.MY_P_KEY, myPassword);
         startActivity(intent);
+        finish();
     }
-    
+
+    @Override
+    public void onBackPressed() {
+    }
+
     public void follow(View view) {
         EditText usernameEditText = (EditText) findViewById(R.id.input_username);
         String username = usernameEditText.getText().toString();
