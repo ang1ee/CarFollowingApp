@@ -59,6 +59,8 @@ public class FollowActivity extends MapActivity {
 
             JSONObject postData = new JSONObject();
             try {
+                postData.put(Constants.MY_U_KEY, myUsername);
+                postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
                 JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
@@ -120,6 +122,8 @@ public class FollowActivity extends MapActivity {
             JSONObject postData = new JSONObject();
             try {
                 //TODO: Adjust JSON parameters to match spec
+                postData.put(Constants.MY_U_KEY, myUsername);
+                postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
                 JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
