@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- API Keys: 
-angeline: AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U
-david: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
--->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cs169.carfollowingapp"
     android:versionCode="1"
@@ -20,6 +14,7 @@ david: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -42,7 +37,7 @@ david: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA" />
+            android:value="AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U" />
 
         <activity
             android:name="cs169.carfollowingapp.FollowActivity"
@@ -75,3 +70,4 @@ david: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
     </application>
 
 </manifest>
+

@@ -1,3 +1,4 @@
+
 package cs169.carfollowingapp;
 
 
@@ -306,3 +307,4 @@ public class FrontPageActivity extends Activity {
     
 
 }
+

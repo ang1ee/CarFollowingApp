@@ -35,21 +35,12 @@ public class FollowActivity extends MapActivity {
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.follow_map)).getMap();
         this.map.setMyLocationEnabled(true);
 
-        if (Constants.DEBUG) {
-            LatLng location = new LatLng(Double.valueOf(90), Double.valueOf(90));
-            
-            coords.add(location);
-            this.plot(coords);
-            return;
-        }
-        
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
         username = intent.getStringExtra(Constants.U_KEY);
 
         new HttpAsyncTask().execute(loginUrl);
-
     }
 
     @Override
@@ -161,6 +152,10 @@ public class FollowActivity extends MapActivity {
 	    startActivity(intent);
 	    finish();
 	}
+
+    @Override
+    public void onBackPressed() {
+    }
 
     /*
     private class DisplayCurrentLocation extends AsyncTask<GoogleMap, Integer, Long> {
