@@ -78,10 +78,6 @@ public class LoginActivity extends Activity {
         });
     }
 
-    @Override
-    public void onBackPressed() {
-    }
-
     //Responsible for sending out the Post request on a different thread.
     //Takes the Username and Password information from the text field
     //to send it out to the server for add or login.

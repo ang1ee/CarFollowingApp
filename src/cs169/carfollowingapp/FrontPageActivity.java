@@ -53,6 +53,7 @@ public class FrontPageActivity extends Activity {
         intent.putExtra(Constants.MY_U_KEY, myUsername);
         intent.putExtra(Constants.MY_P_KEY, myPassword);
         startActivity(intent);
+        finish();
     }
     
     public void logout(View view) {
