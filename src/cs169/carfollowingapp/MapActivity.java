@@ -65,12 +65,21 @@ public class MapActivity extends FragmentActivity {
 	 * -finishes Broadcast/Follow activity
 	 */
 	protected void handleError(CharSequence text) {
+		handleCleanup();
 	    showToast(text);
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    intent.putExtra(Constants.MY_U_KEY, myUsername);
 	    intent.putExtra(Constants.MY_P_KEY, myPassword);
         startActivity(intent);
         finish();
+	}
+	
+	/* Used to handle any additional clean up necessary
+	 * when an error occurs.  Override in subclass to have
+	 * special cleanup for the subclass.
+	 */
+	protected void handleCleanup() {
+		// Implement in subclass
 	}
     
 }

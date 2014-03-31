@@ -16,5 +16,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="logout">Logout</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
 
 </resources>
