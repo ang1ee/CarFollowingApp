@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    
     <string name="app_name">CarFollowingApp</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_follow">FollowActivity</string>
@@ -16,5 +16,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="logout">Logout</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
 
 </resources>
