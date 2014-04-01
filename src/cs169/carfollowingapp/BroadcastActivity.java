@@ -160,7 +160,9 @@ public class BroadcastActivity extends MapActivity {
     
     @Override
     protected void handleCleanup() {
-        BroadcastActivity.currentID++;
+        //BroadcastActivity.currentID++;
+    	broadcastHandler.removeCallbacksAndMessages(null);
+    	followRequestHandler.removeCallbacksAndMessages(null);
     }
         
     /* Finds the current location of the application user and updates
@@ -372,7 +374,7 @@ public class BroadcastActivity extends MapActivity {
         
         @Override
         protected void onPostExecute(Integer result) {
-        	if ((result == GET_LOC_SUCCESS) && (instanceID == BroadcastActivity.currentID)) {
+        	if (result == GET_LOC_SUCCESS) { //&& (instanceID == BroadcastActivity.currentID)) {
         		broadcastHandler.postDelayed(new Runnable() {
                     public void run() {
                     	new HTTPPOSTBroadcastAsyncTask().execute(bActivity);
@@ -558,7 +560,7 @@ public class BroadcastActivity extends MapActivity {
         
         @Override
         protected void onPostExecute(Integer result) {
-        	if ((result == CHECK_FOLLOW_REQS_SUCCESS) && (instanceID == BroadcastActivity.currentID)) {
+        	if (result == CHECK_FOLLOW_REQS_SUCCESS) {// && (instanceID == BroadcastActivity.currentID)) {
         		followRequestHandler.postDelayed(new Runnable() {
                     public void run() {
                     	new HTTPPOSTGetFollowRequestsAsyncTask().execute(bActivity);
