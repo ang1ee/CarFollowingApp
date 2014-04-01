@@ -28,9 +28,10 @@ public class FollowActivity extends MapActivity {
     private int frequency = 5000;
     protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
-    protected static final int USER_NOT_BROADCASTING = -2;
-    protected static final int JSON_EXCEPTION = -3;
-    protected static final int CONNECTION_ERROR = -4;
+    protected static final int INCORRECT_PASSWORD = -2;
+    protected static final int NO_SUCH_BROADCASTER = -3;
+    protected static final int USER_NOT_BROADCASTING = -4;
+    protected static final int ACCESS_NOT_PERMITTED = -5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +98,19 @@ public class FollowActivity extends MapActivity {
                         }, frequency);
                         break;
                     case NO_SUCH_USER:
-                        handleError("User does not exist.");
+                        showToast("User does not exist.");
+                        break;
+                    case INCORRECT_PASSWORD:
+                        showToast("Username and password do not match.");
+                        break;
+                    case NO_SUCH_BROADCASTER:
+                        showToast("Broadcaster does not exist.");
                         break;
                     case USER_NOT_BROADCASTING:
-                        handleError("User is not broadcasting.");
+                        showToast("User is not broadcasting.");
+                        break;
+                    case ACCESS_NOT_PERMITTED:
+                        showToast("No permission to follow user.");
                         break;
                     default:
                         handleError("Unknown errCode.");
@@ -163,6 +173,12 @@ public class FollowActivity extends MapActivity {
                     case NO_SUCH_USER:
                         showToast("User does not exist.");
                         break;
+                    case INCORRECT_PASSWORD:
+                        showToast("Username and password do not match.");
+                        break;
+                    case NO_SUCH_BROADCASTER:
+                        showToast("Broadcaster does not exist.");
+                        break;
                     case USER_NOT_BROADCASTING:
                         showToast("User is not broadcasting.");
                         break;
@@ -183,13 +199,13 @@ public class FollowActivity extends MapActivity {
 
     public void stopFollowing(View view) {
         //TODO: When server allows, uncomment next line, and delete other lines.
-        //new HttpAsyncTask().execute(cancelUrl);
-        Intent intent = new Intent(this, FrontPageActivity.class);
-        intent.putExtra(Constants.MY_U_KEY, myUsername);
-        intent.putExtra(Constants.MY_P_KEY, myPassword);
-        startActivity(intent);
-        handler.removeCallbacks(null);
-        finish();
+        new CancelTask().execute(cancelUrl);
+//        Intent intent = new Intent(this, FrontPageActivity.class);
+//        intent.putExtra(Constants.MY_U_KEY, myUsername);
+//        intent.putExtra(Constants.MY_P_KEY, myPassword);
+//        startActivity(intent);
+//        handler.removeCallbacks(null);
+//        finish();
     }
 
 
