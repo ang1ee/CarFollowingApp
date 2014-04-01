@@ -44,6 +44,10 @@ public class FrontPageActivity extends Activity {
 
     
     @Override
+    public void onBackPressed() {
+    }
+    
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_front_page);
