@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -31,6 +32,10 @@ public class BroadcastActivity extends MapActivity {
     
     private static int currentID = 0;
     private int instanceID;
+    private Handler broadcastHandler = new Handler();
+    //private Runnable broadcastRunnable;
+    //private Runnable followRequestRunnable;
+    private Handler followRequestHandler = new Handler();
     
     /* Used to save currentLocation for AsyncTask. 
      * Maybe should change at some point since seems
@@ -59,8 +64,22 @@ public class BroadcastActivity extends MapActivity {
          * terminate when they see that their ID is not the current ID.
          */
         instanceID = BroadcastActivity.currentID;
+        
+        /*
+        broadcastRunnable = new Runnable() {
+            public void run() {
+            	new HTTPPOSTBroadcastAsyncTask().execute(this);
+            }
+        };
+        
+        followRequestRunnable = new Runnable() {
+            public void run() {
+            	new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
+            }
+        };
+        */
                 
-        //new HTTPPOSTBroadcastAsyncTask().execute(this);
+        new HTTPPOSTBroadcastAsyncTask().execute(this);
         new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
     }
 
@@ -95,21 +114,12 @@ public class BroadcastActivity extends MapActivity {
     
     public void stopBroadcasting() {
     	handleCleanup();
-        JSONObject postData = new JSONObject();
-    	try {
-    	    postData.put("username", myUsername);
-    	    postData.put("password", myPassword);
-    	    postData.put(Constants.ACTION_URL, "api/stop_broadcast");
-	    } catch (JSONException e) {
-	    	CharSequence text = "JSON Error";
-	    	handleError(text);
-	    }
     	
 	    Intent intent = new Intent(this, FrontPageActivity.class);
 	    intent.putExtra(Constants.MY_U_KEY, myUsername);
 	    intent.putExtra(Constants.MY_P_KEY, myPassword);
 	    
-	    new HTTPPOSTStopBroadcastingAsyncTask().execute(postData);
+	    new HTTPPOSTStopBroadcastingAsyncTask().execute(this);
 	    
 	    startActivity(intent);
 	    finish();
@@ -156,11 +166,12 @@ public class BroadcastActivity extends MapActivity {
     /* Finds the current location of the application user and updates
      * the database.
      */
-    private class HTTPPOSTBroadcastAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, String> {
+    private class HTTPPOSTBroadcastAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, Integer> {
     	static final int GET_LOC_SUCCESS = 1;
     	static final int GET_LOC_FAIL = -1;
     	static final int BROADCAST_FREQUENCY = 10 * 1000;
     	private int instanceID;
+    	private BroadcastActivity bActivity;
     	private String myUsername;
     	private String myPassword;
     	
@@ -169,8 +180,8 @@ public class BroadcastActivity extends MapActivity {
     		
     	
     	@Override
-        protected String doInBackground(BroadcastActivity... broadcastActivties) {
-    		BroadcastActivity bActivity = broadcastActivties[0];
+        protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
+    		bActivity = broadcastActivties[0];
     		instanceID = bActivity.instanceID;    		
     		myUsername = bActivity.myUsername;
     		myPassword = bActivity.myPassword;
@@ -180,21 +191,18 @@ public class BroadcastActivity extends MapActivity {
             Criteria criteria = new Criteria();
             String provider = service.getBestProvider(criteria, false);
             
-            while (instanceID == BroadcastActivity.currentID) {
-            	//bActivity.map.clear();
-            	int result = getLocationAndUpdateDB(bActivity, service, provider);
-            	if (result == GET_LOC_FAIL) {
-            		break;
-            	}
-            	try {
-            		Thread.sleep(BROADCAST_FREQUENCY);
-            	} catch(InterruptedException e) {
-            		e.printStackTrace();
-            		bActivity.setErrorText("Thread has interrupted current thread");
-        		    publishProgress(bActivity);
-            	}
+            
+            //while (instanceID == BroadcastActivity.currentID) {
+            //bActivity.map.clear();
+            int result = getLocationAndUpdateDB(bActivity, service, provider);
+            /*
+            if (result == GET_LOC_FAIL) {
+            	break;
             }
-            return null;
+            */
+            //}
+            
+            return result;
     	}
     	
     	protected int getLocationAndUpdateDB(BroadcastActivity bActivity, LocationManager service, String provider) {
@@ -311,9 +319,10 @@ public class BroadcastActivity extends MapActivity {
         		return GET_LOC_FAIL;
         	}
         	
+        	int statusCode = 0;
         	try {
         		JSONObject jsonResponse = new JSONObject(response);
-        		int statusCode = jsonResponse.getInt("status code");
+        		statusCode = jsonResponse.getInt("status code");
         		if (statusCode == SUCCESS) {
     		        return GET_LOC_SUCCESS;
     		    } else if (statusCode == NO_SUCH_USER) {
@@ -334,8 +343,14 @@ public class BroadcastActivity extends MapActivity {
         		publishProgress(bActivity);
         		return GET_LOC_FAIL;
         	}
-        	return GET_LOC_SUCCESS;
-        }
+        	if (statusCode == SUCCESS) {
+		        return GET_LOC_SUCCESS;
+		    } else {
+		    	bActivity.setErrorText("Unrecognized status code!");
+		    	publishProgress(bActivity);
+		    	return GET_LOC_FAIL;
+		    }
+	    }
         
         protected void onProgressUpdate(BroadcastActivity... broadcastActivties) {
         	BroadcastActivity bActivity = broadcastActivties[0];
@@ -356,14 +371,20 @@ public class BroadcastActivity extends MapActivity {
         }
         
         @Override
-        protected void onPostExecute(String result) {
-        	// Do nothing
+        protected void onPostExecute(Integer result) {
+        	if ((result == GET_LOC_SUCCESS) && (instanceID == BroadcastActivity.currentID)) {
+        		broadcastHandler.postDelayed(new Runnable() {
+                    public void run() {
+                    	new HTTPPOSTBroadcastAsyncTask().execute(bActivity);
+                    }
+                }, BROADCAST_FREQUENCY);
+        	}
         }
         
     }
     
     /* Receives follow requests for the broadcaster. */
-    private class HTTPPOSTGetFollowRequestsAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, String> {
+    private class HTTPPOSTGetFollowRequestsAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, Integer> {
     	static final int SUCCESS = 1;
     	static final int NO_SUCH_USER_FOR_MY_USERNAME = -1;
     	static final int INCORRECT_PASSWORD = -2;
@@ -375,16 +396,18 @@ public class BroadcastActivity extends MapActivity {
     	private int instanceID;
     	private String myUsername;
     	private String myPassword;
+    	private BroadcastActivity bActivity;
     	    	
     	@Override
-        protected String doInBackground(BroadcastActivity... broadcastActivties) {
-    		BroadcastActivity bActivity = broadcastActivties[0];
+        protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
+    		bActivity = broadcastActivties[0];
     		instanceID = bActivity.instanceID;    		
     		myUsername = bActivity.myUsername;
     		myPassword = bActivity.myPassword;
     		
-            while (instanceID == BroadcastActivity.currentID) {
-            	int result = checkFollowRequests(bActivity);
+            //while (instanceID == BroadcastActivity.currentID) {
+            int result = checkFollowRequests(bActivity);
+            /*
             	if (result == CHECK_FOLLOW_REQS_FAIL) {
             		break;
             	}
@@ -394,9 +417,10 @@ public class BroadcastActivity extends MapActivity {
             		e.printStackTrace();
             		bActivity.setErrorText("Thread has interrupted current thread");
         		    publishProgress(bActivity);
-            	}
+            	}	
             }
-            return null;
+            */
+            return result;
     	}
     	
     	protected int checkFollowRequests(BroadcastActivity bActivity) {
@@ -440,11 +464,11 @@ public class BroadcastActivity extends MapActivity {
     		}
     		String JSONString = obj.toString();
     		int checkJSONResult = checkJSONResponse(bActivity, JSONString);
-    		publishProgress(bActivity);
     		if (checkJSONResult == CHECK_FOLLOW_REQS_FAIL) {
     			return CHECK_FOLLOW_REQS_FAIL;
     		} else {
     			try {
+    				followers = obj.getJSONArray("follow requests");
     				putFollowReqsInList(bActivity, followers);
     				publishProgress(bActivity);
     				return CHECK_FOLLOW_REQS_SUCCESS;
@@ -461,7 +485,8 @@ public class BroadcastActivity extends MapActivity {
     	 * instance.
     	 */
     	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
-    		for (int i =0; i < followers.length(); i++) {
+    		bActivity.progressSuccessful = true;
+    		for (int i = 0; i < followers.length(); i++) {
     			try {
     				String follower = followers.getString(i);
     				bActivity.followRequestUsernames.add(follower);
@@ -481,12 +506,11 @@ public class BroadcastActivity extends MapActivity {
         		return CHECK_FOLLOW_REQS_FAIL;
         	}
         	
+        	int statusCode = 0;
         	try {
         		JSONObject jsonResponse = new JSONObject(response);
-        		int statusCode = jsonResponse.getInt("status code");
-        		if (statusCode == SUCCESS) {
-    		        return CHECK_FOLLOW_REQS_SUCCESS;
-    		    } else if (statusCode == NO_SUCH_USER_FOR_MY_USERNAME) {
+        		statusCode = jsonResponse.getInt("status code");
+        		if (statusCode == NO_SUCH_USER_FOR_MY_USERNAME) {
     	    		bActivity.setErrorText("No such user!");
             		publishProgress(bActivity);
     	    		return CHECK_FOLLOW_REQS_FAIL;
@@ -504,7 +528,13 @@ public class BroadcastActivity extends MapActivity {
         		publishProgress(bActivity);
         		return CHECK_FOLLOW_REQS_FAIL;
         	}
-        	return CHECK_FOLLOW_REQS_SUCCESS;
+        	if (statusCode == SUCCESS) {
+		        return CHECK_FOLLOW_REQS_SUCCESS;
+		    } else {
+		    	bActivity.setErrorText("Unrecognized status code!");
+        		publishProgress(bActivity);
+	    		return CHECK_FOLLOW_REQS_FAIL;
+		    }
         }
         
         protected void onProgressUpdate(BroadcastActivity... broadcastActivties) {
@@ -515,7 +545,9 @@ public class BroadcastActivity extends MapActivity {
         		return;
         	}
         	
-        	bActivity.showFollowRequestDialog();
+        	if (bActivity.followRequestUsernames.size() > 0) {
+        		bActivity.showFollowRequestDialog();
+        	}
         	/*
         	for (int i = 0; i < bActivity.followRequestUsernames.size(); i++) {
         		DialogFragment newFragment = new FollowRequestDialogFragment();
@@ -525,8 +557,14 @@ public class BroadcastActivity extends MapActivity {
         }
         
         @Override
-        protected void onPostExecute(String result) {
-        	// Do nothing
+        protected void onPostExecute(Integer result) {
+        	if ((result == CHECK_FOLLOW_REQS_SUCCESS) && (instanceID == BroadcastActivity.currentID)) {
+        		followRequestHandler.postDelayed(new Runnable() {
+                    public void run() {
+                    	new HTTPPOSTGetFollowRequestsAsyncTask().execute(bActivity);
+                    }
+                }, REQUEST_CHECK_FREQUENCY);
+        	}
         }
         
     }
@@ -534,19 +572,46 @@ public class BroadcastActivity extends MapActivity {
     /* Finds the current location of the application user and updates
      * the database.
      */
-    private class HTTPPOSTStopBroadcastingAsyncTask extends HTTPPOSTAsyncTask {
-
+    private class HTTPPOSTStopBroadcastingAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, String> {
+    	static final String CONNECTION_ERROR = "Connection Error";
+    	protected static final String JSON_ERROR = "json error";
+    	BroadcastActivity bActivity;
+    	
+    	@Override
+    	protected String doInBackground(BroadcastActivity... broadcastActivities) {
+    		bActivity = broadcastActivities[0];
+    		
+    		JSONObject postData = new JSONObject();
+        	try {
+        	    postData.put(Constants.U_KEY, myUsername);
+        	    postData.put(Constants.P_KEY, myPassword);
+    	    } catch (JSONException e) {
+    	    	return JSON_ERROR;
+    	    }
+        	    		
+    		JSONObject obj = new JSONObject();
+    		try {
+    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
+    		} catch (RuntimeException e) {
+    			return CONNECTION_ERROR;
+    		}
+    		return obj.toString();
+    	}
+    	
         @Override
         protected void onPostExecute(String result) {
         	if (result == null) {
         		CharSequence text = "Unable to update database with current location";
-    		    handleError(text);
+    		    bActivity.handleError(text);
+    		    return;
         	} else if (result == CONNECTION_ERROR) {
         		CharSequence text = "Connection Error";
-    			handleError(text);
+    			bActivity.handleError(text);
     			return;
         	} else if (result == "JSON_EXCEPTION") {
-        		handleError("JSON Error");
+        		CharSequence text = "JSON Error";
+        		bActivity.handleError(text);
+        		return;
         	}
         	
         	try {
@@ -554,13 +619,13 @@ public class BroadcastActivity extends MapActivity {
         		int statusCode = jsonResult.getInt("status code");
         		if (statusCode != SUCCESS) {
         			CharSequence text = "Incorrect error code was returned";
-        			handleError(text);
+        			bActivity.handleError(text);
         			return;
         		}
         	} catch (JSONException e) {
         		e.printStackTrace();
     		    CharSequence text = "JSON Error";
-    		    handleError(text);
+    		    bActivity.handleError(text);
         	}
         }
         
@@ -587,6 +652,8 @@ public class BroadcastActivity extends MapActivity {
         		postData.put("myUsername", bActivity.myUsername);
         		postData.put("myPassword", bActivity.myPassword);
         		postData.put("username", bActivity.followName);
+        		String myUsername = postData.getString("myUsername");
+        		System.out.println("hi");
         		//XXX ADD BOOLEAN
         		
         		/*
