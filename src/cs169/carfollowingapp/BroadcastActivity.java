@@ -5,10 +5,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -59,9 +59,9 @@ public class BroadcastActivity extends MapActivity {
          * terminate when they see that their ID is not the current ID.
          */
         instanceID = BroadcastActivity.currentID;
-        
-        new HTTPPOSTBroadcastAsyncTask().execute(this);
-        //new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
+                
+        //new HTTPPOSTBroadcastAsyncTask().execute(this);
+        new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class BroadcastActivity extends MapActivity {
             String provider = service.getBestProvider(criteria, false);
             
             while (instanceID == BroadcastActivity.currentID) {
-            	bActivity.map.clear();
+            	//bActivity.map.clear();
             	int result = getLocationAndUpdateDB(bActivity, service, provider);
             	if (result == GET_LOC_FAIL) {
             		break;
@@ -364,6 +364,11 @@ public class BroadcastActivity extends MapActivity {
     
     /* Receives follow requests for the broadcaster. */
     private class HTTPPOSTGetFollowRequestsAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, String> {
+    	static final int SUCCESS = 1;
+    	static final int NO_SUCH_USER_FOR_MY_USERNAME = -1;
+    	static final int INCORRECT_PASSWORD = -2;
+    	static final int USER_NOT_BROADCASTING = -3;
+    	
     	static final int REQUEST_CHECK_FREQUENCY = 10 * 1000;
     	static final int CHECK_FOLLOW_REQS_SUCCESS = 1;
     	static final int CHECK_FOLLOW_REQS_FAIL = -1;
@@ -425,6 +430,7 @@ public class BroadcastActivity extends MapActivity {
     		}
     		
     		JSONObject obj = null;
+    		JSONArray followers = null;
     		try {
     			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData);
     		} catch (RuntimeException e) {
@@ -438,17 +444,31 @@ public class BroadcastActivity extends MapActivity {
     		if (checkJSONResult == CHECK_FOLLOW_REQS_FAIL) {
     			return CHECK_FOLLOW_REQS_FAIL;
     		} else {
-    			putFollowReqsInList(bActivity, JSONString);
-    			publishProgress(bActivity);
-    			return CHECK_FOLLOW_REQS_SUCCESS;
+    			try {
+    				putFollowReqsInList(bActivity, followers);
+    				publishProgress(bActivity);
+    				return CHECK_FOLLOW_REQS_SUCCESS;
+    			} catch (JSONException e) {
+        			e.printStackTrace();
+        			bActivity.setErrorText("JSON error");
+            		publishProgress(bActivity);
+        			return CHECK_FOLLOW_REQS_FAIL;
+        		}
     		}
     	}
     	
     	/* Puts follow requests in an array list instance variable in BroadcastActivity
     	 * instance.
     	 */
-    	private void putFollowReqsInList(BroadcastActivity bActivity, String JSONString) {
-    		// Implement later
+    	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
+    		for (int i =0; i < followers.length(); i++) {
+    			try {
+    				String follower = followers.getString(i);
+    				bActivity.followRequestUsernames.add(follower);
+    			} catch (JSONException e) {
+    				throw e;
+    			}
+    		}
     	}
     	
     	/* Checks if there were any errors indicated by the JSON response.
@@ -466,12 +486,16 @@ public class BroadcastActivity extends MapActivity {
         		int statusCode = jsonResponse.getInt("status code");
         		if (statusCode == SUCCESS) {
     		        return CHECK_FOLLOW_REQS_SUCCESS;
-    		    } else if (statusCode == NO_SUCH_USER) {
+    		    } else if (statusCode == NO_SUCH_USER_FOR_MY_USERNAME) {
     	    		bActivity.setErrorText("No such user!");
             		publishProgress(bActivity);
     	    		return CHECK_FOLLOW_REQS_FAIL;
     		    } else if (statusCode == INCORRECT_PASSWORD) {
     	    		bActivity.setErrorText("Incorrect password!");
+            		publishProgress(bActivity);
+    	    		return CHECK_FOLLOW_REQS_FAIL;
+    		    } else if (statusCode == USER_NOT_BROADCASTING) {
+    	    		bActivity.setErrorText("User not broadcasting!");
             		publishProgress(bActivity);
     	    		return CHECK_FOLLOW_REQS_FAIL;
     		    }
@@ -545,9 +569,10 @@ public class BroadcastActivity extends MapActivity {
     private class HTTPPOSTInvitationResponseAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, String> {
     	static final int SUCCESS = 1;
     	static final int NO_SUCH_USERNAME_FOR_MY_USERNAME = -1;
-    	static final int NO_SUCH_FOLLOWER_USERNAME = -2;
+    	static final int INCORRECT_PASSWORD = -2;
     	static final int USER_NOT_BROADCASTING = -3;
-    	static final int INCORRECT_PASSWORD = -4;
+    	static final int NO_SUCH_FOLLOWER_USERNAME = -4;
+
     	
     	static final int JSON_SUCCESS = 1;
     	static final int JSON_FAIL = -1;
