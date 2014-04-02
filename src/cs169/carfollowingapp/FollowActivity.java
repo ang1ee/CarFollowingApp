@@ -55,6 +55,12 @@ public class FollowActivity extends MapActivity {
         return true;
     }
 
+    protected void quit(Intent intent) {
+        startActivity(intent);
+        handler.removeCallbacksAndMessages(null);
+        finish();
+    }
+
     private class FollowTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -154,22 +160,19 @@ public class FollowActivity extends MapActivity {
             JSONObject fin;
             try {
                 if (result == "JSON_EXCEPTION") {
-                    handleError("JSON Error");
+                    showToast("JSON Error");
                 } else if (result == "RUNTIME_EXCEPTION") {
-                    handleError("Connection Error");
+                    showToast("Connection Error");
                 } else if (result == "ERROR") {
-                    handleError("Error");
+                    showToast("Error");
                 }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
+                Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
+                intent.putExtra(Constants.MY_U_KEY, myUsername);
+                intent.putExtra(Constants.MY_P_KEY, myPassword);
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
-                        Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                        intent.putExtra(Constants.MY_U_KEY, myUsername);
-                        intent.putExtra(Constants.MY_P_KEY, myPassword);
-                        startActivity(intent);
-                        handler.removeCallbacksAndMessages(null);
-                        finish();
                         break;
                     case NO_SUCH_USER:
                         showToast("User does not exist.");
@@ -181,12 +184,12 @@ public class FollowActivity extends MapActivity {
                         showToast("Broadcaster does not exist.");
                         break;
                     case USER_NOT_BROADCASTING:
-                        showToast("User is not broadcasting.");
                         break;
                     default:
                         showToast("Unknown errCode.");
                         break;
                 }
+                quit(intent);
             } catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
                 handleError(e.getMessage());
@@ -205,8 +208,7 @@ public class FollowActivity extends MapActivity {
 
 
 
-    // TODO: make sure non-authenticated users can't get anyone's location
-    /* 
+    /*
      * username: who to obtain the location point from
      * returns the obtained latitude/longitude in the form of LatLng, or null otherwise
      * Code snipet from: http://stackoverflow.com/questions/11213594/how-to-make-http-get-request-in-android
