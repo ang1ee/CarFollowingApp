@@ -168,7 +168,7 @@ public class FollowActivity extends MapActivity {
                         intent.putExtra(Constants.MY_U_KEY, myUsername);
                         intent.putExtra(Constants.MY_P_KEY, myPassword);
                         startActivity(intent);
-                        handler.removeCallbacks(null);
+                        handler.removeCallbacksAndMessages(null);
                         finish();
                         break;
                     case NO_SUCH_USER:
@@ -199,14 +199,7 @@ public class FollowActivity extends MapActivity {
     }
 
     public void stopFollowing(View view) {
-        //TODO: When server allows, uncomment next line, and delete other lines.
         new CancelTask().execute(cancelUrl);
-//        Intent intent = new Intent(this, FrontPageActivity.class);
-//        intent.putExtra(Constants.MY_U_KEY, myUsername);
-//        intent.putExtra(Constants.MY_P_KEY, myPassword);
-//        startActivity(intent);
-//        handler.removeCallbacks(null);
-//        finish();
     }
 
 
