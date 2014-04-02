@@ -47,6 +47,8 @@ public class BroadcastActivity extends MapActivity {
     protected CharSequence errorText;
     protected LinkedList<String> followRequestUsernames = new LinkedList<String>();
     protected String followName;
+    protected double debugLatitude = 37.0;
+    protected double debugLongitude = -122.0;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,7 @@ public class BroadcastActivity extends MapActivity {
                 service.setTestProviderEnabled(mocProvider, true);
             }
             // create a new location (hardcoded coordinates)
-            currentLocation = new Location(provider);
+            currentLocation = new Location(mocProvider);
             currentLocation.setLatitude(37.0);
             currentLocation.setLongitude(-122.0);
             currentLocation.setTime(System.currentTimeMillis());
@@ -228,9 +230,6 @@ public class BroadcastActivity extends MapActivity {
     	private BroadcastActivity bActivity;
     	private String myUsername;
     	private String myPassword;
-    	
-    	private double debugLatitude = 37.0;
-    	private double debugLongitude = -122.0;
     		
     	
     	@Override
@@ -244,7 +243,6 @@ public class BroadcastActivity extends MapActivity {
             LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             String provider = service.getBestProvider(criteria, false);
-            
             
             //while (instanceID == BroadcastActivity.currentID) {
             //bActivity.map.clear();
@@ -273,7 +271,7 @@ public class BroadcastActivity extends MapActivity {
                     service.setTestProviderEnabled(mocProvider, true);
                 }
                 // create a new location (hardcoded coordinates)
-                currentLocation = new Location(provider);
+                currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
                 debugLatitude++;
@@ -302,7 +300,7 @@ public class BroadcastActivity extends MapActivity {
                     e.printStackTrace();
                 }
 				
-                service.setTestProviderLocation(provider, currentLocation);
+                service.setTestProviderLocation(mocProvider, currentLocation);
             }
             
             if (currentLocation == null) {
