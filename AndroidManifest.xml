@@ -2,7 +2,8 @@
 <!--  
 Angeline's google key: AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U
 David's google key: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
-Steven's google key: AIzaSyAu1pIz6UFkRdX7ze0B5Wg31qFcGNQiq-w      
+Steven's google key: AIzaSyAu1pIz6UFkRdX7ze0B5Wg31qFcGNQiq-w 
+Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA     
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cs169.carfollowingapp"
@@ -42,7 +43,7 @@ Steven's google key: AIzaSyAu1pIz6UFkRdX7ze0B5Wg31qFcGNQiq-w
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U" />
+            android:value="AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA" />
 
         <activity
             android:name="cs169.carfollowingapp.FollowActivity"
