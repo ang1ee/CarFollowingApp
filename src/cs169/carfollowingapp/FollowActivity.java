@@ -45,7 +45,7 @@ public class FollowActivity extends MapActivity {
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
         username = intent.getStringExtra(Constants.U_KEY);
-        new FollowTask().execute(followUrl);
+        new FollowTask().execute(this);
     }
 
     @Override
@@ -61,16 +61,17 @@ public class FollowActivity extends MapActivity {
         finish();
     }
 
-    private class FollowTask extends AsyncTask<String, Void, String> {
+    private class FollowTask extends AsyncTask<FollowActivity, Void, String> {
+        private FollowActivity fActivity;
         @Override
-        protected String doInBackground(String... urls) {
-
+        protected String doInBackground(FollowActivity... followActivities) {
+            fActivity = followActivities[0];
             JSONObject postData = new JSONObject();
             try {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(followUrl, postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -97,10 +98,10 @@ public class FollowActivity extends MapActivity {
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
                         coords.add(new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude")));
-                        plot(coords);
+                        fActivity.plot(coords);
                         handler.postDelayed(new Runnable() {
                             public void run() {
-                                new FollowTask().execute(followUrl);
+                                new FollowTask().execute(fActivity);
                             }
                         }, frequency);
                         break;
