@@ -81,7 +81,7 @@ public class BroadcastActivity extends MapActivity {
                 e.printStackTrace();
             }
 
-            service.setTestProviderLocation(provider, currentLocation);
+            service.setTestProviderLocation(mocProvider, currentLocation);
         }
         
         if (currentLocation == null) {
