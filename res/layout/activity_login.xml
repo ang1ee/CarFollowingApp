@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
+        android:contentDescription="@string/input_username_hint"
         android:hint="@string/input_username_hint"
         android:layout_below="@+id/tvMessage"/>
 
@@ -33,6 +34,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
+        android:contentDescription="@string/input_password_hint"
         android:hint="@string/input_password_hint"
         android:layout_below="@+id/etUsername"/>
 
