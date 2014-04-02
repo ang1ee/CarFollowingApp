@@ -87,7 +87,7 @@ public class FrontPageActivity extends Activity {
     
     public void logout(View view) {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        handler.removeCallbacks(null);
+        handler.removeCallbacksAndMessages(null);
         startActivity(intent);
         finish();
     }
@@ -196,7 +196,7 @@ public class FrontPageActivity extends Activity {
                 int errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                 	case SUCCESS:
-                		handler.removeCallbacks(null);
+                		handler.removeCallbacksAndMessages(null);
                 		Intent intent = new Intent(getApplicationContext(), FollowActivity.class);
                         intent.putExtra(Constants.U_KEY, username);
                         intent.putExtra(Constants.MY_U_KEY, myUsername);
@@ -273,7 +273,7 @@ public class FrontPageActivity extends Activity {
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
                 
-                        handler.removeCallbacks(null);
+                        handler.removeCallbacksAndMessages(null);
 
                         break;
                     case WRONG_MYUSERNMAE:
