@@ -15,6 +15,7 @@
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/error_box_description"
         android:text="" />
 
     <!-- Input Username field -->
@@ -23,9 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:hint="Username"
-        android:layout_below="@+id/tvMessage"
-        android:layout_toRightOf="@+id/tvUsername"/>
+        android:hint="@string/input_username_hint"
+        android:layout_below="@+id/tvMessage"/>
 
     <!-- Input Password field -->
     <EditText
@@ -33,8 +33,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:hint="Password"
-        android:layout_toRightOf="@+id/tvPassword"
+        android:hint="@string/input_password_hint"
         android:layout_below="@+id/etUsername"/>
 
     <!-- Login button.  On success, moves user to session page -->
@@ -44,14 +43,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/etPassword"
         android:onClick="loginMethod"
-        android:text="Login"/>
+        android:text="@string/button_login"/>
     <!-- Username text -->
 
     <TextView
         android:id="@+id/tvRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Don't have an account?"
+        android:text="@string/register_prompt"
         android:layout_below="@+id/btnLogin"/>
     <!-- Add User button.  On success, moves user to session page -->
     <Button
@@ -59,8 +58,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvRegister"
-        android:layout_toRightOf="@+id/tvPassword"
         android:onClick="RegisterMethod"
-        android:text="Register"/>
+        android:text="@string/register_text"/>
 
 </RelativeLayout>
