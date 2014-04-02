@@ -23,7 +23,6 @@ public class FollowActivity extends MapActivity {
     private String followUrl = Constants.BASE_SERVER_URL + "api/follow";
     private String cancelUrl = Constants.BASE_SERVER_URL + "api/follow_cancellation";
     private int errCode;
-    private ArrayList<LatLng> coords = new ArrayList<LatLng>();
     private String username;
     private Handler handler = new Handler();
     private int frequency = 5000;
@@ -97,6 +96,7 @@ public class FollowActivity extends MapActivity {
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
+                        ArrayList<LatLng> coords = new ArrayList<LatLng>();
                         coords.add(new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude")));
                         fActivity.plot(coords);
                         handler.postDelayed(new Runnable() {
