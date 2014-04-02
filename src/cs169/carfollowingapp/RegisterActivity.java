@@ -1,3 +1,4 @@
+
 package cs169.carfollowingapp;
 
 import java.io.BufferedReader;
@@ -61,6 +62,10 @@ public class RegisterActivity extends Activity {
                 new HttpAsyncTask().execute(registerUrl);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     //Responsible for sending out the Post request on a different thread.
@@ -236,3 +241,4 @@ public class RegisterActivity extends Activity {
 //    }
 
 }
+
