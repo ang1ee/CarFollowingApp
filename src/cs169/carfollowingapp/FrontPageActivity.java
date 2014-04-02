@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class FrontPageActivity extends Activity {
@@ -26,6 +27,7 @@ public class FrontPageActivity extends Activity {
     private String myUsername;
     private String myPassword;
     private String username;
+    private TextView tvMessage;
     
     private static final int SUCCESS = 1;
     private static final int NO_PERMISSION = 2;
@@ -54,6 +56,7 @@ public class FrontPageActivity extends Activity {
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
+        tvMessage = (TextView) findViewById(R.id.tvMessage);
     }
 
     @Override
@@ -138,18 +141,23 @@ public class FrontPageActivity extends Activity {
                         break;
                     case WRONG_MYUSERNMAE:
                         showToast("Incorrect user credential.");
+                        tvMessage.setText("Incorrect user credential.");
                         break;
                     case WRONG_PASSWORD:
                         showToast("Incorrect password.");
+                        tvMessage.setText("Incorrect password.");
                         break;
                     case NO_SUCH_BROADCAST_USER:
                         showToast("No such broadcasting user.");
+                        tvMessage.setText("No such broadcasting user.");
                         break;
                     case USER_NOT_BROADCASTING:
                         showToast("User not broadcasting.");
+                        tvMessage.setText("User not broadcasting.");
                         break;
                     default:
                         showToast("Unknown errCode.");
+                        tvMessage.setText("Unknown errCode.");
                         break;
                 }
 
