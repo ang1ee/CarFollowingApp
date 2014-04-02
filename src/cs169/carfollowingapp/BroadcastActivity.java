@@ -36,6 +36,7 @@ public class BroadcastActivity extends MapActivity {
     //private Runnable broadcastRunnable;
     //private Runnable followRequestRunnable;
     private Handler followRequestHandler = new Handler();
+    private Handler invitationHandler = new Handler();
     
     /* Used to save currentLocation for AsyncTask. 
      * Maybe should change at some point since seems
@@ -47,6 +48,8 @@ public class BroadcastActivity extends MapActivity {
     protected CharSequence errorText;
     protected LinkedList<String> followRequestUsernames = new LinkedList<String>();
     protected String followName;
+    protected double debugLatitude = 37.0;
+    protected double debugLongitude = -122.0;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +79,7 @@ public class BroadcastActivity extends MapActivity {
                 service.setTestProviderEnabled(mocProvider, true);
             }
             // create a new location (hardcoded coordinates)
-            currentLocation = new Location(provider);
+            currentLocation = new Location(mocProvider);
             currentLocation.setLatitude(37.0);
             currentLocation.setLongitude(-122.0);
             currentLocation.setTime(System.currentTimeMillis());
@@ -228,9 +231,6 @@ public class BroadcastActivity extends MapActivity {
     	private BroadcastActivity bActivity;
     	private String myUsername;
     	private String myPassword;
-    	
-    	private double debugLatitude = 37.0;
-    	private double debugLongitude = -122.0;
     		
     	
     	@Override
@@ -244,7 +244,6 @@ public class BroadcastActivity extends MapActivity {
             LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             String provider = service.getBestProvider(criteria, false);
-            
             
             //while (instanceID == BroadcastActivity.currentID) {
             //bActivity.map.clear();
@@ -273,7 +272,7 @@ public class BroadcastActivity extends MapActivity {
                     service.setTestProviderEnabled(mocProvider, true);
                 }
                 // create a new location (hardcoded coordinates)
-                currentLocation = new Location(provider);
+                currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
                 debugLatitude++;
@@ -302,7 +301,7 @@ public class BroadcastActivity extends MapActivity {
                     e.printStackTrace();
                 }
 				
-                service.setTestProviderLocation(provider, currentLocation);
+                service.setTestProviderLocation(mocProvider, currentLocation);
             }
             
             if (currentLocation == null) {
@@ -444,13 +443,14 @@ public class BroadcastActivity extends MapActivity {
     	static final int INCORRECT_PASSWORD = -2;
     	static final int USER_NOT_BROADCASTING = -3;
     	
-    	static final int REQUEST_CHECK_FREQUENCY = 10 * 1000;
+    	static final int REQUEST_CHECK_FREQUENCY = 5 * 1000;
     	static final int CHECK_FOLLOW_REQS_SUCCESS = 1;
     	static final int CHECK_FOLLOW_REQS_FAIL = -1;
     	private int instanceID;
     	private String myUsername;
     	private String myPassword;
     	private BroadcastActivity bActivity;
+    	private boolean foundFollowers = false;
     	    	
     	@Override
         protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
@@ -539,6 +539,9 @@ public class BroadcastActivity extends MapActivity {
     	 * instance.
     	 */
     	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
+    		if (followers.length() > 0) {
+    			foundFollowers = true;
+    		}
     		bActivity.progressSuccessful = true;
     		for (int i = 0; i < followers.length(); i++) {
     			try {
@@ -613,7 +616,11 @@ public class BroadcastActivity extends MapActivity {
         @Override
         protected void onPostExecute(Integer result) {
         	if (result == CHECK_FOLLOW_REQS_SUCCESS) {// && (instanceID == BroadcastActivity.currentID)) {
-        		followRequestHandler.postDelayed(new Runnable() {
+        		if (foundFollowers == true) {
+        			foundFollowers = false;
+        			return;
+        		}
+        		bActivity.followRequestHandler.postDelayed(new Runnable() {
                     public void run() {
                     	new HTTPPOSTGetFollowRequestsAsyncTask().execute(bActivity);
                     }
@@ -695,10 +702,11 @@ public class BroadcastActivity extends MapActivity {
     	
     	static final int JSON_SUCCESS = 1;
     	static final int JSON_FAIL = -1;
+    	BroadcastActivity bActivity;
     	    	
     	@Override
         protected String doInBackground(BroadcastActivity... broadcastActivities) {
-    		BroadcastActivity bActivity = broadcastActivities[0];
+    		bActivity = broadcastActivities[0];
     		String actionURL = "/api/invitation_response";
     		
     		JSONObject postData = new JSONObject();
@@ -741,6 +749,16 @@ public class BroadcastActivity extends MapActivity {
         		publishProgress(bActivity);
         		return null;
     		}
+    		/*
+    		try {
+    			Thread.sleep(5 * 1000);
+    		} catch (InterruptedException e) {
+    			Log.e("HTTPPOSTInvitationResponseAsyncTask", e.getMessage());
+        	    bActivity.setErrorText("Interrupted thread exception");
+        		publishProgress(bActivity);
+        		return null;
+    		}
+    		*/
     		checkJSONResponse(bActivity, obj.toString());
     		return null;
     	}
@@ -792,7 +810,18 @@ public class BroadcastActivity extends MapActivity {
         
         @Override
         protected void onPostExecute(String result) {
-        	// Do nothing
+        	bActivity.followRequestHandler.postDelayed(new Runnable() {
+                public void run() {
+                	new HTTPPOSTGetFollowRequestsAsyncTask().execute(bActivity);
+                }
+            }, 5 * 1000);
+        	/*
+        	bActivity.invitationHandler.postDelayed(new Runnable() {
+                public void run() {
+                	bActivity.showFollowRequestDialog();
+                }
+            }, 5 * 1000);
+            */
         }
     	
     } 
