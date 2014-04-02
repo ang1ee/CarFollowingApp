@@ -31,11 +31,11 @@ public class FollowRequestDialogFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
     	assert (bActivity != null) : "bActivity was null";
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(bActivity.getFollowName() + "would like to follow you")
+        builder.setMessage(bActivity.getFollowName() + " would like to follow you")
                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {               	   
+                   public void onClick(DialogInterface dialog, int id) {
                 	   bActivity.invitationResponse();
-                	   bActivity.showFollowRequestDialog();
+                	   //bActivity.showFollowRequestDialog();
                    }
                })
                .setNegativeButton(R.string.decline, new DialogInterface.OnClickListener() {
