@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--  Angeline's google key: AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U
-      David's google key: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
-      Steven's google key: AIzaSyAu1pIz6UFkRdX7ze0B5Wg31qFcGNQiq-w-->
+<!--
+Angeline's google key: AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U
+David's google key: AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA
+Steven's google key: AIzaSyAu1pIz6UFkRdX7ze0B5Wg31qFcGNQiq-w 
+Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA     
+-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cs169.carfollowingapp"
     android:versionCode="1"
