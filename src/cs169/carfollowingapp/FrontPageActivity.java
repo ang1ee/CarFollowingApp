@@ -44,11 +44,6 @@ public class FrontPageActivity extends Activity {
     private Handler handler = new Handler();
     private int frequency = 5000;
     private AlertDialog.Builder builder;
-
-    
-    @Override
-    public void onBackPressed() {
-    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +89,11 @@ public class FrontPageActivity extends Activity {
         
         
     }
-    
+
+    @Override
+    public void onBackPressed() {
+    }
+
     public void logout(View view) {
         GeneralMethods.clearCookies(getApplicationContext());
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

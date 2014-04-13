@@ -154,10 +154,6 @@ public class BroadcastActivity extends MapActivity {
     }
 
     @Override
-    public void onBackPressed() {
-    }
-
-    @Override
     public void onPause() {
         // TODO: in future iterations, pause any ongoing broadcast updates
         super.onPause();
@@ -174,7 +170,12 @@ public class BroadcastActivity extends MapActivity {
     public void stopBroadcasting(View view) {
         stopBroadcasting();
     }
-    
+
+    @Override
+    public void onBackPressed() {
+        stopBroadcasting();
+    }
+
     public void stopBroadcasting() {
     	handleCleanup();
     	

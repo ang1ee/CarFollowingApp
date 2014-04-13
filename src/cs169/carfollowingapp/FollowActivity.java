@@ -69,6 +69,12 @@ public class FollowActivity extends MapActivity {
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
+        quit(intent);
+    }
+
     private class FollowTask extends AsyncTask<FollowActivity, Void, String> {
         private FollowActivity fActivity;
         @Override
@@ -205,10 +211,6 @@ public class FollowActivity extends MapActivity {
                 handleError(e.getMessage());
             }
         }
-    }
-
-    @Override
-    public void onBackPressed() {
     }
 
     public void stopFollowing(View view) {

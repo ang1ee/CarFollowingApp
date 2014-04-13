@@ -55,7 +55,7 @@ public class RegisterActivity extends Activity {
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // add click listener to Button "Login". Sends a POST request to users/add
+        // add click listener to Button "Register". Sends a POST request to users/register
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,10 +63,6 @@ public class RegisterActivity extends Activity {
                 new HttpAsyncTask().execute(registerUrl);
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
     }
 
     //Responsible for sending out the Post request on a different thread.
