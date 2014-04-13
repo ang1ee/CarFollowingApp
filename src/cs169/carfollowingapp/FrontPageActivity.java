@@ -96,6 +96,7 @@ public class FrontPageActivity extends Activity {
     }
     
     public void logout(View view) {
+        GeneralMethods.clearCookies(getApplicationContext());
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         handler.removeCallbacksAndMessages(null);
         startActivity(intent);
