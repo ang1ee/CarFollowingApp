@@ -4,19 +4,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import android.app.Activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,6 +58,7 @@ public class LoginActivity extends Activity {
                     .commit();
         }
         */
+
         // get reference to the views
         tvMessage = (TextView) findViewById(R.id.tvMessage);
         etUsername = (EditText) findViewById(R.id.etUsername);
@@ -88,7 +94,7 @@ public class LoginActivity extends Activity {
             User user = new User();
             user.setUsername(etUsername.getText().toString());
             user.setPassword(etPassword.getText().toString());
-            String result = POST(urls[0],user);
+            String result = POST(urls[0],user,getApplicationContext());
             return result;
         }
 
@@ -130,53 +136,48 @@ public class LoginActivity extends Activity {
     }
 
     //Packages and sends the POST request to the database url, with information from user.
-    public static String POST(String url, User user){
+    public static String POST(String url, User user, Context context){
         InputStream inputStream = null;
         String result = "";
         try {
-
             // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
+            DefaultHttpClient httpclient = new DefaultHttpClient();
             // make POST request to the given URL
             HttpPost httpPost = new HttpPost(url);
-
             String json = "";
-
             // build jsonObject
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", user.getUsername());
             jsonObject.put("password", user.getPassword());
-
             //  convert JSONObject to JSON to String
             json = jsonObject.toString();
-
-            // ** Alternative way to convert Person object to JSON string using Jackson Lib
-            // ObjectMapper mapper = new ObjectMapper();
-            // json = mapper.writeValueAsString(person);
-
             // set json to StringEntity
             StringEntity se = new StringEntity(json);
             //se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-
             // set httpPost Entity
             httpPost.setEntity(se);
-
             // Set some headers to inform server about the type of the content
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-
             // Execute POST request to the given URL
             HttpResponse httpResponse = httpclient.execute(httpPost);
-
             // receive response as inputStream
             inputStream = httpResponse.getEntity().getContent();
-
             // convert inputstream to string
             if(inputStream != null)
                 result = convertInputStreamToString(inputStream);
             else
                 result = "Did not work!";
+
+           //get cookie from response
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = pref.edit();
+            List<Cookie> cookies = httpclient.getCookieStore().getCookies();
+            for (int i = 0; i < cookies.size(); i++) {
+                Cookie cookie = cookies.get(i);
+                editor.putString(Constants.COOKIE, cookie.toString());
+            }
+            editor.apply();
 
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());

@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,7 +40,7 @@ public class FrontPageActivity extends Activity {
     private String followRequestUrl = Constants.BASE_SERVER_URL + "api/follow_request";
     private String checkPermissionUrl = Constants.BASE_SERVER_URL + "api/check_permission";
     private String cancelUrl = Constants.BASE_SERVER_URL + "api/follow_cancellation";
-    
+
     private Handler handler = new Handler();
     private int frequency = 5000;
     private AlertDialog.Builder builder;
@@ -52,6 +53,14 @@ public class FrontPageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
+            GeneralMethods.clearCookies(getApplicationContext());
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         setContentView(R.layout.activity_front_page);
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
@@ -102,7 +111,7 @@ public class FrontPageActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -176,7 +185,7 @@ public class FrontPageActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -250,7 +259,7 @@ public class FrontPageActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";

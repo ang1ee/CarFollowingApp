@@ -59,6 +59,7 @@ public class RegisterActivity extends Activity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getBaseContext(), "Creating user...", Toast.LENGTH_LONG).show();
                 new HttpAsyncTask().execute(registerUrl);
             }
         });
@@ -84,7 +85,6 @@ public class RegisterActivity extends Activity {
 
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(getBaseContext(), "Data Sent!", Toast.LENGTH_SHORT).show();
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
             JSONObject fin;
             try {
@@ -121,9 +121,7 @@ public class RegisterActivity extends Activity {
 
           //Opens a new page in response to a successful add user.
             if (errCode == 1) { 
-                Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                intent.putExtra(Constants.MY_U_KEY, etUsername.getText().toString());
-                intent.putExtra(Constants.MY_P_KEY, etPassword.getText().toString());
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
                 finish();
             }

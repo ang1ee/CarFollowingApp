@@ -1,5 +1,9 @@
 package cs169.carfollowingapp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,17 +25,22 @@ import org.json.JSONObject;
 public class SimpleHTTPPOSTRequester {
 
 	public static JSONObject makeHTTPPOSTRequest(String url,
-			JSONObject postData) {
+			JSONObject postData, Context context) {
 		try {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
 			HttpClient c = new DefaultHttpClient(); 
 			HttpPost p = new HttpPost(url);
 			StringEntity se = new StringEntity(postData.toString());
 			p.setEntity(se);
 			p.setHeader("Accept", "application/json");
 			p.setHeader("Content-type", "application/json");
+
+            p.setHeader("Cookie", pref.getString(Constants.COOKIE, "default"));
 			
 			HttpResponse r = (HttpResponse) c.execute(p);
 			HttpEntity ent = r.getEntity();
+
 			InputStream is = ent.getContent();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			StringBuilder sb = new StringBuilder();

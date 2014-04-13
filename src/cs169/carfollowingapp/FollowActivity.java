@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +37,14 @@ public class FollowActivity extends MapActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
+            GeneralMethods.clearCookies(getApplicationContext());
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         setContentView(R.layout.activity_follow);
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.follow_map)).getMap();
         this.map.setMyLocationEnabled(true);
@@ -70,7 +79,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(followUrl, postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(followUrl, postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -143,7 +152,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
