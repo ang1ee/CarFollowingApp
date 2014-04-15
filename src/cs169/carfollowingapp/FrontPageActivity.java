@@ -76,12 +76,11 @@ public class FrontPageActivity extends Activity {
     }
     
     public void follow(View view) {
-        EditText usernameEditText = (EditText) findViewById(R.id.input_username);
-        
-        
-        username = usernameEditText.getText().toString();
-        builder = new AlertDialog.Builder(this);
-        new FollowRequestTask().execute(followRequestUrl);
+    	Intent intent = new Intent(getApplicationContext(), SelectBroadcasterActivity.class);
+        intent.putExtra(Constants.MY_U_KEY, myUsername);
+        intent.putExtra(Constants.MY_P_KEY, myPassword);
+        startActivity(intent);
+        finish();
         
         
     }
