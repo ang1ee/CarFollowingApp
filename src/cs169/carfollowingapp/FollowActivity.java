@@ -22,17 +22,14 @@ import android.view.View;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import cs169.carfollowingapp.BroadcastActivity.HTTPPOSTBroadcastAsyncTask;
-
-
-
 public class FollowActivity extends MapActivity {
 
     private String followUrl = Constants.BASE_SERVER_URL + "api/follow";
     private String cancelUrl = Constants.BASE_SERVER_URL + "api/follow_cancellation";
     private int errCode;
     private String username;
-    private Handler handler = new Handler();
+    private Handler followHandler = new Handler();
+    private Handler setFollowerPositionHandler = new Handler();
     private int frequency = 5000;
     protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
@@ -40,6 +37,15 @@ public class FollowActivity extends MapActivity {
     protected static final int NO_SUCH_BROADCASTER = -3;
     protected static final int USER_NOT_BROADCASTING = -4;
     protected static final int ACCESS_NOT_PERMITTED = -5;
+    
+    /* Used to save currentLocation for AsyncTask. 
+     * Maybe should change at some point since seems
+     * somewhat hackish...
+     */
+    protected Location currentLocation;
+    /* Same with the two below... */
+    protected boolean progressSuccessful = true;
+    protected CharSequence errorText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,7 @@ public class FollowActivity extends MapActivity {
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
         username = intent.getStringExtra(Constants.U_KEY);
         new FollowTask().execute(this);
+        new SetFollowerPositionTask().execute(this);
     }
 
     @Override
@@ -72,7 +79,8 @@ public class FollowActivity extends MapActivity {
 
     protected void quit(Intent intent) {
         startActivity(intent);
-        handler.removeCallbacksAndMessages(null);
+        followHandler.removeCallbacksAndMessages(null);
+        setFollowerPositionHandler.removeCallbacksAndMessages(null);
         finish();
     }
 
@@ -80,6 +88,16 @@ public class FollowActivity extends MapActivity {
     public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
         quit(intent);
+    }
+    
+    protected void setCurrentLocation(Location currLoc) {
+    	progressSuccessful = true;
+    	currentLocation = currLoc;
+    }
+    
+    protected void setErrorText(CharSequence errTxt) {
+    	progressSuccessful = false;
+    	errorText = errTxt;
     }
 
     private class FollowTask extends AsyncTask<FollowActivity, Void, String> {
@@ -121,7 +139,7 @@ public class FollowActivity extends MapActivity {
                         ArrayList<LatLng> coords = new ArrayList<LatLng>();
                         coords.add(new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude")));
                         fActivity.plot(coords);
-                        handler.postDelayed(new Runnable() {
+                        followHandler.postDelayed(new Runnable() {
                             public void run() {
                                 new FollowTask().execute(fActivity);
                             }
@@ -232,6 +250,13 @@ public class FollowActivity extends MapActivity {
     	static final int GET_LOC_FAIL = -1;
     	static final int BROADCAST_FREQUENCY = 10 * 1000;
     	private FollowActivity fActivity;
+    	protected double debugLatitude = 37.0;
+        protected double debugLongitude = -122.0;
+        
+        protected static final int SUCCESS = 1;
+        protected static final int AUTHENTICATION_FAILED = -1;
+        protected static final int USER_NOT_FOLLOWING = -2;
+        protected static final int MALFORMED_LOCATION = -3;
     	//private String myUsername;
     	//private String myPassword;
     		
@@ -247,12 +272,12 @@ public class FollowActivity extends MapActivity {
             Criteria criteria = new Criteria();
             String provider = service.getBestProvider(criteria, false);
             
-            int result = getLocationAndUpdateDB(bActivity, service, provider);
+            int result = getLocationAndUpdateDB(fActivity, service, provider);
             
             return result;
     	}
     	
-    	protected int getLocationAndUpdateDB(BroadcastActivity bActivity, LocationManager service, String provider) {
+    	protected int getLocationAndUpdateDB(FollowActivity fActivity, LocationManager service, String provider) {
     		String broadcastActionURL = "api/broadcast";
     		Location currentLocation = service.getLastKnownLocation(provider);
             
@@ -299,14 +324,14 @@ public class FollowActivity extends MapActivity {
             }
             
             if (currentLocation == null) {
-            	bActivity.setErrorText("Cannot get current location");
-            	publishProgress(bActivity);
+            	fActivity.setErrorText("Cannot get current location");
+            	publishProgress(fActivity);
     		    return GET_LOC_FAIL;
             }
             
-            bActivity.setCurrentLocation(currentLocation);
+            fActivity.setCurrentLocation(currentLocation);
             // Plot user location
-            publishProgress(bActivity);
+            publishProgress(fActivity);
             
             // Preparing information to store in database
             JSONObject postData = new JSONObject();
@@ -314,35 +339,35 @@ public class FollowActivity extends MapActivity {
         	try {
         		String latitude = Double.toString(currentLocation.getLatitude());
         		String longitude = Double.toString(currentLocation.getLongitude());
-        		postData.put("username", myUsername);
-        		postData.put("password", myPassword);
+        		//postData.put("username", myUsername);
+        		//postData.put("password", myPassword);
         		postData.put("latitude", latitude);
         		postData.put("longitude", longitude);
         	} catch (RuntimeException e) {
         	    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
-        	    bActivity.setErrorText("A RuntimeException has occurred");
-        		publishProgress(bActivity);
+        	    fActivity.setErrorText("A RuntimeException has occurred");
+        		publishProgress(fActivity);
         		return GET_LOC_FAIL;
     		} catch (JSONException e) {
     		    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
-    		    bActivity.setErrorText("JSON Error");
-    		    publishProgress(bActivity);
+    		    fActivity.setErrorText("JSON Error");
+    		    publishProgress(fActivity);
         		return GET_LOC_FAIL;
     		} catch (Exception e) {
     		    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
-    	    	bActivity.setErrorText("A RuntimeException has occurred");
-        		publishProgress(bActivity);
+    	    	fActivity.setErrorText("A RuntimeException has occurred");
+        		publishProgress(fActivity);
     		}
     		
     		JSONObject obj = null;
     		try {
     			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData, getApplicationContext());
     		} catch (RuntimeException e) {
-    			bActivity.setErrorText("Connection Error");
-        		publishProgress(bActivity);
+    			fActivity.setErrorText("Connection Error");
+        		publishProgress(fActivity);
     			return GET_LOC_FAIL;
     		}
-    		int checkJSONResult = checkJSONResponse(bActivity, obj.toString());
+    		int checkJSONResult = checkJSONResponse(fActivity, obj.toString());
     		if (checkJSONResult == GET_LOC_FAIL) {
     			return GET_LOC_FAIL;
     		} else {
@@ -353,10 +378,10 @@ public class FollowActivity extends MapActivity {
     	/* Checks if there were any errors indicated by the JSON response.
     	 * Returns 1 if there were no errors and returns -1 if there was an issue.
     	 */
-        protected int checkJSONResponse(BroadcastActivity bActivity, String response) {
+        protected int checkJSONResponse(FollowActivity fActivity, String response) {
         	if (response == null) {
-    		    bActivity.setErrorText("Unable to update database with current location");
-        		publishProgress(bActivity);
+    		    fActivity.setErrorText("Unable to update database with current location");
+        		publishProgress(fActivity);
         		return GET_LOC_FAIL;
         	}
         	
@@ -366,41 +391,41 @@ public class FollowActivity extends MapActivity {
         		statusCode = jsonResponse.getInt("status code");
         		if (statusCode == SUCCESS) {
     		        return GET_LOC_SUCCESS;
-    		    } else if (statusCode == NO_SUCH_USER) {
-    	    		bActivity.setErrorText("No such user!");
-            		publishProgress(bActivity);
+    		    } else if (statusCode == AUTHENTICATION_FAILED) {
+    	    		fActivity.setErrorText("Authentication failed!");
+            		publishProgress(fActivity);
     	    		return GET_LOC_FAIL;
-    		    } else if (statusCode == INCORRECT_PASSWORD) {
-    	    		bActivity.setErrorText("Incorrect password!");
-            		publishProgress(bActivity);
+    		    } else if (statusCode == USER_NOT_FOLLOWING) {
+    	    		fActivity.setErrorText("User not following!");
+            		publishProgress(fActivity);
     	    		return GET_LOC_FAIL;
     		    } else if (statusCode == MALFORMED_LOCATION) {
-    	    		bActivity.setErrorText("malformed location!");
-            		publishProgress(bActivity);
+    	    		fActivity.setErrorText("malformed location!");
+            		publishProgress(fActivity);
     	    		return GET_LOC_FAIL;
     		    }
         	} catch (JSONException e) {
-    		    bActivity.setErrorText("JSON Error");
-        		publishProgress(bActivity);
+    		    fActivity.setErrorText("JSON Error");
+        		publishProgress(fActivity);
         		return GET_LOC_FAIL;
         	}
         	if (statusCode == SUCCESS) {
 		        return GET_LOC_SUCCESS;
 		    } else {
-		    	bActivity.setErrorText("Unrecognized status code!");
-		    	publishProgress(bActivity);
+		    	fActivity.setErrorText("Unrecognized status code!");
+		    	publishProgress(fActivity);
 		    	return GET_LOC_FAIL;
 		    }
 	    }
         
-        protected void onProgressUpdate(BroadcastActivity... broadcastActivties) {
-        	BroadcastActivity bActivity = broadcastActivties[0];
+        protected void onProgressUpdate(FollowActivity... followActivties) {
+        	FollowActivity fActivity = followActivties[0];
         	
-        	if (bActivity.progressSuccessful == false) {
-        		bActivity.handleError(bActivity.errorText);
+        	if (fActivity.progressSuccessful == false) {
+        		fActivity.handleError(fActivity.errorText);
         		return;
         	}
-        	Location currentLocation = bActivity.currentLocation;
+        	Location currentLocation = fActivity.currentLocation;
         	// Plot user location
             LatLng userLocation = new LatLng(
                     currentLocation.getLatitude(),
@@ -408,15 +433,15 @@ public class FollowActivity extends MapActivity {
             );
             ArrayList<LatLng> coords = new ArrayList<LatLng>();
             coords.add(userLocation);
-            bActivity.plot(coords);
+            fActivity.plot(coords);
         }
         
         @Override
         protected void onPostExecute(Integer result) {
         	if (result == GET_LOC_SUCCESS) {
-        		broadcastHandler.postDelayed(new Runnable() {
+        		setFollowerPositionHandler.postDelayed(new Runnable() {
                     public void run() {
-                    	new HTTPPOSTBroadcastAsyncTask().execute(bActivity);
+                    	new SetFollowerPositionTask().execute(fActivity);
                     }
                 }, BROADCAST_FREQUENCY);
         	}
