@@ -1,5 +1,7 @@
 package cs169.carfollowingapp;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.json.JSONException;
@@ -7,6 +9,9 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +21,8 @@ import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
+import cs169.carfollowingapp.BroadcastActivity.HTTPPOSTBroadcastAsyncTask;
 
 
 
@@ -217,7 +224,205 @@ public class FollowActivity extends MapActivity {
         new CancelTask().execute(cancelUrl);
     }
 
-
+    /* Finds the current location of the application user, who is currently broadcasting,
+     * and updates the database.
+     */
+    private class SetFollowerPositionTask extends AsyncTask<FollowActivity, FollowActivity, Integer> {
+    	static final int GET_LOC_SUCCESS = 1;
+    	static final int GET_LOC_FAIL = -1;
+    	static final int BROADCAST_FREQUENCY = 10 * 1000;
+    	private FollowActivity fActivity;
+    	//private String myUsername;
+    	//private String myPassword;
+    		
+    	
+    	@Override
+        protected Integer doInBackground(FollowActivity... followActivities) {
+    		fActivity = followActivities[0];
+    		//myUsername = bActivity.myUsername;
+    		//myPassword = bActivity.myPassword;
+    		
+    		// Getting the location of user
+            LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            String provider = service.getBestProvider(criteria, false);
+            
+            int result = getLocationAndUpdateDB(bActivity, service, provider);
+            
+            return result;
+    	}
+    	
+    	protected int getLocationAndUpdateDB(BroadcastActivity bActivity, LocationManager service, String provider) {
+    		String broadcastActionURL = "api/broadcast";
+    		Location currentLocation = service.getLastKnownLocation(provider);
+            
+            // If running on emulator, hardcode the location to test UI
+            if (Constants.DEBUG) {
+                String mocProvider = "testLocationProvider";
+                // add the fake service if it hasn't been added
+                if (!service.isProviderEnabled(mocProvider)) {
+                    service.addTestProvider(mocProvider, false, false, false, false,
+                            true, true, true, 0, 5);
+                    service.setTestProviderEnabled(mocProvider, true);
+                }
+                // create a new location (hardcoded coordinates)
+                currentLocation = new Location(mocProvider);
+                currentLocation.setLatitude(debugLatitude);
+                currentLocation.setLongitude(debugLongitude);
+                debugLatitude++;
+                debugLongitude++;
+                currentLocation.setTime(System.currentTimeMillis());
+                currentLocation.setAccuracy(3.0f);
+                
+                // Below is necessary fix for sdk's smaller than 17
+                Method locationJellyBeanFixMethod = null;
+                try {
+                    locationJellyBeanFixMethod = Location.class.getMethod("makeComplete");
+                    if (locationJellyBeanFixMethod != null) {
+                        locationJellyBeanFixMethod.invoke(currentLocation);
+                     }
+                } catch (NoSuchMethodException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+				
+                service.setTestProviderLocation(mocProvider, currentLocation);
+            }
+            
+            if (currentLocation == null) {
+            	bActivity.setErrorText("Cannot get current location");
+            	publishProgress(bActivity);
+    		    return GET_LOC_FAIL;
+            }
+            
+            bActivity.setCurrentLocation(currentLocation);
+            // Plot user location
+            publishProgress(bActivity);
+            
+            // Preparing information to store in database
+            JSONObject postData = new JSONObject();
+            
+        	try {
+        		String latitude = Double.toString(currentLocation.getLatitude());
+        		String longitude = Double.toString(currentLocation.getLongitude());
+        		postData.put("username", myUsername);
+        		postData.put("password", myPassword);
+        		postData.put("latitude", latitude);
+        		postData.put("longitude", longitude);
+        	} catch (RuntimeException e) {
+        	    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
+        	    bActivity.setErrorText("A RuntimeException has occurred");
+        		publishProgress(bActivity);
+        		return GET_LOC_FAIL;
+    		} catch (JSONException e) {
+    		    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
+    		    bActivity.setErrorText("JSON Error");
+    		    publishProgress(bActivity);
+        		return GET_LOC_FAIL;
+    		} catch (Exception e) {
+    		    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
+    	    	bActivity.setErrorText("A RuntimeException has occurred");
+        		publishProgress(bActivity);
+    		}
+    		
+    		JSONObject obj = null;
+    		try {
+    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData, getApplicationContext());
+    		} catch (RuntimeException e) {
+    			bActivity.setErrorText("Connection Error");
+        		publishProgress(bActivity);
+    			return GET_LOC_FAIL;
+    		}
+    		int checkJSONResult = checkJSONResponse(bActivity, obj.toString());
+    		if (checkJSONResult == GET_LOC_FAIL) {
+    			return GET_LOC_FAIL;
+    		} else {
+    			return GET_LOC_SUCCESS;
+    		}
+    	}
+    	
+    	/* Checks if there were any errors indicated by the JSON response.
+    	 * Returns 1 if there were no errors and returns -1 if there was an issue.
+    	 */
+        protected int checkJSONResponse(BroadcastActivity bActivity, String response) {
+        	if (response == null) {
+    		    bActivity.setErrorText("Unable to update database with current location");
+        		publishProgress(bActivity);
+        		return GET_LOC_FAIL;
+        	}
+        	
+        	int statusCode = 0;
+        	try {
+        		JSONObject jsonResponse = new JSONObject(response);
+        		statusCode = jsonResponse.getInt("status code");
+        		if (statusCode == SUCCESS) {
+    		        return GET_LOC_SUCCESS;
+    		    } else if (statusCode == NO_SUCH_USER) {
+    	    		bActivity.setErrorText("No such user!");
+            		publishProgress(bActivity);
+    	    		return GET_LOC_FAIL;
+    		    } else if (statusCode == INCORRECT_PASSWORD) {
+    	    		bActivity.setErrorText("Incorrect password!");
+            		publishProgress(bActivity);
+    	    		return GET_LOC_FAIL;
+    		    } else if (statusCode == MALFORMED_LOCATION) {
+    	    		bActivity.setErrorText("malformed location!");
+            		publishProgress(bActivity);
+    	    		return GET_LOC_FAIL;
+    		    }
+        	} catch (JSONException e) {
+    		    bActivity.setErrorText("JSON Error");
+        		publishProgress(bActivity);
+        		return GET_LOC_FAIL;
+        	}
+        	if (statusCode == SUCCESS) {
+		        return GET_LOC_SUCCESS;
+		    } else {
+		    	bActivity.setErrorText("Unrecognized status code!");
+		    	publishProgress(bActivity);
+		    	return GET_LOC_FAIL;
+		    }
+	    }
+        
+        protected void onProgressUpdate(BroadcastActivity... broadcastActivties) {
+        	BroadcastActivity bActivity = broadcastActivties[0];
+        	
+        	if (bActivity.progressSuccessful == false) {
+        		bActivity.handleError(bActivity.errorText);
+        		return;
+        	}
+        	Location currentLocation = bActivity.currentLocation;
+        	// Plot user location
+            LatLng userLocation = new LatLng(
+                    currentLocation.getLatitude(),
+                    currentLocation.getLongitude()
+            );
+            ArrayList<LatLng> coords = new ArrayList<LatLng>();
+            coords.add(userLocation);
+            bActivity.plot(coords);
+        }
+        
+        @Override
+        protected void onPostExecute(Integer result) {
+        	if (result == GET_LOC_SUCCESS) {
+        		broadcastHandler.postDelayed(new Runnable() {
+                    public void run() {
+                    	new HTTPPOSTBroadcastAsyncTask().execute(bActivity);
+                    }
+                }, BROADCAST_FREQUENCY);
+        	}
+        }
+        
+    }
 
 
     /*

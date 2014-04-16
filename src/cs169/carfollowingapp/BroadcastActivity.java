@@ -155,8 +155,8 @@ public class BroadcastActivity extends MapActivity {
     	followRequestHandler.removeCallbacksAndMessages(null);
     }
         
-    /* Finds the current location of the application user and updates
-     * the database.
+    /* Finds the current location of the application user, who is currently broadcasting,
+     * and updates the database.
      */
     private class HTTPPOSTBroadcastAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, Integer> {
     	static final int GET_LOC_SUCCESS = 1;
@@ -249,12 +249,6 @@ public class BroadcastActivity extends MapActivity {
         		postData.put("password", myPassword);
         		postData.put("latitude", latitude);
         		postData.put("longitude", longitude);
-        		
-        		/*
-        		JSONObject obj = SimpleHTTPPOSTRequester
-        				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
-        		return obj.toString();
-        		*/
         	} catch (RuntimeException e) {
         	    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
         	    bActivity.setErrorText("A RuntimeException has occurred");
