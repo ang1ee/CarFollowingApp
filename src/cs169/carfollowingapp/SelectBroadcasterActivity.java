@@ -140,7 +140,7 @@ public class SelectBroadcasterActivity extends Activity {
             try {
                 postData.put(Constants.MY_U_KEY, myUsername);//TODO:Cookie
                 postData.put(Constants.MY_P_KEY, myPassword);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);;
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
