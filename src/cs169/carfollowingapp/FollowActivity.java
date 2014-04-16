@@ -92,7 +92,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(followUrl, postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(followUrl, postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -165,7 +165,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
