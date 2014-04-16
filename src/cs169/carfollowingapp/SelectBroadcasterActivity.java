@@ -57,6 +57,14 @@ public class SelectBroadcasterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_broadcaster);
+
+        if (!Singleton.getInstance().cookieCheck()) {
+            Singleton.getInstance().clearCookies();
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
@@ -192,7 +200,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -266,7 +274,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -340,7 +348,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
