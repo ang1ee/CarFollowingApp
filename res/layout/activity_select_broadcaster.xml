@@ -23,9 +23,9 @@
 	    android:contentDescription="followUsername" />
     <ListView
         android:id="@+id/broadcaster_history_list"
-        android:layout_below="@id/follow_button"
+        android:layout_below="@id/input_username"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
+        android:layout_height="300dp"/>
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
