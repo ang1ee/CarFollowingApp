@@ -49,8 +49,8 @@ public class FrontPageActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
-            GeneralMethods.clearCookies(getApplicationContext());
+        if (!Singleton.getInstance().cookieCheck()) {
+            Singleton.getInstance().clearCookies();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
@@ -94,7 +94,7 @@ public class FrontPageActivity extends Activity {
     }
 
     public void logout(View view) {
-        GeneralMethods.clearCookies(getApplicationContext());
+        Singleton.getInstance().clearCookies();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         handler.removeCallbacksAndMessages(null);
         startActivity(intent);
@@ -110,7 +110,7 @@ public class FrontPageActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -184,7 +184,7 @@ public class FrontPageActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -258,7 +258,7 @@ public class FrontPageActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";

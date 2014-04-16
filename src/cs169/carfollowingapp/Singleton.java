@@ -85,7 +85,7 @@ public class Singleton {
         }
     }
 
-    public boolean cookieCheck(Context context) {
+    public boolean cookieCheck() {
         List<Cookie> cookies = mClient.getCookieStore().getCookies();
         if (cookies != null) {
             return true;
@@ -93,7 +93,7 @@ public class Singleton {
         return false;
     }
 
-    public void clearCookies(Context context) {
+    public void clearCookies() {
         mClient.getCookieStore().clear();
     }
 

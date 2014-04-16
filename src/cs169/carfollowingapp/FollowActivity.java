@@ -45,8 +45,8 @@ public class FollowActivity extends MapActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
-            GeneralMethods.clearCookies(getApplicationContext());
+        if (!Singleton.getInstance().cookieCheck()) {
+            Singleton.getInstance().clearCookies();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
@@ -336,7 +336,7 @@ public class FollowActivity extends MapActivity {
     		
     		JSONObject obj = null;
     		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData, getApplicationContext());
+    			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData);
     		} catch (RuntimeException e) {
     			bActivity.setErrorText("Connection Error");
         		publishProgress(bActivity);
