@@ -131,7 +131,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -205,7 +205,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -279,7 +279,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";

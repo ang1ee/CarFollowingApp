@@ -31,13 +31,10 @@ public class BroadcastActivity extends MapActivity {
     protected static final int INCORRECT_PASSWORD = -2;
     protected static final int MALFORMED_LOCATION = -3;
     
-    private static int currentID = 0;
-    private int instanceID;
     private Handler broadcastHandler = new Handler();
     //private Runnable broadcastRunnable;
     //private Runnable followRequestRunnable;
     private Handler followRequestHandler = new Handler();
-    private Handler invitationHandler = new Handler();
     
     /* Used to save currentLocation for AsyncTask. 
      * Maybe should change at some point since seems
@@ -70,78 +67,7 @@ public class BroadcastActivity extends MapActivity {
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
-
-        // Getting the location of user
-        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String provider = service.getBestProvider(criteria, false);
-        Location currentLocation = service.getLastKnownLocation(provider);
-        
-        // If running on emulator, hardcode the location to test UI
-        if (Constants.DEBUG) {
-            String mocProvider = "testLocationProvider";
-            // add the fake service if it hasn't been added
-            if (!service.isProviderEnabled(mocProvider)) {
-                service.addTestProvider(mocProvider, false, false, false, false,
-                        true, true, true, 0, 5);
-                service.setTestProviderEnabled(mocProvider, true);
-            }
-            // create a new location (hardcoded coordinates)
-            currentLocation = new Location(mocProvider);
-            currentLocation.setLatitude(37.0);
-            currentLocation.setLongitude(-122.0);
-            currentLocation.setTime(System.currentTimeMillis());
-            currentLocation.setAccuracy(3.0f);
-            
-            // Below is necessary fix for sdk's smaller than 17
-            Method locationJellyBeanFixMethod = null;
-            try {
-                locationJellyBeanFixMethod = Location.class.getMethod("makeComplete");
-                if (locationJellyBeanFixMethod != null) {
-                    locationJellyBeanFixMethod.invoke(currentLocation);
-                 }
-            } catch (NoSuchMethodException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            service.setTestProviderLocation(mocProvider, currentLocation);
-        }
-        
-        if (currentLocation == null) {
-        	CharSequence text = "Cannot get current location";
-		    handleError(text);
-		    return;
-        }
-        
-        /* Set ID so that AsyncTasks of old instances of BroadcastActivity
-         * terminate when they see that their ID is not the current ID.
-         */
-        instanceID = BroadcastActivity.currentID;
-        
-        /*
-        broadcastRunnable = new Runnable() {
-            public void run() {
-            	new HTTPPOSTBroadcastAsyncTask().execute(this);
-            }
-        };
-        
-        followRequestRunnable = new Runnable() {
-            public void run() {
-            	new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
-            }
-        };
-        */
-                
+                        
         new HTTPPOSTBroadcastAsyncTask().execute(this);
         new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
     }
@@ -236,7 +162,6 @@ public class BroadcastActivity extends MapActivity {
     	static final int GET_LOC_SUCCESS = 1;
     	static final int GET_LOC_FAIL = -1;
     	static final int BROADCAST_FREQUENCY = 10 * 1000;
-    	private int instanceID;
     	private BroadcastActivity bActivity;
     	private String myUsername;
     	private String myPassword;
@@ -245,7 +170,6 @@ public class BroadcastActivity extends MapActivity {
     	@Override
         protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
     		bActivity = broadcastActivties[0];
-    		instanceID = bActivity.instanceID;    		
     		myUsername = bActivity.myUsername;
     		myPassword = bActivity.myPassword;
     		
@@ -254,15 +178,7 @@ public class BroadcastActivity extends MapActivity {
             Criteria criteria = new Criteria();
             String provider = service.getBestProvider(criteria, false);
             
-            //while (instanceID == BroadcastActivity.currentID) {
-            //bActivity.map.clear();
             int result = getLocationAndUpdateDB(bActivity, service, provider);
-            /*
-            if (result == GET_LOC_FAIL) {
-            	break;
-            }
-            */
-            //}
             
             return result;
     	}
@@ -434,7 +350,7 @@ public class BroadcastActivity extends MapActivity {
         
         @Override
         protected void onPostExecute(Integer result) {
-        	if (result == GET_LOC_SUCCESS) { //&& (instanceID == BroadcastActivity.currentID)) {
+        	if (result == GET_LOC_SUCCESS) {
         		broadcastHandler.postDelayed(new Runnable() {
                     public void run() {
                     	new HTTPPOSTBroadcastAsyncTask().execute(bActivity);
@@ -455,7 +371,6 @@ public class BroadcastActivity extends MapActivity {
     	static final int REQUEST_CHECK_FREQUENCY = 5 * 1000;
     	static final int CHECK_FOLLOW_REQS_SUCCESS = 1;
     	static final int CHECK_FOLLOW_REQS_FAIL = -1;
-    	private int instanceID;
     	private String myUsername;
     	private String myPassword;
     	private BroadcastActivity bActivity;
@@ -464,25 +379,11 @@ public class BroadcastActivity extends MapActivity {
     	@Override
         protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
     		bActivity = broadcastActivties[0];
-    		instanceID = bActivity.instanceID;    		
     		myUsername = bActivity.myUsername;
     		myPassword = bActivity.myPassword;
     		
-            //while (instanceID == BroadcastActivity.currentID) {
             int result = checkFollowRequests(bActivity);
-            /*
-            	if (result == CHECK_FOLLOW_REQS_FAIL) {
-            		break;
-            	}
-            	try {
-            		Thread.sleep(REQUEST_CHECK_FREQUENCY);
-            	} catch(InterruptedException e) {
-            		e.printStackTrace();
-            		bActivity.setErrorText("Thread has interrupted current thread");
-        		    publishProgress(bActivity);
-            	}	
-            }
-            */
+
             return result;
     	}
     	
@@ -495,11 +396,6 @@ public class BroadcastActivity extends MapActivity {
         	try {
         		postData.put("myUsername", myUsername);
         		postData.put("myPassword", myPassword);        		
-        		/*
-        		JSONObject obj = SimpleHTTPPOSTRequester
-        				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
-        		return obj.toString();
-        		*/
         	} catch (RuntimeException e) {
         	    Log.e("HTTPPOSTBroadcastAsyncTask", e.getMessage());
         	    bActivity.setErrorText("A RuntimeException has occurred");
@@ -614,17 +510,11 @@ public class BroadcastActivity extends MapActivity {
         	if (bActivity.followRequestUsernames.size() > 0) {
         		bActivity.showFollowRequestDialog();
         	}
-        	/*
-        	for (int i = 0; i < bActivity.followRequestUsernames.size(); i++) {
-        		DialogFragment newFragment = new FollowRequestDialogFragment();
-                newFragment.show(getFragmentManager(), "follow request");
-        	}
-        	*/
         }
         
         @Override
         protected void onPostExecute(Integer result) {
-        	if (result == CHECK_FOLLOW_REQS_SUCCESS) {// && (instanceID == BroadcastActivity.currentID)) {
+        	if (result == CHECK_FOLLOW_REQS_SUCCESS) {
         		if (foundFollowers == true) {
         			foundFollowers = false;
         			return;
@@ -723,15 +613,6 @@ public class BroadcastActivity extends MapActivity {
         		postData.put("myUsername", bActivity.myUsername);
         		postData.put("myPassword", bActivity.myPassword);
         		postData.put("username", bActivity.followName);
-        		String myUsername = postData.getString("myUsername");
-        		System.out.println("hi");
-        		//XXX ADD BOOLEAN
-        		
-        		/*
-        		JSONObject obj = SimpleHTTPPOSTRequester
-        				.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/broadcast", postData);
-        		return obj.toString();
-        		*/
         	} catch (RuntimeException e) {
         	    Log.e("HTTPPOSTInvitationResponseAsyncTask", e.getMessage());
         	    bActivity.setErrorText("Connection error");
@@ -758,16 +639,7 @@ public class BroadcastActivity extends MapActivity {
         		publishProgress(bActivity);
         		return null;
     		}
-    		/*
-    		try {
-    			Thread.sleep(5 * 1000);
-    		} catch (InterruptedException e) {
-    			Log.e("HTTPPOSTInvitationResponseAsyncTask", e.getMessage());
-        	    bActivity.setErrorText("Interrupted thread exception");
-        		publishProgress(bActivity);
-        		return null;
-    		}
-    		*/
+
     		checkJSONResponse(bActivity, obj.toString());
     		return null;
     	}
@@ -824,13 +696,6 @@ public class BroadcastActivity extends MapActivity {
                 	new HTTPPOSTGetFollowRequestsAsyncTask().execute(bActivity);
                 }
             }, 5 * 1000);
-        	/*
-        	bActivity.invitationHandler.postDelayed(new Runnable() {
-                public void run() {
-                	bActivity.showFollowRequestDialog();
-                }
-            }, 5 * 1000);
-            */
         }
     	
     } 
