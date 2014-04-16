@@ -749,9 +749,8 @@ public class BroadcastActivity extends MapActivity {
                 int errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
-                        ArrayList<LatLng> coords = new ArrayList<LatLng>();
-                        coords.add(new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude")));
-                        bActivity.plot(coords);
+                        JSONObject followerPositionsDict = fin.getJSONObject("user positions");
+                        plotFollowers(followerPositionsDict);
                         getFollowPositionsHandler.postDelayed(new Runnable() {
                             public void run() {
                                 new GetFollowPositionsTask().execute(bActivity);
@@ -768,8 +767,6 @@ public class BroadcastActivity extends MapActivity {
                         handleError("Unknown errCode.");
                         break;
                 }
-                JSONObject followerPositionsDict = fin.getJSONObject("user positions");
-                plotFollowers(followerPositionsDict);
             } catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
                 handleError(e.getMessage());
