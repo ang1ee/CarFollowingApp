@@ -3,6 +3,7 @@ package cs169.carfollowingapp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,6 +48,7 @@ public class SelectBroadcasterActivity extends Activity {
     private String followRequestUrl = Constants.BASE_SERVER_URL + "api/follow_request";
     private String checkPermissionUrl = Constants.BASE_SERVER_URL + "api/check_permission";
     private String cancelUrl = Constants.BASE_SERVER_URL + "api/follow_cancellation";
+    private String broadcasterHistoryUrl = Constants.BASE_SERVER_URL + "api/get_recently_followed";
     
     private Handler handler = new Handler();
     private int frequency = 5000;
@@ -62,7 +64,8 @@ public class SelectBroadcasterActivity extends Activity {
         editText = (EditText) findViewById(R.id.input_username);
         
         listView = (ListView) findViewById(R.id.broadcaster_history_list);
-        broadcasterHistoryList = getBroadcasterHistory();
+        broadcasterHistoryList = new ArrayList<String>();
+        getBroadcasterHistory();
         listView.setAdapter(new BroadcasterHistoryAdapter(getApplicationContext(), 0, broadcasterHistoryList));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -106,9 +109,9 @@ public class SelectBroadcasterActivity extends Activity {
     }
     
     
-    public List<String> getBroadcasterHistory() {
+    public void getBroadcasterHistory() {
     	//TODO: get this from somewhere.
-    	return new ArrayList<String>();
+    	new BroadcasterHistoryTask().execute(broadcasterHistoryUrl);
     }
     
     public void follow(View view) {
@@ -120,6 +123,64 @@ public class SelectBroadcasterActivity extends Activity {
         new FollowRequestTask().execute(followRequestUrl);
         
         
+    }
+    private class BroadcasterHistoryTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            JSONObject postData = new JSONObject();
+            try {
+                postData.put(Constants.MY_U_KEY, myUsername);//TODO:Cookie
+                postData.put(Constants.MY_P_KEY, myPassword);
+                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                return obj.toString();
+            } catch (JSONException e) {
+                return "JSON_EXCEPTION";
+            } catch (RuntimeException e) {
+                return "RUNTIME_EXCEPTION";
+            } catch (Exception e) {
+                return "ERROR";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
+            JSONObject fin;
+            try {
+                if (result == "JSON_EXCEPTION") {
+                    showToast("JSON Error");
+                } else if (result == "RUNTIME_EXCEPTION") {
+                    showToast("Connection Error");
+                } else if (result == "ERROR") {
+                    showToast("Error");
+                }
+                fin = new JSONObject(result);
+                int errCode = fin.getInt("status code");
+                switch (errCode) { //Updates the message on the Log In page, depending on the database response.
+                    case SUCCESS:
+                    	JSONArray jsonArray = fin.getJSONArray("history");
+                    	if (jsonArray != null) { 
+                    		   for (int i=0;i<jsonArray.length();i++){ 
+                    		    broadcasterHistoryList.add(jsonArray.get(i).toString()); 
+                    		}
+                    	}
+                        break;
+                    case WRONG_MYUSERNMAE:
+                        showToast("Incorrect user credential.");
+                        tvMessage.setText("Incorrect user credential.");
+                        break;
+                    
+                    default:
+                        showToast("Unknown errCode.");
+                        tvMessage.setText("Unknown errCode.");
+                        break;
+                }
+
+            } catch (Exception e) {
+                Log.d("InputStream", e.getLocalizedMessage());
+                showToast(e.getMessage());
+            }
+        }
     }
 
     private class FollowRequestTask extends AsyncTask<String, Void, String> {
