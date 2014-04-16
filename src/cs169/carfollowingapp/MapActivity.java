@@ -52,10 +52,10 @@ public class MapActivity extends FragmentActivity {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(coords.get(0), 13));
         
         for (int i = 0; i < coords.size(); i++) {
-            map.addMarker(new MarkerOptions().position(coords.get(i)));
+        	map.addMarker(new MarkerOptions().position(coords.get(i)));
         }
     }
-    
+        
 	// Displays toast showing the text argument.
 	protected void showToast(CharSequence text) {
 	    Context context = getApplicationContext();

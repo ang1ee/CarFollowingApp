@@ -3,14 +3,18 @@ package cs169.carfollowingapp;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -22,19 +26,37 @@ import android.view.Menu;
 import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import android.graphics.Color;
 
 public class BroadcastActivity extends MapActivity {
 
+	protected HashMap<String, Circle> followerMarkersDict = new HashMap<String, Circle>();
+	
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
     protected static final int INCORRECT_PASSWORD = -2;
     protected static final int MALFORMED_LOCATION = -3;
     
     private Handler broadcastHandler = new Handler();
-    //private Runnable broadcastRunnable;
-    //private Runnable followRequestRunnable;
     private Handler followRequestHandler = new Handler();
+    private Handler getFollowPositionsHandler = new Handler();
+    private int numberOfColors = 11;
+    private int nextColorNum = 0;
+    private int[] colors = {Color.BLACK,
+    						Color.BLUE,
+    						Color.CYAN,
+    						Color.DKGRAY,
+    						Color.GRAY,
+    						Color.GREEN,
+    						Color.LTGRAY,
+    						Color.MAGENTA,
+    						Color.RED,
+    						Color.WHITE,
+    						Color.YELLOW
+    						}; 
     
     /* Used to save currentLocation for AsyncTask. 
      * Maybe should change at some point since seems
@@ -67,9 +89,10 @@ public class BroadcastActivity extends MapActivity {
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
-                        
+        
         new HTTPPOSTBroadcastAsyncTask().execute(this);
         new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
+        new GetFollowPositionsTask().execute(this);
     }
 
     @Override
@@ -694,4 +717,106 @@ public class BroadcastActivity extends MapActivity {
     	
     } 
      
+    private class GetFollowPositionsTask extends AsyncTask<BroadcastActivity, Void, String> {
+        private BroadcastActivity bActivity;
+        private String getFollowerPositions = Constants.BASE_SERVER_URL + "get_follower_positions";
+        private int frequency = 10 * 1000;
+        
+        static final int SUCCESS = 1;
+        static final int AUTHENTICATION_FAILED = -1;
+        static final int USER_NOT_BROADCASTING = -3;
+        
+        @Override
+        protected String doInBackground(BroadcastActivity... followActivities) {
+            bActivity = followActivities[0];
+            try {
+                JSONObject obj = SimpleHTTPGETRequester.makeHTTPGETRequest(getFollowerPositions, getApplicationContext());
+                return obj.toString();
+            } catch (RuntimeException e) {
+                return "RUNTIME_EXCEPTION";
+            }
+        }
+        
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
+            JSONObject fin;
+            try {
+                if (result == "RUNTIME_EXCEPTION") {
+                    handleError("Connection Error");
+                }
+                fin = new JSONObject(result);
+                int errCode = fin.getInt("status code");
+                switch (errCode) { //Updates the message on the Log In page, depending on the database response.
+                    case SUCCESS:
+                        ArrayList<LatLng> coords = new ArrayList<LatLng>();
+                        coords.add(new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude")));
+                        bActivity.plot(coords);
+                        getFollowPositionsHandler.postDelayed(new Runnable() {
+                            public void run() {
+                                new GetFollowPositionsTask().execute(bActivity);
+                            }
+                        }, frequency);
+                        break;
+                    case AUTHENTICATION_FAILED:
+                        showToast("Authentication failed.");
+                        break;
+                    case USER_NOT_BROADCASTING:
+                        showToast("User not broadcasting.");
+                        break;
+                    default:
+                        handleError("Unknown errCode.");
+                        break;
+                }
+                JSONObject followerPositionsDict = fin.getJSONObject("user positions");
+                plotFollowers(followerPositionsDict);
+            } catch (Exception e) {
+                Log.d("InputStream", e.getLocalizedMessage());
+                handleError(e.getMessage());
+            }
+        }
+        
+        void plotFollowers(JSONObject followerPositionsDict) {
+        	Iterator<String> followers = (Iterator<String>) followerPositionsDict.keys();
+        	try {
+        		HashSet<String> currentFollowers = new HashSet<String>();
+        		while (followers.hasNext()) {
+        			String follower = followers.next();
+        			currentFollowers.add(follower);
+        			JSONArray positionArr = followerPositionsDict.getJSONArray(follower);
+        			Double lat = positionArr.getDouble(0);
+        			Double lng = positionArr.getDouble(1);
+        			LatLng position = new LatLng(lat, lng);
+        			CircleOptions circOpt = new CircleOptions().center(position);
+        			circOpt.fillColor(colors[nextColorNum]);;
+        			nextColorNum = (nextColorNum + 1) % numberOfColors;
+        			
+        			if (followerMarkersDict.containsKey(follower)) {
+        				Circle c =  followerMarkersDict.get(follower);
+        				c.setCenter(position);
+        			} else {
+        				Circle c = bActivity.map.addCircle(circOpt);
+        				followerMarkersDict.put(follower, c);
+        			}
+        		}
+        		deleteExFollowers(currentFollowers);
+        	} catch (JSONException e) {
+        		handleError("JSON exception.");
+        	}
+        }
+        
+        void deleteExFollowers(Set<String> currentFollowers) {
+        	Set<String> oldFollowers = followerMarkersDict.keySet();
+        	oldFollowers.removeAll(currentFollowers);
+        	Iterator<String> iter  = oldFollowers.iterator();
+        	while (iter.hasNext()) {
+        		String exFollower = iter.next();
+        		Circle c = followerMarkersDict.get(exFollower);
+        		c.remove();
+        		followerMarkersDict.remove(exFollower);
+        	}
+        }
+        
+    }
+    
 }
