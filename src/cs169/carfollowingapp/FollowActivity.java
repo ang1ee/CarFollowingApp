@@ -51,8 +51,8 @@ public class FollowActivity extends MapActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
-            GeneralMethods.clearCookies(getApplicationContext());
+        if (!Singleton.getInstance().cookieCheck()) {
+            Singleton.getInstance().clearCookies();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
@@ -110,7 +110,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(followUrl, postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(followUrl, postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -183,7 +183,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
-                JSONObject obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(urls[0], postData, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
                 return "JSON_EXCEPTION";
@@ -361,7 +361,7 @@ public class FollowActivity extends MapActivity {
     		
     		JSONObject obj = null;
     		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData, getApplicationContext());
+    			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData);
     		} catch (RuntimeException e) {
     			fActivity.setErrorText("Connection Error");
         		publishProgress(fActivity);

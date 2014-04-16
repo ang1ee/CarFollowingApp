@@ -33,8 +33,8 @@ public class FrontPageActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
-            GeneralMethods.clearCookies(getApplicationContext());
+        if (!Singleton.getInstance().cookieCheck()) {
+            Singleton.getInstance().clearCookies();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
@@ -70,7 +70,7 @@ public class FrontPageActivity extends Activity {
         startActivity(intent);
         finish();
         
-        
+
     }
 
     @Override
@@ -78,23 +78,11 @@ public class FrontPageActivity extends Activity {
     }
 
     public void logout(View view) {
-        GeneralMethods.clearCookies(getApplicationContext());
+        Singleton.getInstance().clearCookies();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
         finish();
     }
-    
-
-    
-    // Displays toast showing the text argument.
- 	protected void showToast(CharSequence text) {
- 	    Context context = getApplicationContext();
- 	    int duration = Toast.LENGTH_SHORT;
- 	    
- 	    Toast toast = Toast.makeText(context, text, duration);
- 	    toast.show();
- 	}
-    
 
 }
 

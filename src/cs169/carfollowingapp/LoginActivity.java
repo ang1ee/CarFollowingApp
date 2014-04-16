@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -39,6 +40,7 @@ public class LoginActivity extends Activity {
     TextView tvMessage;
     EditText etUsername,etPassword;
     Button btnLogin, btnRegister;
+    String username, password;
 
     //Destination addresses for the login and add location of the server
     String loginUrl = Constants.BASE_SERVER_URL + "api/login";
@@ -70,6 +72,8 @@ public class LoginActivity extends Activity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                username = etUsername.getText().toString();
+                password = etPassword.getText().toString();
                 new HttpAsyncTask().execute(loginUrl);
             }
         });
@@ -91,11 +95,24 @@ public class LoginActivity extends Activity {
         @Override
         protected String doInBackground(String... urls) {
 
-            User user = new User();
-            user.setUsername(etUsername.getText().toString());
-            user.setPassword(etPassword.getText().toString());
-            String result = POST(urls[0],user,getApplicationContext());
-            return result;
+//            User user = new User();
+//            user.setUsername(etUsername.getText().toString());
+//            user.setPassword(etPassword.getText().toString());
+//            String result = POST(urls[0],user,getApplicationContext());
+            JSONObject postData = new JSONObject();
+            try {
+                postData.put(Constants.U_KEY, username);
+                postData.put(Constants.P_KEY, password);
+                JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
+                return obj.toString();
+            } catch (JSONException e) {
+                return "JSON_EXCEPTION";
+            } catch (RuntimeException e) {
+                return "RUNTIME_EXCEPTION";
+            } catch (Exception e) {
+                return "ERROR";
+            }
+//            return result;
         }
 
         @Override
@@ -127,78 +144,78 @@ public class LoginActivity extends Activity {
 
             if (errCode == 1) { //Opens a new page in response to a successful log in/add user.
                 Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                intent.putExtra(Constants.MY_U_KEY, etUsername.getText().toString());
-                intent.putExtra(Constants.MY_P_KEY, etPassword.getText().toString());
+                intent.putExtra(Constants.MY_U_KEY, username);
+                intent.putExtra(Constants.MY_P_KEY, password);
                 startActivity(intent);
                 finish();
             }
         }
     }
 
-    //Packages and sends the POST request to the database url, with information from user.
-    public static String POST(String url, User user, Context context){
-        InputStream inputStream = null;
-        String result = "";
-        try {
-            // create HttpClient
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            // make POST request to the given URL
-            HttpPost httpPost = new HttpPost(url);
-            String json = "";
-            // build jsonObject
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("username", user.getUsername());
-            jsonObject.put("password", user.getPassword());
-            //  convert JSONObject to JSON to String
-            json = jsonObject.toString();
-            // set json to StringEntity
-            StringEntity se = new StringEntity(json);
-            //se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-            // set httpPost Entity
-            httpPost.setEntity(se);
-            // Set some headers to inform server about the type of the content
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Content-type", "application/json");
-            // Execute POST request to the given URL
-            HttpResponse httpResponse = httpclient.execute(httpPost);
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-           //get cookie from response
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = pref.edit();
-            List<Cookie> cookies = httpclient.getCookieStore().getCookies();
-            for (int i = 0; i < cookies.size(); i++) {
-                Cookie cookie = cookies.get(i);
-                editor.putString(Constants.COOKIE, cookie.toString());
-            }
-            editor.apply();
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-        // 11. return result
-        return result;
-    }
-
-    //Converts the data in the InputStream into the result string. Used to change the Http response
-    //from the database into an easier to read format.
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException{
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
-    }
+//    //Packages and sends the POST request to the database url, with information from user.
+//    public static String POST(String url, User user, Context context){
+//        InputStream inputStream = null;
+//        String result = "";
+//        try {
+//            // create HttpClient
+//            DefaultHttpClient httpclient = new DefaultHttpClient();
+//            // make POST request to the given URL
+//            HttpPost httpPost = new HttpPost(url);
+//            String json = "";
+//            // build jsonObject
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("username", user.getUsername());
+//            jsonObject.put("password", user.getPassword());
+//            //  convert JSONObject to JSON to String
+//            json = jsonObject.toString();
+//            // set json to StringEntity
+//            StringEntity se = new StringEntity(json);
+//            //se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+//            // set httpPost Entity
+//            httpPost.setEntity(se);
+//            // Set some headers to inform server about the type of the content
+//            httpPost.setHeader("Accept", "application/json");
+//            httpPost.setHeader("Content-type", "application/json");
+//            // Execute POST request to the given URL
+//            HttpResponse httpResponse = httpclient.execute(httpPost);
+//            // receive response as inputStream
+//            inputStream = httpResponse.getEntity().getContent();
+//            // convert inputstream to string
+//            if(inputStream != null)
+//                result = convertInputStreamToString(inputStream);
+//            else
+//                result = "Did not work!";
+//
+//           //get cookie from response
+//            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+//            SharedPreferences.Editor editor = pref.edit();
+//            List<Cookie> cookies = httpclient.getCookieStore().getCookies();
+//            for (int i = 0; i < cookies.size(); i++) {
+//                Cookie cookie = cookies.get(i);
+//                editor.putString(Constants.COOKIE, cookie.toString());
+//            }
+//            editor.apply();
+//
+//        } catch (Exception e) {
+//            Log.d("InputStream", e.getLocalizedMessage());
+//        }
+//        // 11. return result
+//        return result;
+//    }
+//
+//    //Converts the data in the InputStream into the result string. Used to change the Http response
+//    //from the database into an easier to read format.
+//    private static String convertInputStreamToString(InputStream inputStream) throws IOException{
+//        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+//        String line = "";
+//        String result = "";
+//        while((line = bufferedReader.readLine()) != null)
+//            result += line;
+//
+//        inputStream.close();
+//        return result;
+//
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

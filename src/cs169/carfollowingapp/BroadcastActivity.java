@@ -79,8 +79,8 @@ public class BroadcastActivity extends MapActivity {
                 .findFragmentById(R.id.broadcast_map)).getMap();
         this.map.setMyLocationEnabled(true);
 
-        if (!GeneralMethods.cookieCheck(getApplicationContext())) {
-            GeneralMethods.clearCookies(getApplicationContext());
+        if (!Singleton.getInstance().cookieCheck()) {
+            Singleton.getInstance().clearCookies();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
@@ -290,7 +290,7 @@ public class BroadcastActivity extends MapActivity {
     		
     		JSONObject obj = null;
     		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData, getApplicationContext());
+    			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData);
     		} catch (RuntimeException e) {
     			bActivity.setErrorText("Connection Error");
         		publishProgress(bActivity);
@@ -432,7 +432,7 @@ public class BroadcastActivity extends MapActivity {
     		JSONObject obj = null;
     		JSONArray followers = null;
     		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData, getApplicationContext());
+    			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData);
     		} catch (RuntimeException e) {
     			bActivity.setErrorText("Connection Error");
         		publishProgress(bActivity);
@@ -568,7 +568,7 @@ public class BroadcastActivity extends MapActivity {
         	    		
     		JSONObject obj = new JSONObject();
     		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData, getApplicationContext());
+    			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + "api/stop_broadcast", postData);
     		} catch (RuntimeException e) {
     			return CONNECTION_ERROR;
     		}
@@ -649,7 +649,7 @@ public class BroadcastActivity extends MapActivity {
     		
     		JSONObject obj = null;
     		try {
-    			obj = SimpleHTTPPOSTRequester.makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData, getApplicationContext());
+    			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData);
     		} catch (RuntimeException e) {
     			Log.e("HTTPPOSTInvitationResponseAsyncTask", e.getMessage());
         	    bActivity.setErrorText("Connection error");
