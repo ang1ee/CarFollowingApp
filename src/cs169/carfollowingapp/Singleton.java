@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -85,12 +86,50 @@ public class Singleton {
         }
     }
 
+    public JSONObject makeHTTPGETRequest(String url) {
+        try {
+            HttpGet request = new HttpGet(url);
+            HttpResponse response = mClient.execute(request);
+
+            HttpEntity ent = response.getEntity();
+            InputStream is = ent.getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+            } catch (IOException e) {
+                throw new IOException("asd");
+            } finally {
+                is.close();
+            }
+            String string = sb.toString();
+            is.close();
+            String result = string.substring(0,string.length()-1);
+            JSONObject jsonResult = new JSONObject(result);
+            return jsonResult;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Connection Error.");
+        }
+    }
+
     public boolean cookieCheck() {
         List<Cookie> cookies = mClient.getCookieStore().getCookies();
         if (cookies != null) {
             return true;
         }
         return false;
+    }
+
+    public String getCookie() {
+        List<Cookie> cookies = mClient.getCookieStore().getCookies();
+        if (cookies == null) {
+            return "";
+        }
+        return cookies.get(0).toString();
     }
 
     public void clearCookies() {
