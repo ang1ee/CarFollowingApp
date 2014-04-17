@@ -43,7 +43,7 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDa0c-LEhNpZflo4MGQj_NF9AmABQjP5uA" />
+            android:value="AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U" />
 
         <activity
             android:name="cs169.carfollowingapp.FollowActivity"
@@ -55,7 +55,8 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
         </activity>
         <activity
             android:name="cs169.carfollowingapp.BroadcastActivity"
-            android:label="@string/title_activity_broadcast" >
+            android:label="@string/title_activity_broadcast"
+            android:configChanges="orientation" >
         </activity>
         <activity
             android:name="cs169.carfollowingapp.LoginActivity"
