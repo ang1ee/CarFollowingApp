@@ -120,6 +120,7 @@ public class SelectBroadcasterActivity extends Activity {
     public void getBroadcasterHistory() {
     	//TODO: get this from somewhere.
     	new BroadcasterHistoryTask().execute(broadcasterHistoryUrl);
+
     }
     
     public void follow(View view) {
