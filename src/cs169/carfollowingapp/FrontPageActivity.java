@@ -39,6 +39,11 @@ public class FrontPageActivity extends Activity {
             startActivity(intent);
             finish();
         }
+        Context context = getApplicationContext();
+        CharSequence text = "Cookie: " + Singleton.getInstance().getCookie();
+        int duration = Toast.LENGTH_SHORT;
+        Toast.makeText(context, text, duration).show();
+
 
         setContentView(R.layout.activity_front_page);
         Intent intent = getIntent();
