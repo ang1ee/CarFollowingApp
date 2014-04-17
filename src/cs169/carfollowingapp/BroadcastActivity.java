@@ -113,7 +113,15 @@ public class BroadcastActivity extends MapActivity {
         super.onDestroy();
         // Before this activity dies, tell the server 
         // to stop broadcasting will that take too much time?
-        stopBroadcasting();
+        handleCleanup();
+    	
+	    Intent intent = new Intent(this, FrontPageActivity.class);
+	    intent.putExtra(Constants.MY_U_KEY, myUsername);
+	    intent.putExtra(Constants.MY_P_KEY, myPassword);
+	    
+	    new HTTPPOSTStopBroadcastingAsyncTask().execute(this);
+	    
+	    startActivity(intent);
     }
     
     public void stopBroadcasting(View view) {
@@ -126,15 +134,7 @@ public class BroadcastActivity extends MapActivity {
     }
 
     public void stopBroadcasting() {
-    	handleCleanup();
-    	
-	    Intent intent = new Intent(this, FrontPageActivity.class);
-	    intent.putExtra(Constants.MY_U_KEY, myUsername);
-	    intent.putExtra(Constants.MY_P_KEY, myPassword);
-	    
-	    new HTTPPOSTStopBroadcastingAsyncTask().execute(this);
-	    
-	    startActivity(intent);
+  
 	    finish();
 	}
     
