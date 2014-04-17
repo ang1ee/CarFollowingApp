@@ -28,4 +28,6 @@
     <string name="register_text">Register</string>
     <string name="title_activity_select_broadcaster">SelectBroadcasterActivity</string>
 
+    <string name="open_drawer">Open Followers</string>
+    <string name="close_drawer">Close Followers</string>
 </resources>

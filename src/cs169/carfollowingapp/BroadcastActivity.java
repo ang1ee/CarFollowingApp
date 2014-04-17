@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -20,9 +21,14 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -69,12 +75,80 @@ public class BroadcastActivity extends MapActivity {
     protected double debugLatitude = 37.0;
     protected double debugLongitude = -122.0;
     
+    private String[] mFollowers;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    
     private Marker broadcaster;
+    private int count = 0;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
+
+        mTitle = mDrawerTitle = getTitle();
+        mFollowers = new String[] { "hi", "2", "3" };
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 
+                R.drawable.ic_launcher, R.string.open_drawer, R.string.close_drawer) {
+            
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActionBar().setTitle(mTitle);
+                
+                count++;
+                String s1 = "" + count;
+                String s2 = "" + count;
+                mFollowers = new String[] { s1, s2, s1, s1 };
+                
+                mDrawerList.setAdapter(new ArrayAdapter<String>(getApplicationContext(),
+                        R.layout.item_follower, mFollowers));
+                
+                // creates call to onPrepareOptionsMenu
+                invalidateOptionsMenu();
+            }
+            
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getActionBar().setTitle(mDrawerTitle);
+                
+                // creates call to onPrepareOptionsMenu
+                invalidateOptionsMenu();
+            }
+            
+            public boolean onOptionsItemSelected(MenuItem item) {
+                // update String thing here
+                
+                // FIX THIS can't update here cause then it updates every time you 
+                // open and close it.... and then not when you swipe. there must be a better place..
+                // on open?
+                
+                
+                return super.onOptionsItemSelected(item);
+            }
+        };
+        
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+                
+        // Set adapter for list view (update everytime we get new follower??
+        // Does that mean we have to check every time whether it's changed?
+        // ... hashhhhtaaabllle?
+        // or just recreate every time? is that a good idea?
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.item_follower, mFollowers));
+        
+        // mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        
         this.map = ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.broadcast_map)).getMap();
         this.map.setMyLocationEnabled(true);
@@ -94,7 +168,37 @@ public class BroadcastActivity extends MapActivity {
         new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
         new GetFollowPositionsTask().execute(this);
     }
-
+    
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        
+        // Handle your other action bar items
+        return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+    
+    // override onPrepareOptionsMenu to hide action items
+    
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
