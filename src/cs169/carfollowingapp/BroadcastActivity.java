@@ -719,7 +719,7 @@ public class BroadcastActivity extends MapActivity {
      
     private class GetFollowPositionsTask extends AsyncTask<BroadcastActivity, Void, String> {
         private BroadcastActivity bActivity;
-        private String getFollowerPositions = Constants.BASE_SERVER_URL + "get_follower_positions";
+        private String getFollowerPositions = Constants.BASE_SERVER_URL + "api/get_follower_positions";
         private int frequency = 10 * 1000;
         
         static final int SUCCESS = 1;
@@ -730,9 +730,10 @@ public class BroadcastActivity extends MapActivity {
         protected String doInBackground(BroadcastActivity... followActivities) {
             bActivity = followActivities[0];
             try {
-                JSONObject obj = SimpleHTTPGETRequester.makeHTTPGETRequest(getFollowerPositions, getApplicationContext());
+                JSONObject obj = Singleton.getInstance().makeHTTPGETRequest(getFollowerPositions);
                 return obj.toString();
             } catch (RuntimeException e) {
+                Log.d("runtimeException", e.getLocalizedMessage());
                 return "RUNTIME_EXCEPTION";
             }
         }
@@ -798,6 +799,7 @@ public class BroadcastActivity extends MapActivity {
         		}
         		deleteExFollowers(currentFollowers);
         	} catch (JSONException e) {
+        	    Log.d("plotFollowers", e.getLocalizedMessage());
         		handleError("JSON exception.");
         	}
         }
