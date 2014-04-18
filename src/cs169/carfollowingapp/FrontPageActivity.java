@@ -1,34 +1,19 @@
 
 package cs169.carfollowingapp;
 
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class FrontPageActivity extends Activity {
-    
 
-    
     private String myUsername;
     private String myPassword;
-
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {

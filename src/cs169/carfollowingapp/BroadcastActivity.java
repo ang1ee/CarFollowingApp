@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -14,15 +15,20 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -30,11 +36,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.content.pm.ActivityInfo;
-
 public class BroadcastActivity extends MapActivity {
 
 	protected HashMap<String, Marker> followerCircleDict = new HashMap<String, Marker>();
+	protected HashMap<String, Float> followerColorMap = new HashMap<String, Float>();
 	
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
@@ -68,8 +73,16 @@ public class BroadcastActivity extends MapActivity {
     protected CharSequence errorText;
     protected LinkedList<String> followRequestUsernames = new LinkedList<String>();
     protected String followName;
-    protected double debugLatitude = 37.0;
-    protected double debugLongitude = -122.0;
+    protected double debugLatitude = 37.866750;
+    protected double debugLongitude = -122.262074;
+    
+    private String[] mFollowers;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
     
     private Marker broadcaster;
     
@@ -77,6 +90,51 @@ public class BroadcastActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
+
+        mTitle = mDrawerTitle = getTitle();
+        mFollowers = new String[] { "hi", "2", "3" };
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 
+                R.drawable.ic_launcher, R.string.open_drawer, R.string.close_drawer) {
+            
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActionBar().setTitle(mTitle);
+                
+                // creates call to onPrepareOptionsMenu
+                invalidateOptionsMenu();
+            }
+            
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getActionBar().setTitle(mDrawerTitle);
+                
+                mDrawerList.setAdapter(new FollowerListAdapter(
+                        getApplicationContext(),
+                        R.layout.item_follower, 
+                        followerColorMap.entrySet().toArray((Map.Entry<String, Float>[]) new Map.Entry[]{}))
+                );
+                
+                // creates call to onPrepareOptionsMenu
+                invalidateOptionsMenu();
+            }
+        };
+        
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        
+        mDrawerList.setAdapter(new FollowerListAdapter(
+                this,
+                R.layout.item_follower, 
+                followerColorMap.entrySet().toArray((Map.Entry<String, Float>[]) new Map.Entry[]{}))
+        );
+        
+        
+        // mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         this.map = ((SupportMapFragment) getSupportFragmentManager()
@@ -98,7 +156,37 @@ public class BroadcastActivity extends MapActivity {
         new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
         new GetFollowPositionsTask().execute(this);
     }
-
+    
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        
+        // Handle your other action bar items
+        return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+    
+    // override onPrepareOptionsMenu to hide action items
+    
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -222,12 +310,14 @@ public class BroadcastActivity extends MapActivity {
                             true, true, true, 0, 5);
                     service.setTestProviderEnabled(mocProvider, true);
                 }
+                Log.d("LATITUDE", "" + debugLatitude);
                 // create a new location (hardcoded coordinates)
                 currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
                 debugLatitude = debugLatitude + 0.001;
                 debugLongitude = debugLongitude + 0.001;
+
                 currentLocation.setTime(System.currentTimeMillis());
                 currentLocation.setAccuracy(3.0f);
                 
@@ -799,6 +889,7 @@ public class BroadcastActivity extends MapActivity {
             			nextColorNum = (nextColorNum + 1) % colors.length;
                         marcOpt.icon(BitmapDescriptorFactory.defaultMarker(colors[nextColorNum]));
         				Marker m = bActivity.map.addMarker(marcOpt);
+        				followerColorMap.put(follower, new Float(colors[nextColorNum]));
         				followerCircleDict.put(follower, m);
         			}
         		}
@@ -819,6 +910,7 @@ public class BroadcastActivity extends MapActivity {
         		Marker m = followerCircleDict.get(exFollower);
         		m.remove();
         		followerCircleDict.remove(exFollower);
+        		followerColorMap.remove(exFollower);
         	}
         }
         
