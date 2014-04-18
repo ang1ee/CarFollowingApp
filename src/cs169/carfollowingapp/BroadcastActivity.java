@@ -552,7 +552,7 @@ public class BroadcastActivity extends MapActivity {
     	 * instance.
     	 */
     	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
-    		if (followers.length() > 0) {
+    		if (bActivity.followRequestUsernames.size() > 0) {
     			foundFollowers = true;
     		}
     		bActivity.progressSuccessful = true;
