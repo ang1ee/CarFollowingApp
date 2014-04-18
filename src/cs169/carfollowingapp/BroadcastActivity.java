@@ -785,14 +785,14 @@ public class BroadcastActivity extends MapActivity {
         			Double lat = positionArr.getDouble(0);
         			Double lng = positionArr.getDouble(1);
         			LatLng position = new LatLng(lat, lng);
-        			CircleOptions circOpt = new CircleOptions().center(position);
-        			circOpt.fillColor(colors[nextColorNum]);;
-        			nextColorNum = (nextColorNum + 1) % numberOfColors;
         			
         			if (followerMarkersDict.containsKey(follower)) {
         				Circle c =  followerMarkersDict.get(follower);
         				c.setCenter(position);
         			} else {
+        				CircleOptions circOpt = new CircleOptions().center(position);
+            			circOpt.fillColor(colors[nextColorNum]);
+            			nextColorNum = (nextColorNum + 1) % numberOfColors;
         				Circle c = bActivity.map.addCircle(circOpt);
         				followerMarkersDict.put(follower, c);
         			}
