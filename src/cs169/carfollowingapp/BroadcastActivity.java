@@ -257,15 +257,7 @@ public class BroadcastActivity extends MapActivity {
     	newFragment.setBActivity(this);
     	newFragment.show(getFragmentManager(), "follow request");
     }
-    
-    public void restartGetFollowRequests() {
-    	followRequestHandler.postDelayed(new Runnable() {
-            public void run() {
-            	new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
-            }
-        }, 5 * 1000);
-    }
-    
+        
     @Override
     protected void handleCleanup() {
         //BroadcastActivity.currentID++;
@@ -721,10 +713,10 @@ public class BroadcastActivity extends MapActivity {
     	    	
     	@Override
         protected String doInBackground(BroadcastActivity... broadcastActivities) {
-    		if (invitationAccepted == false) {
+    		bActivity = broadcastActivities[0];
+    		if (bActivity.invitationAccepted == false) {
     			return null;
     		}
-    		bActivity = broadcastActivities[0];
     		String actionURL = "/api/invitation_response";
     		
     		JSONObject postData = new JSONObject();

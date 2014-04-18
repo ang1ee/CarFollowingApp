@@ -34,13 +34,15 @@ public class FollowRequestDialogFragment extends DialogFragment {
         builder.setMessage(bActivity.getFollowName() + " would like to follow you")
                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
+                	   bActivity.invitationAccepted = true;
                 	   bActivity.invitationResponse();
                 	   //bActivity.showFollowRequestDialog();
                    }
                })
                .setNegativeButton(R.string.decline, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
-                	   bActivity.restartGetFollowRequests();
+                	   bActivity.invitationAccepted = false;
+                	   bActivity.invitationResponse();
                    }
                });
         // Create the AlertDialog object and return it
