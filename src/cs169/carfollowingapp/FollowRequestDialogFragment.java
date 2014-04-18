@@ -40,7 +40,7 @@ public class FollowRequestDialogFragment extends DialogFragment {
                })
                .setNegativeButton(R.string.decline, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
-                	   bActivity.showFollowRequestDialog();
+                	   bActivity.restartGetFollowRequests();
                    }
                });
         // Create the AlertDialog object and return it

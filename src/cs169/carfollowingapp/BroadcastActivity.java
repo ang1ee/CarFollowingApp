@@ -257,6 +257,14 @@ public class BroadcastActivity extends MapActivity {
     	newFragment.show(getFragmentManager(), "follow request");
     }
     
+    public void restartGetFollowRequests() {
+    	followRequestHandler.postDelayed(new Runnable() {
+            public void run() {
+            	new HTTPPOSTGetFollowRequestsAsyncTask().execute(this);
+            }
+        }, 5 * 1000);
+    }
+    
     @Override
     protected void handleCleanup() {
         //BroadcastActivity.currentID++;
