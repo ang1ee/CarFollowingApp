@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.location.Criteria;
 import android.location.Location;
@@ -27,9 +28,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -136,6 +135,7 @@ public class BroadcastActivity extends MapActivity {
         
         
         // mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         this.map = ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.broadcast_map)).getMap();
