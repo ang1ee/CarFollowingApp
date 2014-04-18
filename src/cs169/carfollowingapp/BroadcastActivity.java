@@ -14,7 +14,6 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -72,8 +71,8 @@ public class BroadcastActivity extends MapActivity {
     protected CharSequence errorText;
     protected LinkedList<String> followRequestUsernames = new LinkedList<String>();
     protected String followName;
-    protected double debugLatitude = 37.0;
-    protected double debugLongitude = -122.0;
+    protected double debugLatitude = 37.866750;
+    protected double debugLongitude = -122.262074;
     
     private String[] mFollowers;
     private DrawerLayout mDrawerLayout;
@@ -323,12 +322,14 @@ public class BroadcastActivity extends MapActivity {
                             true, true, true, 0, 5);
                     service.setTestProviderEnabled(mocProvider, true);
                 }
+                Log.d("LATITUDE", "" + debugLatitude);
                 // create a new location (hardcoded coordinates)
                 currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
                 debugLatitude = debugLatitude + 0.001;
                 debugLongitude = debugLongitude + 0.001;
+
                 currentLocation.setTime(System.currentTimeMillis());
                 currentLocation.setAccuracy(3.0f);
                 

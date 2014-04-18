@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -22,6 +24,7 @@ public class MapActivity extends FragmentActivity {
        needs these variables */
     protected String myUsername;
     protected String myPassword;
+    private Marker myMarker;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,7 @@ public class MapActivity extends FragmentActivity {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 13));
         return map.addMarker(new MarkerOptions().position(coord));
     }
-        
+    
 	// Displays toast showing the text argument.
 	protected void showToast(CharSequence text) {
 	    Context context = getApplicationContext();
