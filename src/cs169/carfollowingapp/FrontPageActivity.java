@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,6 +40,8 @@ public class FrontPageActivity extends Activity {
             startActivity(intent);
             finish();
         }
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        
         Context context = getApplicationContext();
         CharSequence text = "Cookie: " + Singleton.getInstance().getCookie();
         int duration = Toast.LENGTH_SHORT;
