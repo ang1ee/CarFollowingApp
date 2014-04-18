@@ -2,7 +2,6 @@ package cs169.carfollowingapp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class BroadcastActivity extends MapActivity {
 
@@ -69,6 +69,8 @@ public class BroadcastActivity extends MapActivity {
     protected String followName;
     protected double debugLatitude = 37.0;
     protected double debugLongitude = -122.0;
+    
+    private Marker broadcaster;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -222,8 +224,8 @@ public class BroadcastActivity extends MapActivity {
                 currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
-                debugLatitude++;
-                debugLongitude++;
+                debugLatitude = debugLatitude + 0.001;
+                debugLongitude = debugLongitude + 0.001;
                 currentLocation.setTime(System.currentTimeMillis());
                 currentLocation.setAccuracy(3.0f);
                 
@@ -359,9 +361,11 @@ public class BroadcastActivity extends MapActivity {
                     currentLocation.getLatitude(),
                     currentLocation.getLongitude()
             );
-            ArrayList<LatLng> coords = new ArrayList<LatLng>();
-            coords.add(userLocation);
-            bActivity.plot(coords);
+            if (broadcaster == null) {
+                broadcaster = bActivity.plot(userLocation);
+            } else {
+                broadcaster.setPosition(userLocation);
+            }
         }
         
         @Override
