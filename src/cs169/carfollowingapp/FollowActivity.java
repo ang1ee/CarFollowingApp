@@ -83,17 +83,22 @@ public class FollowActivity extends MapActivity {
         return true;
     }
 
-    protected void quit(Intent intent) {
-        startActivity(intent);
-        followHandler.removeCallbacksAndMessages(null);
-        setFollowerPositionHandler.removeCallbacksAndMessages(null);
+    protected void quit() {
+    	Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
+    	startActivity(intent);
         finish();
+    }
+    
+    @Override
+    protected void handleCleanup() {
+    	followHandler.removeCallbacksAndMessages(null);
+        setFollowerPositionHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-        quit(intent);
+    	handleCleanup();
+    	new CancelTask().execute(cancelUrl);
     }
     
     protected void setCurrentLocation(Location currLoc) {
@@ -239,7 +244,7 @@ public class FollowActivity extends MapActivity {
                         showToast("Unknown errCode.");
                         break;
                 }
-                quit(intent);
+                quit();
             } catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
                 handleError(e.getMessage());
@@ -248,7 +253,8 @@ public class FollowActivity extends MapActivity {
     }
 
     public void stopFollowing(View view) {
-        new CancelTask().execute(cancelUrl);
+    	handleCleanup();
+    	new CancelTask().execute(cancelUrl);
     }
 
     /* Finds the current location of the application user, who is currently broadcasting,
