@@ -29,11 +29,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import android.graphics.Color;
 
 public class BroadcastActivity extends MapActivity {
 
-	protected HashMap<String, Circle> followerMarkersDict = new HashMap<String, Circle>();
+	protected HashMap<String, Circle> followerCircleDict = new HashMap<String, Circle>();
 	
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
@@ -786,15 +785,16 @@ public class BroadcastActivity extends MapActivity {
         			Double lng = positionArr.getDouble(1);
         			LatLng position = new LatLng(lat, lng);
         			
-        			if (followerMarkersDict.containsKey(follower)) {
-        				Circle c =  followerMarkersDict.get(follower);
+        			if (followerCircleDict.containsKey(follower)) {
+        				Circle c =  followerCircleDict.get(follower);
         				c.setCenter(position);
         			} else {
         				CircleOptions circOpt = new CircleOptions().center(position);
+        				circOpt.radius(10);
             			circOpt.fillColor(colors[nextColorNum]);
             			nextColorNum = (nextColorNum + 1) % numberOfColors;
         				Circle c = bActivity.map.addCircle(circOpt);
-        				followerMarkersDict.put(follower, c);
+        				followerCircleDict.put(follower, c);
         			}
         		}
         		deleteExFollowers(currentFollowers);
@@ -805,14 +805,15 @@ public class BroadcastActivity extends MapActivity {
         }
         
         void deleteExFollowers(Set<String> currentFollowers) {
-        	Set<String> oldFollowers = followerMarkersDict.keySet();
+        	/* Must make a new HashSet in order to not affect followerMarkers.Dict */
+        	HashSet<String> oldFollowers = new HashSet<String>(followerCircleDict.keySet());
         	oldFollowers.removeAll(currentFollowers);
         	Iterator<String> iter  = oldFollowers.iterator();
         	while (iter.hasNext()) {
         		String exFollower = iter.next();
-        		Circle c = followerMarkersDict.get(exFollower);
+        		Circle c = followerCircleDict.get(exFollower);
         		c.remove();
-        		followerMarkersDict.remove(exFollower);
+        		followerCircleDict.remove(exFollower);
         	}
         }
         
