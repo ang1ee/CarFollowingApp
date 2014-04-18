@@ -2,7 +2,6 @@ package cs169.carfollowingapp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,12 +82,6 @@ public class FollowActivity extends MapActivity {
         return true;
     }
 
-    protected void quit() {
-    	Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-    	startActivity(intent);
-        finish();
-    }
-    
     @Override
     protected void handleCleanup() {
     	followHandler.removeCallbacksAndMessages(null);
@@ -223,9 +216,6 @@ public class FollowActivity extends MapActivity {
                 }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
-                Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
-                intent.putExtra(Constants.MY_U_KEY, myUsername);
-                intent.putExtra(Constants.MY_P_KEY, myPassword);
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
                         break;
@@ -244,7 +234,7 @@ public class FollowActivity extends MapActivity {
                         showToast("Unknown errCode.");
                         break;
                 }
-                quit();
+                finish();
             } catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
                 handleError(e.getMessage());

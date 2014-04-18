@@ -1,7 +1,6 @@
 package cs169.carfollowingapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -9,8 +8,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -61,10 +58,6 @@ public class MapActivity extends FragmentActivity {
 	protected void handleError(CharSequence text) {
 		handleCleanup();
 	    showToast(text);
-	    Intent intent = new Intent(this, FrontPageActivity.class);
-	    intent.putExtra(Constants.MY_U_KEY, myUsername);
-	    intent.putExtra(Constants.MY_P_KEY, myPassword);
-        startActivity(intent);
         finish();
 	}
 	
