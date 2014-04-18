@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,6 +20,7 @@ import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class FollowActivity extends MapActivity {
 
@@ -47,6 +47,9 @@ public class FollowActivity extends MapActivity {
     protected boolean progressSuccessful = true;
     protected CharSequence errorText;
 
+    private Marker broadcaster;
+    private Marker follower;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,9 +139,12 @@ public class FollowActivity extends MapActivity {
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
-                        ArrayList<LatLng> coords = new ArrayList<LatLng>();
-                        coords.add(new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude")));
-                        fActivity.plot(coords);
+                        LatLng coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
+                        if (broadcaster == null) {
+                            broadcaster = fActivity.plot(coord);
+                        } else {
+                            broadcaster.setPosition(coord);
+                        }
                         followHandler.postDelayed(new Runnable() {
                             public void run() {
                                 new FollowTask().execute(fActivity);
@@ -431,9 +437,11 @@ public class FollowActivity extends MapActivity {
                     currentLocation.getLatitude(),
                     currentLocation.getLongitude()
             );
-            ArrayList<LatLng> coords = new ArrayList<LatLng>();
-            coords.add(userLocation);
-            fActivity.plot(coords);
+            if (follower == null) {
+                follower = fActivity.plot(userLocation);
+            } else {
+                follower.setPosition(userLocation);
+            }
         }
         
         @Override
