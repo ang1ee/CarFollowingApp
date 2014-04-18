@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -28,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -38,6 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class BroadcastActivity extends MapActivity {
 
 	protected HashMap<String, Marker> followerCircleDict = new HashMap<String, Marker>();
+	protected HashMap<String, Float> followerColorMap = new HashMap<String, Float>();
 	
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
@@ -83,7 +86,6 @@ public class BroadcastActivity extends MapActivity {
     private CharSequence mTitle;
     
     private Marker broadcaster;
-    private int count = 0;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,14 +104,6 @@ public class BroadcastActivity extends MapActivity {
                 super.onDrawerClosed(view);
                 getActionBar().setTitle(mTitle);
                 
-                count++;
-                String s1 = "" + count;
-                String s2 = "" + count;
-                mFollowers = new String[] { s1, s2, s1, s1 };
-                
-                mDrawerList.setAdapter(new ArrayAdapter<String>(getApplicationContext(),
-                        R.layout.item_follower, mFollowers));
-                
                 // creates call to onPrepareOptionsMenu
                 invalidateOptionsMenu();
             }
@@ -118,19 +112,14 @@ public class BroadcastActivity extends MapActivity {
                 super.onDrawerOpened(drawerView);
                 getActionBar().setTitle(mDrawerTitle);
                 
+                mDrawerList.setAdapter(new FollowerListAdapter(
+                        getApplicationContext(),
+                        R.layout.item_follower, 
+                        followerColorMap.entrySet().toArray((Map.Entry<String, Float>[]) new Map.Entry[]{}))
+                );
+                
                 // creates call to onPrepareOptionsMenu
                 invalidateOptionsMenu();
-            }
-            
-            public boolean onOptionsItemSelected(MenuItem item) {
-                // update String thing here
-                
-                // FIX THIS can't update here cause then it updates every time you 
-                // open and close it.... and then not when you swipe. there must be a better place..
-                // on open?
-                
-                
-                return super.onOptionsItemSelected(item);
             }
         };
         
@@ -138,13 +127,13 @@ public class BroadcastActivity extends MapActivity {
         
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-                
-        // Set adapter for list view (update everytime we get new follower??
-        // Does that mean we have to check every time whether it's changed?
-        // ... hashhhhtaaabllle?
-        // or just recreate every time? is that a good idea?
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.item_follower, mFollowers));
+        
+        mDrawerList.setAdapter(new FollowerListAdapter(
+                this,
+                R.layout.item_follower, 
+                followerColorMap.entrySet().toArray((Map.Entry<String, Float>[]) new Map.Entry[]{}))
+        );
+        
         
         // mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         
@@ -901,6 +890,7 @@ public class BroadcastActivity extends MapActivity {
             			nextColorNum = (nextColorNum + 1) % colors.length;
                         marcOpt.icon(BitmapDescriptorFactory.defaultMarker(colors[nextColorNum]));
         				Marker m = bActivity.map.addMarker(marcOpt);
+        				followerColorMap.put(follower, new Float(colors[nextColorNum]));
         				followerCircleDict.put(follower, m);
         			}
         		}
@@ -921,6 +911,7 @@ public class BroadcastActivity extends MapActivity {
         		Marker m = followerCircleDict.get(exFollower);
         		m.remove();
         		followerCircleDict.remove(exFollower);
+        		followerColorMap.remove(exFollower);
         	}
         }
         

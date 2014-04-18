@@ -284,7 +284,7 @@ public class FollowActivity extends MapActivity {
     	}
     	
     	protected int getLocationAndUpdateDB(FollowActivity fActivity, LocationManager service, String provider) {
-    		String broadcastActionURL = "api/broadcast";
+    		String broadcastActionURL = "api/set_follower_position";
     		Location currentLocation = service.getLastKnownLocation(provider);
             
             // If running on emulator, hardcode the location to test UI
@@ -300,8 +300,8 @@ public class FollowActivity extends MapActivity {
                 currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
-                debugLatitude++;
-                debugLongitude++;
+                debugLatitude = debugLatitude + 0.001;
+                debugLongitude = debugLongitude + 0.001;
                 currentLocation.setTime(System.currentTimeMillis());
                 currentLocation.setAccuracy(3.0f);
                 
