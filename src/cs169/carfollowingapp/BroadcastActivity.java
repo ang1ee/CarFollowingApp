@@ -221,11 +221,6 @@ public class BroadcastActivity extends MapActivity {
     }
 
     public void stopBroadcasting() {
-    	Intent intent = new Intent(this, FrontPageActivity.class);
-	    intent.putExtra(Constants.MY_U_KEY, myUsername);
-	    intent.putExtra(Constants.MY_P_KEY, myPassword);
-    	
-    	startActivity(intent);
 	    finish();
 	}
     

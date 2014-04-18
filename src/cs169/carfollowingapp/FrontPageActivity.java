@@ -2,13 +2,11 @@
 package cs169.carfollowingapp;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Toast;
 
 public class FrontPageActivity extends Activity {
 
@@ -27,12 +25,6 @@ public class FrontPageActivity extends Activity {
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
-        Context context = getApplicationContext();
-        CharSequence text = "Cookie: " + Singleton.getInstance().getCookie();
-        int duration = Toast.LENGTH_SHORT;
-        Toast.makeText(context, text, duration).show();
-
-
         setContentView(R.layout.activity_front_page);
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);

@@ -90,11 +90,7 @@ public class SelectBroadcasterActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-    	Intent intent = new Intent(getApplicationContext(), FrontPageActivity.class);
         handler.removeCallbacksAndMessages(null);
-        intent.putExtra(Constants.MY_U_KEY, myUsername);
-        intent.putExtra(Constants.MY_P_KEY, myPassword);
-        startActivity(intent);
         finish();
     }
     
