@@ -75,6 +75,7 @@ public class BroadcastActivity extends MapActivity {
     protected String followName;
     protected double debugLatitude = 37.866750;
     protected double debugLongitude = -122.262074;
+    protected boolean invitationAccepted = false;
     
     private String[] mFollowers;
     private DrawerLayout mDrawerLayout;
@@ -720,6 +721,9 @@ public class BroadcastActivity extends MapActivity {
     	    	
     	@Override
         protected String doInBackground(BroadcastActivity... broadcastActivities) {
+    		if (invitationAccepted == false) {
+    			return null;
+    		}
     		bActivity = broadcastActivities[0];
     		String actionURL = "/api/invitation_response";
     		
