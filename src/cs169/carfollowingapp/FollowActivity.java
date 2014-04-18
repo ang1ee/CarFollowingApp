@@ -103,6 +103,13 @@ public class FollowActivity extends MapActivity {
     	progressSuccessful = false;
     	errorText = errTxt;
     }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handleCleanup();
+	    new CancelTask().execute(cancelUrl);	    
+    }
 
     private class FollowTask extends AsyncTask<FollowActivity, Void, String> {
         private FollowActivity fActivity;
