@@ -25,14 +25,14 @@ import android.view.Menu;
 import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class BroadcastActivity extends MapActivity {
 
-	protected HashMap<String, Circle> followerCircleDict = new HashMap<String, Circle>();
+	protected HashMap<String, Marker> followerCircleDict = new HashMap<String, Marker>();
 	
 	protected static final int SUCCESS = 1;
     protected static final int NO_SUCH_USER = -1;
@@ -42,20 +42,19 @@ public class BroadcastActivity extends MapActivity {
     private Handler broadcastHandler = new Handler();
     private Handler followRequestHandler = new Handler();
     private Handler getFollowPositionsHandler = new Handler();
-    private int numberOfColors = 11;
     private int nextColorNum = 0;
-    private int[] colors = {Color.BLACK,
-    						Color.BLUE,
-    						Color.CYAN,
-    						Color.DKGRAY,
-    						Color.GRAY,
-    						Color.GREEN,
-    						Color.LTGRAY,
-    						Color.MAGENTA,
-    						Color.RED,
-    						Color.WHITE,
-    						Color.YELLOW
-    						}; 
+    private float[] colors = {
+            BitmapDescriptorFactory.HUE_AZURE,
+            BitmapDescriptorFactory.HUE_BLUE,
+            BitmapDescriptorFactory.HUE_CYAN,
+            BitmapDescriptorFactory.HUE_GREEN,
+            BitmapDescriptorFactory.HUE_MAGENTA,
+            BitmapDescriptorFactory.HUE_ORANGE,
+            BitmapDescriptorFactory.HUE_RED,
+            BitmapDescriptorFactory.HUE_ROSE,
+            BitmapDescriptorFactory.HUE_VIOLET,
+            BitmapDescriptorFactory.HUE_YELLOW
+    }; 
     
     /* Used to save currentLocation for AsyncTask. 
      * Maybe should change at some point since seems
@@ -790,15 +789,14 @@ public class BroadcastActivity extends MapActivity {
         			LatLng position = new LatLng(lat, lng);
         			
         			if (followerCircleDict.containsKey(follower)) {
-        				Circle c =  followerCircleDict.get(follower);
-        				c.setCenter(position);
+        				Marker m =  followerCircleDict.get(follower);
+        				m.setPosition(position);
         			} else {
-        				CircleOptions circOpt = new CircleOptions().center(position);
-        				circOpt.radius(10);
-            			circOpt.fillColor(colors[nextColorNum]);
-            			nextColorNum = (nextColorNum + 1) % numberOfColors;
-        				Circle c = bActivity.map.addCircle(circOpt);
-        				followerCircleDict.put(follower, c);
+        				MarkerOptions marcOpt = new MarkerOptions().position(position);
+            			nextColorNum = (nextColorNum + 1) % colors.length;
+                        marcOpt.icon(BitmapDescriptorFactory.defaultMarker(colors[nextColorNum]));
+        				Marker m = bActivity.map.addMarker(marcOpt);
+        				followerCircleDict.put(follower, m);
         			}
         		}
         		deleteExFollowers(currentFollowers);
@@ -815,8 +813,8 @@ public class BroadcastActivity extends MapActivity {
         	Iterator<String> iter  = oldFollowers.iterator();
         	while (iter.hasNext()) {
         		String exFollower = iter.next();
-        		Circle c = followerCircleDict.get(exFollower);
-        		c.remove();
+        		Marker m = followerCircleDict.get(exFollower);
+        		m.remove();
         		followerCircleDict.remove(exFollower);
         	}
         }
