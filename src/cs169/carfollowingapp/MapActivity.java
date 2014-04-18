@@ -1,22 +1,18 @@
 package cs169.carfollowingapp;
 
-import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
@@ -28,6 +24,7 @@ public class MapActivity extends FragmentActivity {
        needs these variables */
     protected String myUsername;
     protected String myPassword;
+    private Marker myMarker;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,17 +40,14 @@ public class MapActivity extends FragmentActivity {
         return true;
     }
 
-    public void plot(ArrayList<LatLng> coords) {
-        if (coords.size() < 1) {
-            return;
-        }
-        
+    public Marker plot(LatLng coord) {
         // I don't know what 13 encodes yet... i'll make a class variable eventually
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(coords.get(0), 13));
-        
-        for (int i = 0; i < coords.size(); i++) {
-        	map.addMarker(new MarkerOptions().position(coords.get(i)));
-        }
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 13));
+        return map.addMarker(new MarkerOptions().position(coord));
+    }
+    
+    public Circle plot(CircleOptions co) {
+        return map.addCircle(co);
     }
         
 	// Displays toast showing the text argument.

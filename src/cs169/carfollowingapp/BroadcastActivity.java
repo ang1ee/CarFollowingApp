@@ -2,7 +2,6 @@ package cs169.carfollowingapp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +34,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class BroadcastActivity extends MapActivity {
 
@@ -73,8 +73,8 @@ public class BroadcastActivity extends MapActivity {
     protected CharSequence errorText;
     protected LinkedList<String> followRequestUsernames = new LinkedList<String>();
     protected String followName;
-    protected double debugLatitude = 37.0;
-    protected double debugLongitude = -122.0;
+    protected double debugLatitude = 37.866750;
+    protected double debugLongitude = -122.262074;
     
     private String[] mFollowers;
     private DrawerLayout mDrawerLayout;
@@ -84,6 +84,7 @@ public class BroadcastActivity extends MapActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     
+    private Marker broadcaster;
     private int count = 0;
     
     @Override
@@ -323,12 +324,13 @@ public class BroadcastActivity extends MapActivity {
                             true, true, true, 0, 5);
                     service.setTestProviderEnabled(mocProvider, true);
                 }
+                Log.d("LATITUDE", "" + debugLatitude);
                 // create a new location (hardcoded coordinates)
                 currentLocation = new Location(mocProvider);
                 currentLocation.setLatitude(debugLatitude);
                 currentLocation.setLongitude(debugLongitude);
-                debugLatitude++;
-                debugLongitude++;
+                //debugLatitude++;
+                //debugLongitude++;
                 currentLocation.setTime(System.currentTimeMillis());
                 currentLocation.setAccuracy(3.0f);
                 
@@ -464,9 +466,11 @@ public class BroadcastActivity extends MapActivity {
                     currentLocation.getLatitude(),
                     currentLocation.getLongitude()
             );
-            ArrayList<LatLng> coords = new ArrayList<LatLng>();
-            coords.add(userLocation);
-            bActivity.plot(coords);
+            if (broadcaster == null) {
+                broadcaster = bActivity.plot(userLocation);
+            } else {
+                broadcaster.setPosition(userLocation);
+            }
         }
         
         @Override
@@ -892,12 +896,13 @@ public class BroadcastActivity extends MapActivity {
         			CircleOptions circOpt = new CircleOptions().center(position);
         			circOpt.fillColor(colors[nextColorNum]);;
         			nextColorNum = (nextColorNum + 1) % numberOfColors;
-        			
+        			Log.d("FOLLOWER?", follower);
         			if (followerMarkersDict.containsKey(follower)) {
         				Circle c =  followerMarkersDict.get(follower);
         				c.setCenter(position);
         			} else {
-        				Circle c = bActivity.map.addCircle(circOpt);
+        			    Circle c = bActivity.plot(circOpt);
+        				//Circle c = bActivity.map.addCircle(circOpt);
         				followerMarkersDict.put(follower, c);
         			}
         		}
