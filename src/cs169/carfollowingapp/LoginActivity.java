@@ -24,7 +24,7 @@ public class LoginActivity extends Activity {
 
     TextView tvMessage;
     EditText etUsername,etPassword;
-    Button btnLogin, btnRegister;
+    Button btnLogin, btnRegister, btnForgotPassword;
     String username, password;
 
     //Destination addresses for the login and add location of the server
@@ -53,6 +53,7 @@ public class LoginActivity extends Activity {
         etPassword = (EditText) findViewById(R.id.etPassword);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnRegister = (Button) findViewById(R.id.btnRegister);
+        btnForgotPassword = (Button) findViewById(R.id.btnForgotPassword);
 
         // add click listener to Button "Login". Sends a POST request to users/login
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -63,8 +64,17 @@ public class LoginActivity extends Activity {
                 new HttpAsyncTask().execute(loginUrl);
             }
         });
+        
+     // add click listener to Button "Forgot Password?". Routes to ForgotPassword Activity
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	Intent intent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        // add click listener to Button "Login". Routes to Register Acivity
+        // add click listener to Button "Login". Routes to Register Activity
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

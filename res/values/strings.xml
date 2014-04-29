@@ -24,10 +24,12 @@
     <string name="input_username_hint">Username</string>
     <string name="input_password_hint">Password</string>
     <string name="button_login">Login</string>
+    <string name="button_forgot_password">Forgot Passowrd?</string>
     <string name="register_prompt">Don\'t have an account?</string>
     <string name="register_text">Register</string>
     <string name="title_activity_select_broadcaster">SelectBroadcasterActivity</string>
 
     <string name="open_drawer">Open Followers</string>
     <string name="close_drawer">Close Followers</string>
+    
 </resources>

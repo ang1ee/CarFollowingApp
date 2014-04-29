@@ -46,6 +46,16 @@
         android:layout_below="@+id/etPassword"
         android:onClick="loginMethod"
         android:text="@string/button_login"/>
+    
+    <!-- Forgot Password button.  On success, moves user to Forgot Passward page -->
+    <Button
+        android:id="@+id/btnForgotPassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnLogin"
+        android:onClick="forgotPasswordMethod"
+        android:text="@string/button_forgot_password"/>
+    
     <!-- Username text -->
 
     <TextView
@@ -53,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/register_prompt"
-        android:layout_below="@+id/btnLogin"/>
+        android:layout_below="@+id/btnForgotPassword"/>
     <!-- Add User button.  On success, moves user to session page -->
     <Button
         android:id="@+id/btnRegister"
