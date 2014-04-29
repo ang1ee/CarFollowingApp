@@ -77,7 +77,6 @@ public class BroadcastActivity extends MapActivity {
     protected double debugLongitude = -122.262074;
     protected boolean invitationAccepted = false;
     
-    private String[] mFollowers;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     
@@ -93,7 +92,6 @@ public class BroadcastActivity extends MapActivity {
         setContentView(R.layout.activity_broadcast);
 
         mTitle = mDrawerTitle = getTitle();
-        mFollowers = new String[] { "hi", "2", "3" };
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         

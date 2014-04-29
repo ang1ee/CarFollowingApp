@@ -28,8 +28,9 @@
     <string name="register_prompt">Don\'t have an account?</string>
     <string name="register_text">Register</string>
     <string name="title_activity_select_broadcaster">SelectBroadcasterActivity</string>
-
     <string name="open_drawer">Open Followers</string>
     <string name="close_drawer">Close Followers</string>
-    
+
+    <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
+
 </resources>
