@@ -66,7 +66,7 @@ public class LoginActivity extends Activity {
         });
         
      // add click listener to Button "Forgot Password?". Routes to ForgotPassword Activity
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
             	Intent intent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
