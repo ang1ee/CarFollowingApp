@@ -11,4 +11,8 @@ public class Constants {
     public static final String ACTION_URL = "actionURL";
     public static final String COOKIE = "myCookie";
     
+    //For saving username and password to internal storage
+    public static final String U_FILE_NAME = "usernameCFA";
+    public static final String P_FILE_NAME = "passwordCFA";
+    
 }

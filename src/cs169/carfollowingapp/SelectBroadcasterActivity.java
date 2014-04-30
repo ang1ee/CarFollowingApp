@@ -34,18 +34,13 @@ public class SelectBroadcasterActivity extends Activity {
 	private String myUsername;
     private String myPassword;
     private String username;
+    private String message;
     private TextView tvMessage;
     private List<String> broadcasterHistoryList;
     private ListView listView;
-    private EditText editText;
-    
-    private static final int SUCCESS = 1;
-    private static final int NO_PERMISSION = 2;
-    private static final int WRONG_MYUSERNMAE = -1;
-    private static final int WRONG_PASSWORD = -2;
-    private static final int NO_SUCH_BROADCAST_USER = -3;
-    private static final int USER_NOT_BROADCASTING = -4;
-    
+    private EditText broadcasterEditText;
+    private EditText messageEditText;
+        
     private String followRequestUrl = Constants.BASE_SERVER_URL + "api/follow_request";
     private String checkPermissionUrl = Constants.BASE_SERVER_URL + "api/check_permission";
     private String cancelUrl = Constants.BASE_SERVER_URL + "api/follow_cancellation";
@@ -71,7 +66,8 @@ public class SelectBroadcasterActivity extends Activity {
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
         tvMessage = (TextView) findViewById(R.id.tvMessage);
-        editText = (EditText) findViewById(R.id.input_username);
+        broadcasterEditText = (EditText) findViewById(R.id.input_username);
+        messageEditText = (EditText) findViewById(R.id.input_message);
         
         listView = (ListView) findViewById(R.id.broadcaster_history_list);
         broadcasterHistoryList = new ArrayList<String>();
@@ -81,7 +77,7 @@ public class SelectBroadcasterActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 String broadcaster = (String) adapterView.getItemAtPosition(position);
-                editText.setText(broadcaster);
+                broadcasterEditText.setText(broadcaster);
                 
             }
         });
@@ -124,14 +120,18 @@ public class SelectBroadcasterActivity extends Activity {
     public void follow(View view) {
         EditText usernameEditText = (EditText) findViewById(R.id.input_username);
         
-        
         username = usernameEditText.getText().toString();
+        message = messageEditText.getText().toString();
         builder = new AlertDialog.Builder(this);
         new FollowRequestTask().execute(followRequestUrl);
         
         
     }
+    
     private class BroadcasterHistoryTask extends AsyncTask<String, Void, String> {
+    	private static final int SUCCESS = 1;
+    	private static final int AUTHENTICATION_FAILED = -1;
+    	
         @Override
         protected String doInBackground(String... urls) {
 
@@ -172,11 +172,10 @@ public class SelectBroadcasterActivity extends Activity {
                     		}
                     	}
                         break;
-                    case WRONG_MYUSERNMAE:
-                        showToast("Incorrect user credential.");
-                        tvMessage.setText("Incorrect user credential.");
+                    case AUTHENTICATION_FAILED:
+                        showToast("Authentication failed.");
+                        tvMessage.setText("Authentication failed.");
                         break;
-                    
                     default:
                         showToast("Unknown errCode.");
                         tvMessage.setText("Unknown errCode.");
@@ -191,6 +190,12 @@ public class SelectBroadcasterActivity extends Activity {
     }
 
     private class FollowRequestTask extends AsyncTask<String, Void, String> {
+    	private static final int SUCCESS = 1;
+    	private static final int AUTHENTICATION_FAILED = -1;
+    	private static final int INVALID_MESSAGE = -2;
+    	private static final int NO_SUCH_BROADCASTER_USERNAME = -3;
+    	private static final int USER_NOT_BROADCASTING = -4;
+    	
         @Override
         protected String doInBackground(String... urls) {
 
@@ -199,6 +204,7 @@ public class SelectBroadcasterActivity extends Activity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put(Constants.U_KEY, username);
+                postData.put("message", message);
                 JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
@@ -209,6 +215,7 @@ public class SelectBroadcasterActivity extends Activity {
                 return "ERROR";
             }
         }
+        
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
@@ -236,15 +243,15 @@ public class SelectBroadcasterActivity extends Activity {
                     	
                     	new CheckPermissionTask().execute(checkPermissionUrl);
                         break;
-                    case WRONG_MYUSERNMAE:
-                        showToast("Incorrect user credential.");
-                        tvMessage.setText("Incorrect user credential.");
+                    case AUTHENTICATION_FAILED:
+                    	showToast("Authentication failed.");
+                    	tvMessage.setText("Authentication failed.");
                         break;
-                    case WRONG_PASSWORD:
-                        showToast("Incorrect password.");
-                        tvMessage.setText("Incorrect password.");
+                    case INVALID_MESSAGE:
+                    	showToast("Invalid message.");
+                    	tvMessage.setText("Invalid message.");
                         break;
-                    case NO_SUCH_BROADCAST_USER:
+                    case NO_SUCH_BROADCASTER_USERNAME:
                         showToast("No such broadcasting user.");
                         tvMessage.setText("No such broadcasting user.");
                         break;
@@ -264,7 +271,14 @@ public class SelectBroadcasterActivity extends Activity {
             }
         }
     }
+    
     private class CheckPermissionTask extends AsyncTask<String, Void, String> {
+    	private static final int PERMITTED = 1;
+    	private static final int NOT_PERMITTED = 2;
+    	private static final int AUTHENTICATION_FAILED = -1;
+    	private static final int USER_NOT_BROADCASTING = -3;
+    	private static final int NO_SUCH_BROADCASTER_USERNAME = -4;
+    	
         @Override
         protected String doInBackground(String... urls) {
 
@@ -283,6 +297,7 @@ public class SelectBroadcasterActivity extends Activity {
                 return "ERROR";
             }
         }
+        
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
@@ -298,7 +313,7 @@ public class SelectBroadcasterActivity extends Activity {
                 fin = new JSONObject(result);
                 int errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
-                	case SUCCESS:
+                	case PERMITTED:
                 		handler.removeCallbacksAndMessages(null);
                 		Intent intent = new Intent(getApplicationContext(), FollowActivity.class);
                         intent.putExtra(Constants.U_KEY, username);
@@ -307,24 +322,21 @@ public class SelectBroadcasterActivity extends Activity {
                         startActivity(intent);
                         finish();
                 		break;
-                	case NO_PERMISSION:
+                	case NOT_PERMITTED:
                     	handler.postDelayed(new Runnable() {
                             public void run() {
                                 new CheckPermissionTask().execute(checkPermissionUrl);
                             }
                         }, frequency);
                         break;
-                    case WRONG_MYUSERNMAE:
+                    case AUTHENTICATION_FAILED:
                         showToast("Incorrect user credential.");
-                        break;
-                    case WRONG_PASSWORD:
-                        showToast("Incorrect password.");
-                        break;
-                    case NO_SUCH_BROADCAST_USER:
-                        showToast("No such broadcasting user.");
                         break;
                     case USER_NOT_BROADCASTING:
                         showToast("User not broadcasting.");
+                        break;
+                    case NO_SUCH_BROADCASTER_USERNAME:
+                        showToast("No such broadcasting user.");
                         break;
                     default:
                         showToast("Unknown errCode.");
@@ -338,6 +350,11 @@ public class SelectBroadcasterActivity extends Activity {
         }
     }
     private class CancelTask extends AsyncTask<String, Void, String> {
+    	private static final int SUCCESS = 1;
+    	private static final int AUTHENTICATION_FAILED = -1;
+    	private static final int NO_SUCH_BROADCASTER_USERNAME = -3;
+    	private static final int USER_NOT_BROADCASTING = -4;
+    	
         @Override
         protected String doInBackground(String... urls) {
 
@@ -379,17 +396,14 @@ public class SelectBroadcasterActivity extends Activity {
                         handler.removeCallbacksAndMessages(null);
 
                         break;
-                    case WRONG_MYUSERNMAE:
-                        showToast("Incorrect user credential.");
+                    case AUTHENTICATION_FAILED:
+                        showToast("AUTHENTICATION_FAILED");
                         break;
-                    case WRONG_PASSWORD:
-                        showToast("Incorrect password.");
-                        break;
-                    case NO_SUCH_BROADCAST_USER:
-                        showToast("No such broadcasting user.");
+                    case NO_SUCH_BROADCASTER_USERNAME:
+                        showToast("No such broadcaster username.");
                         break;
                     case USER_NOT_BROADCASTING:
-                        showToast("User not broadcasting.");
+                    	showToast("User not broadcasting.");
                         break;
                     default:
                         showToast("Unknown errCode.");

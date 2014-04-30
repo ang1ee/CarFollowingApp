@@ -1,9 +1,15 @@
 package cs169.carfollowingapp;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
@@ -18,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class LoginActivity extends Activity {
@@ -47,6 +54,32 @@ public class LoginActivity extends Activity {
         }
         */
 
+        //XXX Auto login code
+        
+        /*
+        Context context = getApplicationContext();
+        String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+        String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+        File usernameFile = new File(usernameFilePath);
+        File passwordFile = new File(passwordFilePath);
+        
+        try {
+        	if (usernameFile.exists()) {
+        		if (passwordFile.exists()) {
+        			username = readInternalFile(Constants.U_FILE_NAME);
+        			password = readInternalFile(Constants.P_FILE_NAME);
+        			new HttpAsyncTask().execute(loginUrl);
+        		} else {
+        			usernameFile.delete();
+        		}
+        	} else {
+        		passwordFile.delete();
+        	}
+        } catch (IOException e) {
+        	showToast("Cannot read login info files");
+        }
+        */
+        
         // get reference to the views
         tvMessage = (TextView) findViewById(R.id.tvMessage);
         etUsername = (EditText) findViewById(R.id.etUsername);
@@ -81,9 +114,33 @@ public class LoginActivity extends Activity {
                 Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
                 startActivity(intent);
             }
-        });
+        });    
+        
     }
-
+    
+    String readInternalFile(String filename) throws IOException {
+    	ArrayList<Byte> bytes = new ArrayList<Byte>();
+    	Integer currByte = openFileInput(filename).read();
+    	while (currByte != -1) {
+    		bytes.add(currByte.byteValue());
+    	}
+    	byte[] byteArr = new byte[bytes.size()];
+    	for (int i = 0; i < bytes.size(); i++) {
+    		byteArr[i] = bytes.get(i);
+    	}
+    	String contents =  new String(byteArr);
+    	return contents;
+    }
+    
+ // Displays toast showing the text argument.
+ 	protected void showToast(CharSequence text) {
+ 	    Context context = getApplicationContext();
+ 	    int duration = Toast.LENGTH_SHORT;
+ 	    
+ 	    Toast toast = Toast.makeText(context, text, duration);
+ 	    toast.show();
+ 	}
+    
     //Responsible for sending out the Post request on a different thread.
     //Takes the Username and Password information from the text field
     //to send it out to the server for add or login.
@@ -131,6 +188,45 @@ public class LoginActivity extends Activity {
                         break;
                     default:
                         message = "Login successful.";
+                        
+                        Context context = getApplicationContext();
+                        String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+                        String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+                        File usernameFile = new File(usernameFilePath);
+                        File passwordFile = new File(passwordFilePath);
+                        
+                        if (!usernameFile.exists()) {
+                        	if (!passwordFile.exists()) {
+                        		FileOutputStream usernameOutStream;
+                        		FileOutputStream passwordOutStream;
+                        
+                        		try {
+                        			usernameOutStream = openFileOutput(Constants.U_FILE_NAME, Context.MODE_PRIVATE);
+                        			usernameOutStream.write(username.getBytes());
+                        			usernameOutStream.close();
+                        	
+                        			passwordOutStream = openFileOutput(Constants.P_FILE_NAME, Context.MODE_PRIVATE);
+                        			passwordOutStream.write(password.getBytes());
+                        			passwordOutStream.close();
+                        		} catch (Exception e) {
+                        			String text = "Could not save login info";
+                        			context.deleteFile(Constants.U_FILE_NAME);
+                        			context.deleteFile(Constants.P_FILE_NAME);
+                        	
+                        			int duration = Toast.LENGTH_SHORT;
+                    	    
+                        			Toast toast = Toast.makeText(context, text, duration);
+                        			toast.show();
+                        			e.printStackTrace();
+                        		}
+                        	} else {
+                        		// If only one file exists, makes it so neither exist for simplicity.
+                        		passwordFile.delete();
+                        	}
+                        } else if (passwordFile.exists()) {
+                        	// If only one file exists, makes it so neither exist for simplicity.
+                        	passwordFile.delete();
+                        }
                         break;
                 }
                 tvMessage.setText(message);

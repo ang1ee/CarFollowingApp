@@ -31,7 +31,16 @@ public class FollowRequestDialogFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
     	assert (bActivity != null) : "bActivity was null";
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(bActivity.getFollowName() + " would like to follow you")
+        String[] followerTuple = bActivity.getFollowerTuple();
+        String followerName = followerTuple[0];
+        String followerMessage = followerTuple[1];
+        String dialogString;
+        if (followerMessage == "") {
+        	dialogString = followerName + " would like to follow you";
+        } else {
+        	dialogString = followerName + ": " + followerMessage;
+        }
+        builder.setMessage(dialogString)
                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   bActivity.invitationAccepted = true;
