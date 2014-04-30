@@ -8,6 +8,7 @@ public class Constants {
     public static final String MY_P_KEY = "myPassword";
     public static final String U_KEY = "username";
     public static final String P_KEY = "password";
+    public static final String E_KEY = "email";
     public static final String ACTION_URL = "actionURL";
     public static final String COOKIE = "myCookie";
     
