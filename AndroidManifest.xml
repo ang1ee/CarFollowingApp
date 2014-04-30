@@ -11,6 +11,7 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <!-- For Auto-Login -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <uses-sdk

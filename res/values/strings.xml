@@ -25,13 +25,14 @@
     <string name="input_username_hint">Username</string>
     <string name="input_password_hint">Password</string>
     <string name="button_login">Login</string>
-    <string name="button_forgot_password">Forgot Passowrd?</string>
-    <string name="register_prompt">Don\'t have an account?</string>
-    <string name="register_text">Register</string>
+    <string name="button_forgot_password"><u>Recover your password</u></string>
+    <string name="register"><u>Sign Up for Caravan</u></string>
     <string name="title_activity_select_broadcaster">SelectBroadcasterActivity</string>
     <string name="open_drawer">Open Followers</string>
     <string name="close_drawer">Close Followers</string>
 
+    <!-- ForgotPassword Strings -->
+    <string name="button_recover_password">Recover Your Password</string>
     <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
 
 </resources>

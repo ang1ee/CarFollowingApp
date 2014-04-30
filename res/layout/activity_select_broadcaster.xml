@@ -3,21 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="cs169.carfollowingapp.SelectBroadcasterActivity">
-    
-    <Button android:id="@+id/follow_button"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="follow"
-        android:text="@string/follow" />
+
+
     <EditText android:id="@+id/input_username"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/follow_button"
-	    android:layout_width="wrap_content"
+	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:hint="@string/input_hint_username"
 	    android:contentDescription="followUsername" />
@@ -32,7 +26,8 @@
         android:id="@+id/broadcaster_history_list"
         android:layout_below="@id/input_message"
         android:layout_width="fill_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp"
+        android:layout_centerVertical="true"/>
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
@@ -41,6 +36,18 @@
         android:text="" 
         android:layout_centerHorizontal="true"
         android:layout_below="@id/broadcaster_history_list"/>
-    
-    
+
+    <RelativeLayout
+        android:id="@+id/InnerRelativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+        <Button android:id="@+id/follow_button"
+            android:layout_centerHorizontal="true"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="follow"
+            android:text="@string/follow" />
+    </RelativeLayout>
+
 </RelativeLayout>
