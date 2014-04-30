@@ -64,6 +64,7 @@ public class FrontPageActivity extends Activity {
         Singleton.getInstance().clearCookies();
         
         // Delete files storing username and password
+        /*
         Context context = getApplicationContext();
         boolean deletedUsernameFile = context.deleteFile(Constants.U_FILE_NAME);
         boolean deletedPasswordFile = context.deleteFile(Constants.P_FILE_NAME);
@@ -76,6 +77,7 @@ public class FrontPageActivity extends Activity {
         if (deletedPasswordFile) {
         	showToast("Could not delete password file");
         }
+        */
         
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);

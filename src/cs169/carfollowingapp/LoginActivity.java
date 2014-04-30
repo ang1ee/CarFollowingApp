@@ -189,6 +189,7 @@ public class LoginActivity extends Activity {
                     default:
                         message = "Login successful.";
                         
+                        /*
                         Context context = getApplicationContext();
                         String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
                         String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
@@ -227,6 +228,8 @@ public class LoginActivity extends Activity {
                         	// If only one file exists, makes it so neither exist for simplicity.
                         	passwordFile.delete();
                         }
+                        */
+                        
                         break;
                 }
                 tvMessage.setText(message);
