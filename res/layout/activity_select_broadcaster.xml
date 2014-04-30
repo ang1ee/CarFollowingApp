@@ -19,11 +19,18 @@
         android:layout_below="@id/follow_button"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:hint="@string/input_hint"
+	    android:hint="@string/input_hint_username"
 	    android:contentDescription="followUsername" />
+    <EditText android:id="@+id/input_message"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/input_username"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/input_hint_message"
+	    android:contentDescription="message" />
     <ListView
         android:id="@+id/broadcaster_history_list"
-        android:layout_below="@id/input_username"
+        android:layout_below="@id/input_message"
         android:layout_width="fill_parent"
         android:layout_height="300dp"/>
     <TextView

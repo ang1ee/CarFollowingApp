@@ -7,7 +7,8 @@
     <string name="title_activity_front_page">FrontPageActivity</string>
     <string name="broadcast">Broadcast</string>
     <string name="username_text">Username: </string>
-    <string name="input_hint">username</string>
+    <string name="input_hint_username">username</string>
+    <string name="input_hint_message">message</string>
     <string name="follow">Follow</string>
     <string name="title_activity_broadcast">BroadcastActivity</string>
     <string name="stop_broadcasting">Stop Broadcasting</string>
