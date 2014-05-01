@@ -37,8 +37,11 @@ public class MapActivity extends FragmentActivity {
         return true;
     }
 
-    public Marker plot(LatLng coord) {
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 13));
+    public Marker plot(LatLng coord, boolean center) {
+        if (center) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 13));
+        } 
+        
         return map.addMarker(new MarkerOptions().position(coord));
     }
     

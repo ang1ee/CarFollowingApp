@@ -2,12 +2,16 @@ package cs169.carfollowingapp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,6 +25,8 @@ import android.view.View;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class FollowActivity extends MapActivity {
 
@@ -31,7 +37,9 @@ public class FollowActivity extends MapActivity {
     private Handler followHandler = new Handler();
     private Handler setFollowerPositionHandler = new Handler();
     private int frequency = 5000;
+    private boolean update = false;
     protected static final int SUCCESS = 1;
+    protected static final int SUCCESS_W_DIRECTIONS = 2;
     protected static final int NO_SUCH_USER = -1;
     protected static final int INCORRECT_PASSWORD = -2;
     protected static final int NO_SUCH_BROADCASTER = -3;
@@ -121,6 +129,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
+                postData.put("update", update);
                 JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(followUrl, postData);
                 return obj.toString();
             } catch (JSONException e) {
@@ -131,6 +140,68 @@ public class FollowActivity extends MapActivity {
                 return "ERROR";
             }
         }
+        
+        /* code taken from http://stackoverflow.com/questions/14702621/answer-draw-path-between-two-points-using-google-maps-android-api-v2
+         */
+        private List<LatLng> decodePoly(String encoded) {
+
+            List<LatLng> poly = new ArrayList<LatLng>();
+            int index = 0, len = encoded.length();
+            int lat = 0, lng = 0;
+
+            while (index < len) {
+                int b, shift = 0, result = 0;
+                do {
+                    b = encoded.charAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+                int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+                lat += dlat;
+
+                shift = 0;
+                result = 0;
+                do {
+                    b = encoded.charAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+                int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+                lng += dlng;
+
+                LatLng p = new LatLng( (((double) lat / 1E5)),
+                         (((double) lng / 1E5) ));
+                poly.add(p);
+            }
+
+            return poly;
+        }
+        
+        public void drawPath(String result) {
+            try {
+                    //Tranform the string into a json object
+                   JSONObject jObj = new JSONObject(result);
+                   JSONArray routeArray = jObj.getJSONArray("routes");
+                   JSONObject routes = routeArray.getJSONObject(0);
+                   JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
+                   String encodedString = overviewPolylines.getString("points");
+                   List<LatLng> list = decodePoly(encodedString);
+
+                   for(int z = 0; z<list.size()-1;z++){
+                        LatLng src= list.get(z);
+                        LatLng dest= list.get(z+1);
+                        Polyline line = map.addPolyline(new PolylineOptions()
+                        .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude, dest.longitude))
+                        .width(3)
+                        .color(Color.BLUE).geodesic(true));
+                    }
+
+            } 
+            catch (JSONException e) {
+                Log.d("DRAWPATH", e.getLocalizedMessage());
+            }
+        } 
+        
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
@@ -144,12 +215,13 @@ public class FollowActivity extends MapActivity {
                     handleError("Error");
                 }
                 fin = new JSONObject(result);
+                LatLng coord;
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
-                        LatLng coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
+                        coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (broadcaster == null) {
-                            broadcaster = fActivity.plot(coord);
+                            broadcaster = fActivity.plot(coord, false);
                         } else {
                             broadcaster.setPosition(coord);
                         }
@@ -158,6 +230,19 @@ public class FollowActivity extends MapActivity {
                                 new FollowTask().execute(fActivity);
                             }
                         }, frequency);
+                        break;
+                    case SUCCESS_W_DIRECTIONS:
+                        map.clear();
+                        coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
+                        follower = fActivity.plot(follower.getPosition(), false);
+                        broadcaster = fActivity.plot(coord, false);
+                        followHandler.postDelayed(new Runnable() {
+                            public void run() {
+                                new FollowTask().execute(fActivity);
+                            }
+                        }, frequency);
+                        String jo = (String) fin.get("directions");
+                        drawPath(jo);
                         break;
                     case NO_SUCH_USER:
                         showToast("User does not exist.");
@@ -179,10 +264,15 @@ public class FollowActivity extends MapActivity {
                         break;
                 }
 
-            } catch (Exception e) {
+            } catch (JSONException je) {
+                Log.d("JSONEXCEPTION", je.getMessage());
+            } 
+            /*
+            catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
                 handleError(e.getMessage());
             }
+            */
         }
     }
 
@@ -252,6 +342,11 @@ public class FollowActivity extends MapActivity {
     public void stopFollowing(View view) {
     	handleCleanup();
     	new CancelTask().execute(cancelUrl);
+    }
+    
+    public void update(View view) {
+        this.update = true;
+        showToast("Request Processed");
     }
 
     /* Finds the current location of the application user, who is currently broadcasting,
@@ -444,7 +539,7 @@ public class FollowActivity extends MapActivity {
                     currentLocation.getLongitude()
             );
             if (follower == null) {
-                follower = fActivity.plot(userLocation);
+                follower = fActivity.plot(userLocation, true);
             } else {
                 follower.setPosition(userLocation);
             }
