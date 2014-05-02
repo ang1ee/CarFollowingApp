@@ -96,7 +96,7 @@ public class FollowActivity extends MapActivity {
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 
-                R.drawable.ic_launcher, R.string.open_drawer, R.string.close_drawer) {
+                R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer) {
             
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
@@ -117,8 +117,8 @@ public class FollowActivity extends MapActivity {
         
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-//        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
         
         mDrawerList.setAdapter(new ArrayAdapter<String>(
                 this,
