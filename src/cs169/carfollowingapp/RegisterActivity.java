@@ -124,7 +124,10 @@ public class RegisterActivity extends Activity {
                 String message = "";
                 
                 //Updates the message on the Log In page, depending on the database response.
-                switch (errCode) { 
+                switch (errCode) {
+                    case -4:
+                        message = "Malformed Email";
+                        break;
                     case -3:
                         message = "Password must have 1 to 128 characters";
                         break;
@@ -138,7 +141,7 @@ public class RegisterActivity extends Activity {
                         message = "Error";
                         break;
                     default:
-                        message = "User registered successfully";
+                        message = "User registered successfully" + errCode;
                         break;
                 }
                 Context context = getApplicationContext();

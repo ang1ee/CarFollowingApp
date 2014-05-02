@@ -448,7 +448,7 @@ public class BroadcastActivity extends MapActivity {
                     currentLocation.getLongitude()
             );
             if (broadcaster == null) {
-                broadcaster = bActivity.plot(userLocation);
+                broadcaster = bActivity.plot(userLocation, true);
             } else {
                 broadcaster.setPosition(userLocation);
             }
