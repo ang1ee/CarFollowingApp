@@ -45,6 +45,7 @@ public class ForgotPasswordActivity extends Activity {
         
         etUsername = (EditText) findViewById(R.id.etUsernameForgotPW);
         btnForgotPassword = (Button) findViewById(R.id.btnForgotPassword);
+        tvMessage = (TextView) findViewById(R.id.tvMessage);
         
      // add click listener to Button "Register". Sends a POST request to users/register
         btnForgotPassword.setOnClickListener(new View.OnClickListener() {
