@@ -68,7 +68,7 @@ public class FollowActivity extends MapActivity {
 
         if (!Singleton.getInstance().cookieCheck()) {
             Singleton.getInstance().clearCookies();
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            Intent intent = new Intent(getApplicationContext(), CFA.class);
             startActivity(intent);
             finish();
         }
@@ -257,7 +257,6 @@ public class FollowActivity extends MapActivity {
                 LatLng coord;
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
-                    case SUCCESS_AND_CONTAINS_DIRECTIONS:
                     case SUCCESS:
                         coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (broadcaster == null) {
@@ -273,8 +272,8 @@ public class FollowActivity extends MapActivity {
                             }
                         }, frequency);
                         break;
-                    
-                       /* map.clear();
+                    case SUCCESS_AND_CONTAINS_DIRECTIONS: 
+                        map.clear();
                         coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (follower != null) {
                             follower = fActivity.plot(follower.getPosition(), false);
@@ -288,7 +287,6 @@ public class FollowActivity extends MapActivity {
                         String jo = (String) fin.get("directions");
                         drawPath(jo);
                         break;
-                        */
                     case AUTHENTICATION_FAILED:
                         handleError("Authentication failed.");
                         break;

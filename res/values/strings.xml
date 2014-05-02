@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">CarFollowingApp</string>
+    <string name="app_name">Caravan</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_follow">FollowActivity</string>
     <string name="title_activity_front_page">FrontPageActivity</string>
@@ -14,7 +14,7 @@
     <string name="stop_broadcasting">Stop Broadcasting</string>
     <string name="stop_following">Stop Following</string>
     <string name="update">Update</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Caravan</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="logout">Logout</string>

@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class LoginActivity extends Activity {
+public class CFA extends Activity {
 
     TextView tvMessage;
     EditText etUsername,etPassword;

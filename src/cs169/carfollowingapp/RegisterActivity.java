@@ -158,7 +158,7 @@ public class RegisterActivity extends Activity {
 
           //Opens a new page in response to a successful add user.
             if (errCode == 1) { 
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CFA.class);
                 startActivity(intent);
                 finish();
             }

@@ -26,7 +26,7 @@ public class FrontPageActivity extends Activity {
 
         if (!Singleton.getInstance().cookieCheck()) {
             Singleton.getInstance().clearCookies();
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            Intent intent = new Intent(getApplicationContext(), CFA.class);
             startActivity(intent);
             finish();
         }
@@ -117,7 +117,7 @@ public class FrontPageActivity extends Activity {
         }
         */
         
-        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        Intent intent = new Intent(getApplicationContext(), CFA.class);
         startActivity(intent);
         finish();
     }

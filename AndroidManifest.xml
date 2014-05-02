@@ -24,7 +24,6 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -32,7 +31,7 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/jia"
+        android:icon="@drawable/navigation"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -49,19 +48,19 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
 
         <activity
             android:name="cs169.carfollowingapp.FollowActivity"
-            android:label="@string/title_activity_follow" >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="cs169.carfollowingapp.FrontPageActivity"
-            android:label="@string/title_activity_front_page" >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="cs169.carfollowingapp.BroadcastActivity"
             android:configChanges="orientation"
-            android:label="@string/title_activity_broadcast" >
+            android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="cs169.carfollowingapp.LoginActivity"
+            android:name=".CFA"
             android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -71,18 +70,18 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
         </activity>
         <activity
             android:name="cs169.carfollowingapp.RegisterActivity"
-            android:label="@string/title_activity_register" >
+            android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.LoginActivity"
                 android:value="cs169.carfollowingapp.LoginActivity" />
         </activity>
         <activity
             android:name="cs169.carfollowingapp.SelectBroadcasterActivity"
-            android:label="@string/title_activity_select_broadcaster" >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="cs169.carfollowingapp.ForgotPasswordActivity"
-            android:label="@string/title_activity_forgot_password" >
+            android:label="@string/app_name" >
         </activity>
     </application>
 
