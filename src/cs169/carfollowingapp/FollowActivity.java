@@ -2,12 +2,16 @@ package cs169.carfollowingapp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,6 +25,8 @@ import android.view.View;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class FollowActivity extends MapActivity {
 
@@ -31,9 +37,10 @@ public class FollowActivity extends MapActivity {
     private Handler followHandler = new Handler();
     private Handler setFollowerPositionHandler = new Handler();
     private int frequency = 5000;
+    private boolean update = false;
     protected static final int SUCCESS = 1;
-    protected static final int NO_SUCH_USER = -1;
-    protected static final int INCORRECT_PASSWORD = -2;
+    protected static final int SUCCESS_AND_CONTAINS_DIRECTIONS = 2;
+    protected static final int AUTHENTICATION_FAILED = -1;
     protected static final int NO_SUCH_BROADCASTER = -3;
     protected static final int USER_NOT_BROADCASTING = -4;
     protected static final int ACCESS_NOT_PERMITTED = -5;
@@ -113,6 +120,7 @@ public class FollowActivity extends MapActivity {
 
     private class FollowTask extends AsyncTask<FollowActivity, Void, String> {
         private FollowActivity fActivity;
+        
         @Override
         protected String doInBackground(FollowActivity... followActivities) {
             fActivity = followActivities[0];
@@ -121,6 +129,7 @@ public class FollowActivity extends MapActivity {
                 postData.put(Constants.MY_U_KEY, myUsername);
                 postData.put(Constants.MY_P_KEY, myPassword);
                 postData.put("username", username);
+                postData.put("update", update);
                 JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(followUrl, postData);
                 return obj.toString();
             } catch (JSONException e) {
@@ -131,6 +140,68 @@ public class FollowActivity extends MapActivity {
                 return "ERROR";
             }
         }
+        
+        /* code taken from http://stackoverflow.com/questions/14702621/answer-draw-path-between-two-points-using-google-maps-android-api-v2
+         */
+        private List<LatLng> decodePoly(String encoded) {
+
+            List<LatLng> poly = new ArrayList<LatLng>();
+            int index = 0, len = encoded.length();
+            int lat = 0, lng = 0;
+
+            while (index < len) {
+                int b, shift = 0, result = 0;
+                do {
+                    b = encoded.charAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+                int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+                lat += dlat;
+
+                shift = 0;
+                result = 0;
+                do {
+                    b = encoded.charAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+                int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+                lng += dlng;
+
+                LatLng p = new LatLng( (((double) lat / 1E5)),
+                         (((double) lng / 1E5) ));
+                poly.add(p);
+            }
+
+            return poly;
+        }
+        
+        public void drawPath(String result) {
+            try {
+                    //Tranform the string into a json object
+                   JSONObject jObj = new JSONObject(result);
+                   JSONArray routeArray = jObj.getJSONArray("routes");
+                   JSONObject routes = routeArray.getJSONObject(0);
+                   JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
+                   String encodedString = overviewPolylines.getString("points");
+                   List<LatLng> list = decodePoly(encodedString);
+
+                   for(int z = 0; z<list.size()-1;z++){
+                        LatLng src= list.get(z);
+                        LatLng dest= list.get(z+1);
+                        Polyline line = map.addPolyline(new PolylineOptions()
+                        .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude, dest.longitude))
+                        .width(3)
+                        .color(Color.BLUE).geodesic(true));
+                    }
+
+            } 
+            catch (JSONException e) {
+                Log.d("DRAWPATH", e.getLocalizedMessage());
+            }
+        } 
+        
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
@@ -138,18 +209,28 @@ public class FollowActivity extends MapActivity {
             try {
                 if (result == "JSON_EXCEPTION") {
                     handleError("JSON Error");
+                    return;
                 } else if (result == "RUNTIME_EXCEPTION") {
-                    handleError("Connection Error");
+                    showToast("Connection Error");
+                    followHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            new FollowTask().execute(fActivity);
+                        }
+                    }, frequency);
+                    return;
                 } else if (result == "ERROR") {
                     handleError("Error");
+                    return;
                 }
                 fin = new JSONObject(result);
+                LatLng coord;
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
+                    case SUCCESS_AND_CONTAINS_DIRECTIONS:
                     case SUCCESS:
-                        LatLng coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
+                        coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (broadcaster == null) {
-                            broadcaster = fActivity.plot(coord);
+                            broadcaster = fActivity.plot(coord, false);
                         } else {
                             broadcaster.setPosition(coord);
                         }
@@ -159,11 +240,24 @@ public class FollowActivity extends MapActivity {
                             }
                         }, frequency);
                         break;
-                    case NO_SUCH_USER:
-                        showToast("User does not exist.");
+                    
+                       /* map.clear();
+                        coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
+                        if (follower != null) {
+                            follower = fActivity.plot(follower.getPosition(), false);
+                        }
+                        broadcaster = fActivity.plot(coord, false);
+                        followHandler.postDelayed(new Runnable() {
+                            public void run() {
+                                new FollowTask().execute(fActivity);
+                            }
+                        }, frequency);
+                        String jo = (String) fin.get("directions");
+                        drawPath(jo);
                         break;
-                    case INCORRECT_PASSWORD:
-                        showToast("Username and password do not match.");
+                        */
+                    case AUTHENTICATION_FAILED:
+                        handleError("Authentication failed.");
                         break;
                     case NO_SUCH_BROADCASTER:
                         showToast("Broadcaster does not exist.");
@@ -179,15 +273,25 @@ public class FollowActivity extends MapActivity {
                         break;
                 }
 
-            } catch (Exception e) {
+            } catch (JSONException je) {
+                Log.d("JSONEXCEPTION", je.getMessage());
+            } 
+            /*
+            catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
                 handleError(e.getMessage());
             }
+            */
         }
     }
 
 
     private class CancelTask extends AsyncTask<String, Void, String> {
+    	private static final int SUCCESS = 1;
+    	private static final int AUTHENTICATION_FAILED = -1;
+    	private static final int NO_SUCH_BROADCASTER_USERNAME = -3;
+    	private static final int USER_NOT_BROADCASTING = -4;
+    	
         @Override
         protected String doInBackground(String... urls) {
 
@@ -215,27 +319,28 @@ public class FollowActivity extends MapActivity {
             JSONObject fin;
             try {
                 if (result == "JSON_EXCEPTION") {
-                    showToast("JSON Error");
+                    handleError("JSON Error");
+                    return;
                 } else if (result == "RUNTIME_EXCEPTION") {
                     showToast("Connection Error");
+                    return;
                 } else if (result == "ERROR") {
-                    showToast("Error");
+                    handleError("Error");
+                    return;
                 }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
                         break;
-                    case NO_SUCH_USER:
-                        showToast("User does not exist.");
+                    case AUTHENTICATION_FAILED:
+                        handleError("Authentication failed.");
                         break;
-                    case INCORRECT_PASSWORD:
-                        showToast("Username and password do not match.");
-                        break;
-                    case NO_SUCH_BROADCASTER:
-                        showToast("Broadcaster does not exist.");
+                    case NO_SUCH_BROADCASTER_USERNAME:
+                        showToast("No such broadcaster username.");
                         break;
                     case USER_NOT_BROADCASTING:
+                        showToast("User not braodcasting.");
                         break;
                     default:
                         showToast("Unknown errCode.");
@@ -253,6 +358,11 @@ public class FollowActivity extends MapActivity {
     	handleCleanup();
     	new CancelTask().execute(cancelUrl);
     }
+    
+    public void update(View view) {
+        this.update = true;
+        showToast("Request Processed");
+    }
 
     /* Finds the current location of the application user, who is currently broadcasting,
      * and updates the database.
@@ -262,8 +372,10 @@ public class FollowActivity extends MapActivity {
     	static final int GET_LOC_FAIL = -1;
     	static final int BROADCAST_FREQUENCY = 10 * 1000;
     	private FollowActivity fActivity;
+
     	protected double debugLatitude = 37.0;
         protected double debugLongitude = -122.0;
+        private boolean finishActivity = true;
         
         protected static final int SUCCESS = 1;
         protected static final int AUTHENTICATION_FAILED = -1;
@@ -337,6 +449,7 @@ public class FollowActivity extends MapActivity {
             
             if (currentLocation == null) {
             	fActivity.setErrorText("Cannot get current location");
+            	finishActivity = false;
             	publishProgress(fActivity);
     		    return GET_LOC_FAIL;
             }
@@ -376,6 +489,7 @@ public class FollowActivity extends MapActivity {
     			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData);
     		} catch (RuntimeException e) {
     			fActivity.setErrorText("Connection Error");
+    			finishActivity = false;
         		publishProgress(fActivity);
     			return GET_LOC_FAIL;
     		}
@@ -434,7 +548,12 @@ public class FollowActivity extends MapActivity {
         	FollowActivity fActivity = followActivties[0];
         	
         	if (fActivity.progressSuccessful == false) {
-        		fActivity.handleError(fActivity.errorText);
+        		if (finishActivity) {
+        			fActivity.handleError(fActivity.errorText);
+        		} else {
+        			fActivity.handleError(fActivity.errorText);
+        		}
+        		finishActivity = true;
         		return;
         	}
         	Location currentLocation = fActivity.currentLocation;
@@ -444,7 +563,7 @@ public class FollowActivity extends MapActivity {
                     currentLocation.getLongitude()
             );
             if (follower == null) {
-                follower = fActivity.plot(userLocation);
+                follower = fActivity.plot(userLocation, true);
             } else {
                 follower.setPosition(userLocation);
             }

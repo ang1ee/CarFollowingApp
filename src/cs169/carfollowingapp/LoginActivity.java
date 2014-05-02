@@ -1,7 +1,5 @@
 package cs169.carfollowingapp;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -147,7 +145,6 @@ public class LoginActivity extends Activity {
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
-
 //            User user = new User();
 //            user.setUsername(etUsername.getText().toString());
 //            user.setPassword(etPassword.getText().toString());
@@ -173,6 +170,16 @@ public class LoginActivity extends Activity {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
             JSONObject fin;
             try {
+            	if (result == "JSON_EXCEPTION") {
+                    showToast("JSON Error");
+                    return;
+                } else if (result == "RUNTIME_EXCEPTION") {
+                    showToast("Connection Error");
+                    return;
+                } else if (result == "ERROR") {
+                    showToast("Error");
+                    return;
+                }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
                 String message;
@@ -189,6 +196,7 @@ public class LoginActivity extends Activity {
                     default:
                         message = "Login successful.";
                         
+                        /*
                         Context context = getApplicationContext();
                         String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
                         String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
@@ -227,6 +235,8 @@ public class LoginActivity extends Activity {
                         	// If only one file exists, makes it so neither exist for simplicity.
                         	passwordFile.delete();
                         }
+                        */
+                        
                         break;
                 }
                 tvMessage.setText(message);

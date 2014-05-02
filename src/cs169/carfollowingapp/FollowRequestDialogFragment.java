@@ -34,11 +34,9 @@ public class FollowRequestDialogFragment extends DialogFragment {
         String[] followerTuple = bActivity.getFollowerTuple();
         String followerName = followerTuple[0];
         String followerMessage = followerTuple[1];
-        String dialogString;
-        if (followerMessage == "") {
-        	dialogString = followerName + " would like to follow you";
-        } else {
-        	dialogString = followerName + ": " + followerMessage;
+        String dialogString = followerName + " would like to follow you";
+        if (!followerMessage.equals("")) {
+        	dialogString += "\nmessage: " + followerMessage;
         }
         builder.setMessage(dialogString)
                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {

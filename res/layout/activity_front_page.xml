@@ -24,8 +24,6 @@
 	    android:text="@string/broadcast"
         android:layout_above="@id/follow_button"/>
     
-
-
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"

@@ -448,7 +448,7 @@ public class BroadcastActivity extends MapActivity {
                     currentLocation.getLongitude()
             );
             if (broadcaster == null) {
-                broadcaster = bActivity.plot(userLocation);
+                broadcaster = bActivity.plot(userLocation, true);
             } else {
                 broadcaster.setPosition(userLocation);
             }
@@ -479,7 +479,8 @@ public class BroadcastActivity extends MapActivity {
     	private String myUsername;
     	private String myPassword;
     	private BroadcastActivity bActivity;
-    	private boolean foundFollowers = false;
+    	private boolean finishActivity = true;
+    	//private boolean foundFollowers = false;
     	    	
     	@Override
         protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
@@ -523,6 +524,7 @@ public class BroadcastActivity extends MapActivity {
     			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + actionURL, postData);
     		} catch (RuntimeException e) {
     			bActivity.setErrorText("Connection Error");
+    			finishActivity = false;
         		publishProgress(bActivity);
     			return CHECK_FOLLOW_REQS_FAIL;
     		}
@@ -534,7 +536,7 @@ public class BroadcastActivity extends MapActivity {
     			try {
     				followers = obj.getJSONArray("follow requests");
     				putFollowReqsInList(bActivity, followers);
-    				publishProgress(bActivity);
+    				//publishProgress(bActivity);
     				return CHECK_FOLLOW_REQS_SUCCESS;
     			} catch (JSONException e) {
         			e.printStackTrace();
@@ -549,9 +551,6 @@ public class BroadcastActivity extends MapActivity {
     	 * instance.
     	 */
     	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
-    		if (bActivity.followRequestUsers.size() > 0) {
-    			foundFollowers = true;
-    		}
     		bActivity.progressSuccessful = true;
     		for (int i = 0; i < followers.length(); i++) {
     			try {
@@ -564,6 +563,11 @@ public class BroadcastActivity extends MapActivity {
     				throw e;
     			}
     		}
+    		/*
+    		if (bActivity.followRequestUsers.size() > 0) {
+    			foundFollowers = true;
+    		}
+    		*/
     	}
     	
     	/* Checks if there were any errors indicated by the JSON response.
@@ -607,20 +611,27 @@ public class BroadcastActivity extends MapActivity {
         	BroadcastActivity bActivity = broadcastActivties[0];
         	
         	if (bActivity.progressSuccessful == false) {
-        		handleError(bActivity.errorText);
+        		if (finishActivity) {
+        			bActivity.handleError(bActivity.errorText);
+        		} else {
+        			bActivity.showToast(bActivity.errorText);
+        		}
+        		finishActivity = true;
         		return;
         	}
         	
+        	/*
         	if (bActivity.followRequestUsers.size() > 0) {
         		bActivity.showFollowRequestDialog();
         	}
+        	*/
         }
         
         @Override
         protected void onPostExecute(Integer result) {
         	if (result == CHECK_FOLLOW_REQS_SUCCESS) {
-        		if (foundFollowers == true) {
-        			foundFollowers = false;
+        		if (bActivity.followRequestUsers.size() > 0) {
+        			bActivity.showFollowRequestDialog();
         			return;
         		}
         		bActivity.followRequestHandler.postDelayed(new Runnable() {
@@ -670,7 +681,7 @@ public class BroadcastActivity extends MapActivity {
     		    return;
         	} else if (result == CONNECTION_ERROR) {
         		CharSequence text = "Connection Error";
-    			bActivity.handleError(text);
+    			bActivity.showToast(text);
     			return;
         	} else if (result == "JSON_EXCEPTION") {
         		CharSequence text = "JSON Error";
@@ -706,6 +717,7 @@ public class BroadcastActivity extends MapActivity {
     	static final int JSON_SUCCESS = 1;
     	static final int JSON_FAIL = -1;
     	BroadcastActivity bActivity;
+    	private boolean finishActivity = true;
     	    	
     	@Override
         protected String doInBackground(BroadcastActivity... broadcastActivities) {
@@ -743,6 +755,7 @@ public class BroadcastActivity extends MapActivity {
     		} catch (RuntimeException e) {
     			Log.e("HTTPPOSTInvitationResponseAsyncTask", e.getMessage());
         	    bActivity.setErrorText("Connection error");
+        	    finishActivity = false;
         		publishProgress(bActivity);
         		return null;
     		}
@@ -755,7 +768,12 @@ public class BroadcastActivity extends MapActivity {
         	BroadcastActivity bActivity = broadcastActivties[0];
         	
         	if (bActivity.progressSuccessful == false) {
-        		bActivity.handleError(bActivity.errorText);
+        		if (finishActivity) {
+        			bActivity.handleError(bActivity.errorText);
+        		} else {
+        			bActivity.showToast(bActivity.errorText);
+        		}
+        		finishActivity = true;
         		return;
         	}
         }
@@ -834,7 +852,7 @@ public class BroadcastActivity extends MapActivity {
             JSONObject fin;
             try {
                 if (result == "RUNTIME_EXCEPTION") {
-                    handleError("Connection Error");
+                    bActivity.showToast("Connection Error");
                 }
                 fin = new JSONObject(result);
                 int errCode = fin.getInt("status code");
@@ -849,18 +867,18 @@ public class BroadcastActivity extends MapActivity {
                         }, frequency);
                         break;
                     case AUTHENTICATION_FAILED:
-                        showToast("Authentication failed.");
+                        bActivity.handleError("Authentication failed.");
                         break;
                     case USER_NOT_BROADCASTING:
-                        showToast("User not broadcasting.");
+                        bActivity.handleError("User not broadcasting.");
                         break;
                     default:
-                        handleError("Unknown errCode.");
+                        bActivity.handleError("Unknown errCode.");
                         break;
                 }
             } catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
-                handleError(e.getMessage());
+                bActivity.handleError(e.getMessage());
             }
         }
         
