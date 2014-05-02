@@ -1,6 +1,8 @@
 
 package cs169.carfollowingapp;
 
+import java.io.File;
+
 import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -102,10 +104,20 @@ public class FrontPageActivity extends Activity {
         Singleton.getInstance().clearCookies();
         
         // Delete files storing username and password
-        /*
+        
         Context context = getApplicationContext();
-        boolean deletedUsernameFile = context.deleteFile(Constants.U_FILE_NAME);
-        boolean deletedPasswordFile = context.deleteFile(Constants.P_FILE_NAME);
+        /*
+        boolean deletedUsernameFile = context.deleteFile(context.getFilesDir().getAbsolutePath() + "/" + Constants.U_FILE_NAME);
+        boolean deletedPasswordFile = context.deleteFile(context.getFilesDir().getAbsolutePath() + "/" + Constants.P_FILE_NAME);
+        */
+        
+        String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+        String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+        File usernameFile = new File(usernameFilePath);
+        File passwordFile = new File(passwordFilePath);
+        
+        boolean deletedUsernameFile = usernameFile.delete();
+        boolean deletedPasswordFile = passwordFile.delete();
         
         // For debugging
         if (!deletedUsernameFile) {
@@ -115,7 +127,6 @@ public class FrontPageActivity extends Activity {
         if (deletedPasswordFile) {
         	showToast("Could not delete password file");
         }
-        */
         
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);

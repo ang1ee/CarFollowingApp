@@ -1,5 +1,8 @@
 package cs169.carfollowingapp;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -54,7 +57,7 @@ public class LoginActivity extends Activity {
 
         //XXX Auto login code
         
-        /*
+        
         Context context = getApplicationContext();
         String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
         String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
@@ -76,7 +79,6 @@ public class LoginActivity extends Activity {
         } catch (IOException e) {
         	showToast("Cannot read login info files");
         }
-        */
         
         // get reference to the views
         tvMessage = (TextView) findViewById(R.id.tvMessage);
@@ -118,9 +120,11 @@ public class LoginActivity extends Activity {
     
     String readInternalFile(String filename) throws IOException {
     	ArrayList<Byte> bytes = new ArrayList<Byte>();
-    	Integer currByte = openFileInput(filename).read();
+    	FileInputStream fInStream = openFileInput(filename);
+    	Integer currByte = fInStream.read();
     	while (currByte != -1) {
     		bytes.add(currByte.byteValue());
+    		currByte = fInStream.read();
     	}
     	byte[] byteArr = new byte[bytes.size()];
     	for (int i = 0; i < bytes.size(); i++) {
@@ -196,7 +200,6 @@ public class LoginActivity extends Activity {
                     default:
                         message = "Login successful.";
                         
-                        /*
                         Context context = getApplicationContext();
                         String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
                         String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
@@ -235,7 +238,10 @@ public class LoginActivity extends Activity {
                         	// If only one file exists, makes it so neither exist for simplicity.
                         	passwordFile.delete();
                         }
-                        */
+                        
+                        boolean a = usernameFile.exists();
+                        boolean b = passwordFile.exists();
+                        System.out.println("boo");
                         
                         break;
                 }
