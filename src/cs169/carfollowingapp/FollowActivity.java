@@ -209,15 +209,24 @@ public class FollowActivity extends MapActivity {
             try {
                 if (result == "JSON_EXCEPTION") {
                     handleError("JSON Error");
+                    return;
                 } else if (result == "RUNTIME_EXCEPTION") {
                     showToast("Connection Error");
+                    followHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            new FollowTask().execute(fActivity);
+                        }
+                    }, frequency);
+                    return;
                 } else if (result == "ERROR") {
                     handleError("Error");
+                    return;
                 }
                 fin = new JSONObject(result);
                 LatLng coord;
                 errCode = fin.getInt("status code");
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
+                    case SUCCESS_AND_CONTAINS_DIRECTIONS:
                     case SUCCESS:
                         coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (broadcaster == null) {
@@ -231,8 +240,8 @@ public class FollowActivity extends MapActivity {
                             }
                         }, frequency);
                         break;
-                    case SUCCESS_AND_CONTAINS_DIRECTIONS:
-                        map.clear();
+                    
+                       /* map.clear();
                         coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (follower != null) {
                             follower = fActivity.plot(follower.getPosition(), false);
@@ -246,6 +255,7 @@ public class FollowActivity extends MapActivity {
                         String jo = (String) fin.get("directions");
                         drawPath(jo);
                         break;
+                        */
                     case AUTHENTICATION_FAILED:
                         handleError("Authentication failed.");
                         break;
@@ -310,10 +320,13 @@ public class FollowActivity extends MapActivity {
             try {
                 if (result == "JSON_EXCEPTION") {
                     handleError("JSON Error");
+                    return;
                 } else if (result == "RUNTIME_EXCEPTION") {
                     showToast("Connection Error");
+                    return;
                 } else if (result == "ERROR") {
                     handleError("Error");
+                    return;
                 }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
@@ -436,6 +449,7 @@ public class FollowActivity extends MapActivity {
             
             if (currentLocation == null) {
             	fActivity.setErrorText("Cannot get current location");
+            	finishActivity = false;
             	publishProgress(fActivity);
     		    return GET_LOC_FAIL;
             }

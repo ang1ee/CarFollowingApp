@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 Angeline's google key: AIzaSyBJ_jzVae_hy1nRDwE42b5rPjyhioAnu5U
@@ -13,7 +14,7 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
 
     <!-- For Auto-Login -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
+
     <uses-sdk
         android:minSdkVersion="16"
         android:targetSdkVersion="16" />
@@ -32,7 +33,6 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
 
     <application
         android:allowBackup="true"
-
         android:icon="@drawable/jia"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -58,8 +58,8 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
         </activity>
         <activity
             android:name="cs169.carfollowingapp.BroadcastActivity"
-            android:label="@string/title_activity_broadcast"
-            android:configChanges="orientation" >
+            android:configChanges="orientation"
+            android:label="@string/title_activity_broadcast" >
         </activity>
         <activity
             android:name="cs169.carfollowingapp.LoginActivity"
@@ -81,7 +81,11 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
             android:name="cs169.carfollowingapp.SelectBroadcasterActivity"
             android:label="@string/title_activity_select_broadcaster" >
         </activity>
-       
+        <activity
+            android:name="cs169.carfollowingapp.ForgotPasswordActivity"
+            android:label="@string/title_activity_forgot_password" >
+        </activity>
     </application>
 
 </manifest>
+
