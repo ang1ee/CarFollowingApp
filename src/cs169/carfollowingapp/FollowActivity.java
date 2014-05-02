@@ -163,7 +163,7 @@ public class FollowActivity extends MapActivity {
                 return true;
             case R.id.action_help:
                 builder = new AlertDialog.Builder(this);
-                msg = "You are now following a broadcaster!\n\nThe red-orange marker indicates your position.  Follow the blue path to reach the broadcaster's location.\n\nSwipe from the leftmost side to see the street-wise directions.\n\nHit update to manually call for a new path and set of directions!";
+                msg = "You are now following a broadcaster!\n\nThe red-orange marker indicates your position.  Follow the blue path to reach the broadcaster's location.\n\nSwipe from the leftmost side to see street-wise directions.\n\nHit Update to manually call for a new path and set of directions!";
                 builder.setMessage(msg)
                         .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {

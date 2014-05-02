@@ -180,7 +180,7 @@ public class BroadcastActivity extends MapActivity {
         int id = item.getItemId();
         if (id == R.id.action_help) {
             builder = new AlertDialog.Builder(this);
-            msg = "You are broadcasting your location!\n\nOn the map, you're location is indicated by the reddish-orange marker.  Check the legend to map color to username for your followers by hitting the top-left icon.\n\nWhen you're done broadcasting, hit Stop Broadcasting!";
+            msg = "You are broadcasting your location!\n\nOn the map, you're location is indicated by the red-orange marker.  Check the legend of marker color to username for your followers by hitting the top-left icon.\n\nWhen you're done broadcasting, hit Stop Broadcasting!";
             builder.setMessage(msg)
                     .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {

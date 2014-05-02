@@ -56,7 +56,7 @@ public class FrontPageActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_info:
                 builder = new AlertDialog.Builder(this);
-                msg = "Caravan is an application made to streamline the experience of driving as a group!  One user can broadcast his location and have other his friends follow him.\n\nUsers can track each others locations and navigate toward the main broadcaster!";
+                msg = "Caravan is an application made to streamline the experience of driving as a group!  One user can broadcast his location and have his friends follow him.\n\nUsers can track each others locations and navigate toward the main broadcaster, using street-wise directions and the navigation map.\n\nNote: Caravan's optimal use case is when the follower is not directly following the broadcaster.";
                 builder.setMessage(msg)
                         .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
