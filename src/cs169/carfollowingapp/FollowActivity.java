@@ -401,6 +401,7 @@ public class FollowActivity extends MapActivity {
     private class SetFollowerPositionTask extends AsyncTask<FollowActivity, FollowActivity, Integer> {
     	static final int GET_LOC_SUCCESS = 1;
     	static final int GET_LOC_FAIL = -1;
+    	static final int GET_LOC_FAIL_BUT_CONTINUE = -2;
     	static final int BROADCAST_FREQUENCY = 10 * 1000;
     	private FollowActivity fActivity;
 
@@ -482,7 +483,7 @@ public class FollowActivity extends MapActivity {
             	fActivity.setErrorText("Cannot get current location");
             	finishActivity = false;
             	publishProgress(fActivity);
-    		    return GET_LOC_FAIL;
+    		    return GET_LOC_FAIL_BUT_CONTINUE;
             }
             
             fActivity.setCurrentLocation(currentLocation);
@@ -522,7 +523,7 @@ public class FollowActivity extends MapActivity {
     			fActivity.setErrorText("Connection Error");
     			finishActivity = false;
         		publishProgress(fActivity);
-    			return GET_LOC_FAIL;
+    			return GET_LOC_FAIL_BUT_CONTINUE;
     		}
     		int checkJSONResult = checkJSONResponse(fActivity, obj.toString());
     		if (checkJSONResult == GET_LOC_FAIL) {
@@ -582,7 +583,7 @@ public class FollowActivity extends MapActivity {
         		if (finishActivity) {
         			fActivity.handleError(fActivity.errorText);
         		} else {
-        			fActivity.handleError(fActivity.errorText);
+        			fActivity.showToast(fActivity.errorText);
         		}
         		finishActivity = true;
         		return;
@@ -602,7 +603,7 @@ public class FollowActivity extends MapActivity {
         
         @Override
         protected void onPostExecute(Integer result) {
-        	if (result == GET_LOC_SUCCESS) {
+        	if ((result == GET_LOC_SUCCESS) || (result == GET_LOC_FAIL_BUT_CONTINUE)) {
         		setFollowerPositionHandler.postDelayed(new Runnable() {
                     public void run() {
                     	new SetFollowerPositionTask().execute(fActivity);

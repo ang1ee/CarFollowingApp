@@ -492,6 +492,7 @@ public class BroadcastActivity extends MapActivity {
     	static final int REQUEST_CHECK_FREQUENCY = 5 * 1000;
     	static final int CHECK_FOLLOW_REQS_SUCCESS = 1;
     	static final int CHECK_FOLLOW_REQS_FAIL = -1;
+    	static final int CHECK_FOLLOW_REQS_FAIL_BUT_CONTINUE = -2;
     	private String myUsername;
     	private String myPassword;
     	private BroadcastActivity bActivity;
@@ -542,7 +543,7 @@ public class BroadcastActivity extends MapActivity {
     			bActivity.setErrorText("Connection Error");
     			finishActivity = false;
         		publishProgress(bActivity);
-    			return CHECK_FOLLOW_REQS_FAIL;
+    			return CHECK_FOLLOW_REQS_FAIL_BUT_CONTINUE;
     		}
     		String JSONString = obj.toString();
     		int checkJSONResult = checkJSONResponse(bActivity, JSONString);
@@ -645,7 +646,7 @@ public class BroadcastActivity extends MapActivity {
         
         @Override
         protected void onPostExecute(Integer result) {
-        	if (result == CHECK_FOLLOW_REQS_SUCCESS) {
+        	if ((result == CHECK_FOLLOW_REQS_SUCCESS) || (result == CHECK_FOLLOW_REQS_FAIL_BUT_CONTINUE)) {
         		if (bActivity.followRequestUsers.size() > 0) {
         			bActivity.showFollowRequestDialog();
         			return;
@@ -799,7 +800,7 @@ public class BroadcastActivity extends MapActivity {
     	 */
         protected int checkJSONResponse(BroadcastActivity bActivity, String response) {
         	if (response == null) {
-    		    bActivity.setErrorText("Unable to update database with current location");
+    		    bActivity.setErrorText("Unable to respond to invitation.");
         		publishProgress(bActivity);
         		return JSON_FAIL;
         	}
