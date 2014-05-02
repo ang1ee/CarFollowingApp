@@ -304,7 +304,7 @@ public class FollowActivity extends MapActivity {
                directions = new String[steps.length()];
                for (int i=0; i < steps.length(); i++) {
                    JSONObject step = steps.getJSONObject(i);
-                   directions[i] = Html.fromHtml(step.getString("html_instructions")).toString();
+                   directions[i] = Html.fromHtml("&#8226;" + step.getString("html_instructions")).toString();
                }
             } 
             catch (JSONException e) {
