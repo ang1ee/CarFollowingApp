@@ -117,8 +117,8 @@ public class FollowActivity extends MapActivity {
         
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-//        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
         
         mDrawerList.setAdapter(new ArrayAdapter<String>(
                 this,
