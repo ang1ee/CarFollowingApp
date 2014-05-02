@@ -59,8 +59,8 @@ public class LoginActivity extends Activity {
         
         
         Context context = getApplicationContext();
-        String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
-        String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+        String usernameFilePath = context.getFilesDir().getAbsolutePath() + "/" + Constants.U_FILE_NAME;
+        String passwordFilePath= context.getFilesDir().getAbsolutePath() + "/" + Constants.P_FILE_NAME;
         File usernameFile = new File(usernameFilePath);
         File passwordFile = new File(passwordFilePath);
         
@@ -201,8 +201,8 @@ public class LoginActivity extends Activity {
                         message = "Login successful.";
                         
                         Context context = getApplicationContext();
-                        String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
-                        String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+                        String usernameFilePath = context.getFilesDir().getAbsolutePath()+ "/" + Constants.U_FILE_NAME;
+                        String passwordFilePath= context.getFilesDir().getAbsolutePath()+ "/" + Constants.P_FILE_NAME;
                         File usernameFile = new File(usernameFilePath);
                         File passwordFile = new File(passwordFilePath);
                         
@@ -220,28 +220,40 @@ public class LoginActivity extends Activity {
                         			passwordOutStream.write(password.getBytes());
                         			passwordOutStream.close();
                         		} catch (Exception e) {
-                        			String text = "Could not save login info";
-                        			context.deleteFile(Constants.U_FILE_NAME);
-                        			context.deleteFile(Constants.P_FILE_NAME);
+                        			//String text = "Could not save login info";
+                        	        
+                        	        boolean deletedUsernameFile = usernameFile.delete();
+                        	        boolean deletedPasswordFile = passwordFile.delete();
+                        	        
+                        	        // For debugging
+                        	        if (!deletedUsernameFile) {
+                        	        	showToast("Could not delete username file");
+                        	        }
+                        	        
+                        	        if (!deletedPasswordFile) {
+                        	        	showToast("Could not delete password file");
+                        	        }
                         	
-                        			int duration = Toast.LENGTH_SHORT;
+                        			//int duration = Toast.LENGTH_SHORT;
                     	    
-                        			Toast toast = Toast.makeText(context, text, duration);
-                        			toast.show();
+                        			//Toast toast = Toast.makeText(context, text, duration);
+                        			//toast.show();
                         			e.printStackTrace();
                         		}
                         	} else {
                         		// If only one file exists, makes it so neither exist for simplicity.
                         		passwordFile.delete();
                         	}
-                        } else if (passwordFile.exists()) {
+                        } else if (!passwordFile.exists()) {
                         	// If only one file exists, makes it so neither exist for simplicity.
-                        	passwordFile.delete();
+                        	usernameFile.delete();
                         }
                         
+                        /*
                         boolean a = usernameFile.exists();
                         boolean b = passwordFile.exists();
                         System.out.println("boo");
+                        */
                         
                         break;
                 }

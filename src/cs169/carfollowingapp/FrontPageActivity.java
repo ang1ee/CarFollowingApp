@@ -111,8 +111,8 @@ public class FrontPageActivity extends Activity {
         boolean deletedPasswordFile = context.deleteFile(context.getFilesDir().getAbsolutePath() + "/" + Constants.P_FILE_NAME);
         */
         
-        String usernameFilePath = context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
-        String passwordFilePath= context.getFilesDir().getAbsolutePath()+"/" + Constants.U_FILE_NAME;
+        String usernameFilePath = context.getFilesDir().getAbsolutePath() + "/" + Constants.U_FILE_NAME;
+        String passwordFilePath= context.getFilesDir().getAbsolutePath() + "/" + Constants.P_FILE_NAME;
         File usernameFile = new File(usernameFilePath);
         File passwordFile = new File(passwordFilePath);
         
@@ -124,7 +124,7 @@ public class FrontPageActivity extends Activity {
         	showToast("Could not delete username file");
         }
         
-        if (deletedPasswordFile) {
+        if (!deletedPasswordFile) {
         	showToast("Could not delete password file");
         }
         
