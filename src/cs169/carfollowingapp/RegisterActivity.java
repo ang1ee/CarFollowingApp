@@ -30,9 +30,9 @@ import android.widget.Toast;
 
 public class RegisterActivity extends Activity {
 
-    EditText etUsername,etPassword;
+    EditText etUsername,etPassword,etEmail;
     Button btnRegister;
-    String username, password;
+    String username, password, email;
 
     //Destination addresses for the login and add location of the server
     String registerUrl = Constants.BASE_SERVER_URL + "api/create_user";
@@ -55,6 +55,7 @@ public class RegisterActivity extends Activity {
         // get reference to the views
         etUsername = (EditText) findViewById(R.id.etUsername);
         etPassword = (EditText) findViewById(R.id.etPassword);
+        etEmail = (EditText) findViewById(R.id.etEmail);
         btnRegister = (Button) findViewById(R.id.btnRegister);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -65,6 +66,7 @@ public class RegisterActivity extends Activity {
             public void onClick(View v) {
                 username = etUsername.getText().toString();
                 password = etPassword.getText().toString();
+                email = etEmail.getText().toString();
                 Toast.makeText(getBaseContext(), "Creating user...", Toast.LENGTH_LONG).show();
                 new HttpAsyncTask().execute(registerUrl);
             }
@@ -82,6 +84,7 @@ public class RegisterActivity extends Activity {
             try {
                 postData.put(Constants.U_KEY, username);
                 postData.put(Constants.P_KEY, password);
+                postData.put(Constants.E_KEY, email);
                 JSONObject obj = Singleton.getInstance().makeHTTPPOSTRequest(urls[0], postData);
                 return obj.toString();
             } catch (JSONException e) {
@@ -105,7 +108,10 @@ public class RegisterActivity extends Activity {
                 String message = "";
                 
                 //Updates the message on the Log In page, depending on the database response.
-                switch (errCode) { 
+                switch (errCode) {
+                    case -4:
+                        message = "Malformed Email";
+                        break;
                     case -3:
                         message = "Password must have 1 to 128 characters";
                         break;
@@ -119,7 +125,7 @@ public class RegisterActivity extends Activity {
                         message = "Error";
                         break;
                     default:
-                        message = "User registered successfully";
+                        message = "User registered successfully" + errCode;
                         break;
                 }
                 Context context = getApplicationContext();

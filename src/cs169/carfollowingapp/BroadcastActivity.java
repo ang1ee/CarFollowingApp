@@ -71,8 +71,8 @@ public class BroadcastActivity extends MapActivity {
     /* Same with the four below... */
     protected boolean progressSuccessful = true;
     protected CharSequence errorText;
-    protected LinkedList<String> followRequestUsernames = new LinkedList<String>();
-    protected String followName;
+    protected LinkedList<String[]> followRequestUsers = new LinkedList<String[]>();
+    protected String[] followerTuple = new String[2];
     protected double debugLatitude = 37.866750;
     protected double debugLongitude = -122.262074;
     protected boolean invitationAccepted = false;
@@ -223,8 +223,8 @@ public class BroadcastActivity extends MapActivity {
 	    finish();
 	}
     
-    protected String getFollowName() {
-    	return followName;
+    protected String[] getFollowerTuple() {
+    	return followerTuple;
     }
     
     protected void setCurrentLocation(Location currLoc) {
@@ -237,9 +237,9 @@ public class BroadcastActivity extends MapActivity {
     	errorText = errTxt;
     }
     
-    protected void setFollowRequestUsernames(LinkedList<String> followers) {
+    protected void setFollowRequestUsers(LinkedList<String[]> followers) {
     	progressSuccessful = true;
-    	followRequestUsernames = followers;
+    	followRequestUsers = followers;
     }
     
     public void invitationResponse() {
@@ -247,10 +247,10 @@ public class BroadcastActivity extends MapActivity {
     }
     
     public void showFollowRequestDialog() {
-    	if (followRequestUsernames.size() <= 0) {
+    	if (followRequestUsers.size() <= 0) {
     		return;
     	}
-    	followName = followRequestUsernames.remove();
+    	followerTuple = followRequestUsers.remove();
     	FollowRequestDialogFragment newFragment = new FollowRequestDialogFragment();
     	newFragment.setBActivity(this);
     	newFragment.show(getFragmentManager(), "follow request");
@@ -470,8 +470,7 @@ public class BroadcastActivity extends MapActivity {
     /* Receives follow requests for the broadcaster. */
     private class HTTPPOSTGetFollowRequestsAsyncTask extends AsyncTask<BroadcastActivity, BroadcastActivity, Integer> {
     	static final int SUCCESS = 1;
-    	static final int NO_SUCH_USER_FOR_MY_USERNAME = -1;
-    	static final int INCORRECT_PASSWORD = -2;
+    	static final int AUTHENTICATION_FAILED = -1;
     	static final int USER_NOT_BROADCASTING = -3;
     	
     	static final int REQUEST_CHECK_FREQUENCY = 5 * 1000;
@@ -480,7 +479,7 @@ public class BroadcastActivity extends MapActivity {
     	private String myUsername;
     	private String myPassword;
     	private BroadcastActivity bActivity;
-    	private boolean foundFollowers = false;
+    	//private boolean foundFollowers = false;
     	    	
     	@Override
         protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
@@ -535,7 +534,7 @@ public class BroadcastActivity extends MapActivity {
     			try {
     				followers = obj.getJSONArray("follow requests");
     				putFollowReqsInList(bActivity, followers);
-    				publishProgress(bActivity);
+    				//publishProgress(bActivity);
     				return CHECK_FOLLOW_REQS_SUCCESS;
     			} catch (JSONException e) {
         			e.printStackTrace();
@@ -550,18 +549,23 @@ public class BroadcastActivity extends MapActivity {
     	 * instance.
     	 */
     	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
-    		if (bActivity.followRequestUsernames.size() > 0) {
-    			foundFollowers = true;
-    		}
     		bActivity.progressSuccessful = true;
     		for (int i = 0; i < followers.length(); i++) {
     			try {
-    				String follower = followers.getString(i);
-    				bActivity.followRequestUsernames.add(follower);
+    				JSONArray followerJSON = followers.getJSONArray(i);
+    				String[] follower = new String[2];
+    				follower[0] = followerJSON.getString(0);
+    				follower[1] = followerJSON.getString(1);
+    				bActivity.followRequestUsers.add(follower);
     			} catch (JSONException e) {
     				throw e;
     			}
     		}
+    		/*
+    		if (bActivity.followRequestUsers.size() > 0) {
+    			foundFollowers = true;
+    		}
+    		*/
     	}
     	
     	/* Checks if there were any errors indicated by the JSON response.
@@ -578,11 +582,7 @@ public class BroadcastActivity extends MapActivity {
         	try {
         		JSONObject jsonResponse = new JSONObject(response);
         		statusCode = jsonResponse.getInt("status code");
-        		if (statusCode == NO_SUCH_USER_FOR_MY_USERNAME) {
-    	    		bActivity.setErrorText("No such user!");
-            		publishProgress(bActivity);
-    	    		return CHECK_FOLLOW_REQS_FAIL;
-    		    } else if (statusCode == INCORRECT_PASSWORD) {
+        		if (statusCode == AUTHENTICATION_FAILED) {
     	    		bActivity.setErrorText("Incorrect password!");
             		publishProgress(bActivity);
     	    		return CHECK_FOLLOW_REQS_FAIL;
@@ -613,16 +613,18 @@ public class BroadcastActivity extends MapActivity {
         		return;
         	}
         	
-        	if (bActivity.followRequestUsernames.size() > 0) {
+        	/*
+        	if (bActivity.followRequestUsers.size() > 0) {
         		bActivity.showFollowRequestDialog();
         	}
+        	*/
         }
         
         @Override
         protected void onPostExecute(Integer result) {
         	if (result == CHECK_FOLLOW_REQS_SUCCESS) {
-        		if (foundFollowers == true) {
-        			foundFollowers = false;
+        		if (bActivity.followRequestUsers.size() > 0) {
+        			bActivity.showFollowRequestDialog();
         			return;
         		}
         		bActivity.followRequestHandler.postDelayed(new Runnable() {
@@ -721,7 +723,7 @@ public class BroadcastActivity extends MapActivity {
     		try {
         		postData.put("myUsername", bActivity.myUsername);
         		postData.put("myPassword", bActivity.myPassword);
-        		postData.put("username", bActivity.followName);
+        		postData.put("username", bActivity.followerTuple[0]);
         	} catch (RuntimeException e) {
         	    Log.e("HTTPPOSTInvitationResponseAsyncTask", e.getMessage());
         	    bActivity.setErrorText("Connection error");

@@ -39,9 +39,8 @@ public class FollowActivity extends MapActivity {
     private int frequency = 5000;
     private boolean update = false;
     protected static final int SUCCESS = 1;
-    protected static final int SUCCESS_W_DIRECTIONS = 2;
-    protected static final int NO_SUCH_USER = -1;
-    protected static final int INCORRECT_PASSWORD = -2;
+    protected static final int SUCCESS_AND_CONTAINS_DIRECTIONS = 2;
+    protected static final int AUTHENTICATION_FAILED = -1;
     protected static final int NO_SUCH_BROADCASTER = -3;
     protected static final int USER_NOT_BROADCASTING = -4;
     protected static final int ACCESS_NOT_PERMITTED = -5;
@@ -231,10 +230,12 @@ public class FollowActivity extends MapActivity {
                             }
                         }, frequency);
                         break;
-                    case SUCCESS_W_DIRECTIONS:
+                    case SUCCESS_AND_CONTAINS_DIRECTIONS:
                         map.clear();
                         coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
-                        follower = fActivity.plot(follower.getPosition(), false);
+                        if (follower != null) {
+                            follower = fActivity.plot(follower.getPosition(), false);
+                        }
                         broadcaster = fActivity.plot(coord, false);
                         followHandler.postDelayed(new Runnable() {
                             public void run() {
@@ -244,11 +245,8 @@ public class FollowActivity extends MapActivity {
                         String jo = (String) fin.get("directions");
                         drawPath(jo);
                         break;
-                    case NO_SUCH_USER:
-                        showToast("User does not exist.");
-                        break;
-                    case INCORRECT_PASSWORD:
-                        showToast("Username and password do not match.");
+                    case AUTHENTICATION_FAILED:
+                        showToast("Authentication failed.");
                         break;
                     case NO_SUCH_BROADCASTER:
                         showToast("Broadcaster does not exist.");
@@ -278,6 +276,11 @@ public class FollowActivity extends MapActivity {
 
 
     private class CancelTask extends AsyncTask<String, Void, String> {
+    	private static final int SUCCESS = 1;
+    	private static final int AUTHENTICATION_FAILED = -1;
+    	private static final int NO_SUCH_BROADCASTER_USERNAME = -3;
+    	private static final int USER_NOT_BROADCASTING = -4;
+    	
         @Override
         protected String doInBackground(String... urls) {
 
@@ -316,16 +319,14 @@ public class FollowActivity extends MapActivity {
                 switch (errCode) { //Updates the message on the Log In page, depending on the database response.
                     case SUCCESS:
                         break;
-                    case NO_SUCH_USER:
+                    case AUTHENTICATION_FAILED:
                         showToast("User does not exist.");
                         break;
-                    case INCORRECT_PASSWORD:
+                    case NO_SUCH_BROADCASTER_USERNAME:
                         showToast("Username and password do not match.");
                         break;
-                    case NO_SUCH_BROADCASTER:
-                        showToast("Broadcaster does not exist.");
-                        break;
                     case USER_NOT_BROADCASTING:
+                        showToast("Broadcaster does not exist.");
                         break;
                     default:
                         showToast("Unknown errCode.");
@@ -357,8 +358,8 @@ public class FollowActivity extends MapActivity {
     	static final int GET_LOC_FAIL = -1;
     	static final int BROADCAST_FREQUENCY = 10 * 1000;
     	private FollowActivity fActivity;
-    	protected double debugLatitude = 37.0;
-        protected double debugLongitude = -122.0;
+        protected double debugLatitude = 37.8;
+        protected double debugLongitude = -122.2;
         
         protected static final int SUCCESS = 1;
         protected static final int AUTHENTICATION_FAILED = -1;
