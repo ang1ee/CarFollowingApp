@@ -479,7 +479,7 @@ public class BroadcastActivity extends MapActivity {
     	private String myUsername;
     	private String myPassword;
     	private BroadcastActivity bActivity;
-    	private boolean foundFollowers = false;
+    	//private boolean foundFollowers = false;
     	    	
     	@Override
         protected Integer doInBackground(BroadcastActivity... broadcastActivties) {
@@ -534,7 +534,7 @@ public class BroadcastActivity extends MapActivity {
     			try {
     				followers = obj.getJSONArray("follow requests");
     				putFollowReqsInList(bActivity, followers);
-    				publishProgress(bActivity);
+    				//publishProgress(bActivity);
     				return CHECK_FOLLOW_REQS_SUCCESS;
     			} catch (JSONException e) {
         			e.printStackTrace();
@@ -549,9 +549,6 @@ public class BroadcastActivity extends MapActivity {
     	 * instance.
     	 */
     	private void putFollowReqsInList(BroadcastActivity bActivity, JSONArray followers) throws JSONException {
-    		if (bActivity.followRequestUsers.size() > 0) {
-    			foundFollowers = true;
-    		}
     		bActivity.progressSuccessful = true;
     		for (int i = 0; i < followers.length(); i++) {
     			try {
@@ -564,6 +561,11 @@ public class BroadcastActivity extends MapActivity {
     				throw e;
     			}
     		}
+    		/*
+    		if (bActivity.followRequestUsers.size() > 0) {
+    			foundFollowers = true;
+    		}
+    		*/
     	}
     	
     	/* Checks if there were any errors indicated by the JSON response.
@@ -611,16 +613,18 @@ public class BroadcastActivity extends MapActivity {
         		return;
         	}
         	
+        	/*
         	if (bActivity.followRequestUsers.size() > 0) {
         		bActivity.showFollowRequestDialog();
         	}
+        	*/
         }
         
         @Override
         protected void onPostExecute(Integer result) {
         	if (result == CHECK_FOLLOW_REQS_SUCCESS) {
-        		if (foundFollowers == true) {
-        			foundFollowers = false;
+        		if (bActivity.followRequestUsers.size() > 0) {
+        			bActivity.showFollowRequestDialog();
         			return;
         		}
         		bActivity.followRequestHandler.postDelayed(new Runnable() {
