@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,10 +21,15 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -59,6 +65,14 @@ public class FollowActivity extends MapActivity {
     protected boolean progressSuccessful = true;
     protected CharSequence errorText;
 
+    private String[] directions = new String[] {};
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    
     private Marker broadcaster;
     private Marker follower;
     
@@ -76,9 +90,44 @@ public class FollowActivity extends MapActivity {
         setContentView(R.layout.activity_follow);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
+        mTitle = mDrawerTitle = getTitle();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.follow_drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 
+                R.drawable.ic_launcher, R.string.open_drawer, R.string.close_drawer) {
+            
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActionBar().setTitle(mTitle);
+                
+                // creates call to onPrepareOptionsMenu
+                invalidateOptionsMenu();
+            }
+            
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getActionBar().setTitle(mDrawerTitle);
+                
+                // creates call to onPrepareOptionsMenu
+                invalidateOptionsMenu();
+            }
+        };
+        
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        
+        mDrawerList.setAdapter(new ArrayAdapter<String>(
+                this,
+                R.layout.item_direction, 
+                directions)
+        );
+        
         this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.follow_map)).getMap();
         this.map.setMyLocationEnabled(true);
-
+        
         Intent intent = getIntent();
         myUsername = intent.getStringExtra(Constants.MY_U_KEY);
         myPassword = intent.getStringExtra(Constants.MY_P_KEY);
@@ -87,6 +136,14 @@ public class FollowActivity extends MapActivity {
         new SetFollowerPositionTask().execute(this);
     }
 
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+    
+    // override onPrepareOptionsMenu to hide action items 
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -233,6 +290,28 @@ public class FollowActivity extends MapActivity {
             }
         } 
         
+        public void saveDirections(String result) {
+            try {
+                //Tranform the string into a json object
+               JSONObject jObj = new JSONObject(result);
+               JSONArray routeArray = jObj.getJSONArray("routes");
+               JSONObject routes = routeArray.getJSONObject(0);
+               
+               JSONArray legs = routes.getJSONArray("legs");
+               JSONObject leg = legs.getJSONObject(0);
+               
+               JSONArray steps = leg.getJSONArray("steps");
+               directions = new String[steps.length()];
+               for (int i=0; i < steps.length(); i++) {
+                   JSONObject step = steps.getJSONObject(i);
+                   directions[i] = Html.fromHtml(step.getString("html_instructions")).toString();
+               }
+            } 
+            catch (JSONException e) {
+                Log.d("SAVE_DIRECTIONS", e.getLocalizedMessage());
+            }
+        }
+        
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
@@ -278,13 +357,21 @@ public class FollowActivity extends MapActivity {
                         if (follower != null) {
                             follower = fActivity.plot(follower.getPosition(), false);
                         }
-                        broadcaster = fActivity.plot(coord, false);
+                        MarkerOptions marcOpt = new MarkerOptions().position(coord);
+                        marcOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                        broadcaster = map.addMarker(marcOpt);
                         followHandler.postDelayed(new Runnable() {
                             public void run() {
                                 new FollowTask().execute(fActivity);
                             }
                         }, frequency);
                         String jo = (String) fin.get("directions");
+                        saveDirections(jo);
+                        mDrawerList.setAdapter(new ArrayAdapter<String>(
+                                getApplicationContext(),
+                                R.layout.item_direction, 
+                                directions)
+                        );
                         drawPath(jo);
                         break;
                     case AUTHENTICATION_FAILED:
