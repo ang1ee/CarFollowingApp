@@ -114,10 +114,13 @@ public class RegisterActivity extends Activity {
             try {
             	if (result == "JSON_EXCEPTION") {
                     showToast("JSON Error");
+                    return;
                 } else if (result == "RUNTIME_EXCEPTION") {
                     showToast("Connection Error");
+                    return;
                 } else if (result == "ERROR") {
                     showToast("Error");
+                    return;
                 }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
