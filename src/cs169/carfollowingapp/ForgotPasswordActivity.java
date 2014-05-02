@@ -36,14 +36,15 @@ public class ForgotPasswordActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-
+        /*
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment()).commit();
         }
+        */
         
         etUsername = (EditText) findViewById(R.id.etUsernameForgotPW);
-        btnForgotPassword = (Button) findViewById(R.id.btnLogin);
+        btnForgotPassword = (Button) findViewById(R.id.btnForgotPassword);
         
      // add click listener to Button "Register". Sends a POST request to users/register
         btnForgotPassword.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +80,7 @@ public class ForgotPasswordActivity extends Activity {
     /**
      * A placeholder fragment containing a simple view.
      */
+    /*
     public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
@@ -92,6 +94,7 @@ public class ForgotPasswordActivity extends Activity {
             return rootView;
         }
     }
+    */
     
     //Responsible for sending out the Post request on a different thread.
     //Takes the Username information from the text field
