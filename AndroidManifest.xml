@@ -81,6 +81,7 @@ Chris's google key: AIzaSyBEJCW834clkEIqWmNv-UiwBxaH5LJ8AFA
             android:name="cs169.carfollowingapp.SelectBroadcasterActivity"
             android:label="@string/title_activity_select_broadcaster" >
         </activity>
+       
     </application>
 
 </manifest>

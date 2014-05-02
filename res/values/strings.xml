@@ -31,6 +31,8 @@
     <string name="title_activity_select_broadcaster">SelectBroadcasterActivity</string>
     <string name="open_drawer">Open Followers</string>
     <string name="close_drawer">Close Followers</string>
+    
+    <string name="input_email_hint">email</string>
 
     <!-- ForgotPassword Strings -->
     <string name="button_recover_password">Recover Your Password</string>

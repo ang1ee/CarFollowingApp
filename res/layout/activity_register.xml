@@ -16,7 +16,8 @@
         android:ems="10"
         android:id="@+id/etUsername"
         android:layout_gravity="center_horizontal"
-        android:hint="Username"
+        android:contentDescription="@string/input_username_hint"
+        android:hint="@string/input_username_hint"
         android:layout_above="@+id/etPassword"/>
 
     <EditText
@@ -26,7 +27,8 @@
         android:ems="10"
         android:id="@+id/etPassword"
         android:layout_gravity="center_horizontal"
-        android:hint="Password"
+        android:hint="@string/input_password_hint"
+        android:contentDescription="@string/input_password_hint"
         android:layout_above="@+id/etEmail"/>
 
     <EditText
@@ -36,7 +38,8 @@
         android:ems="10"
         android:id="@+id/etEmail"
         android:layout_gravity="center_horizontal"
-        android:hint="E-mail address"
+        android:hint="@string/input_email_hint"
+        android:contentDescription="@string/input_email_hint"
         android:layout_above="@+id/btnRegister"/>
 
     <Button
