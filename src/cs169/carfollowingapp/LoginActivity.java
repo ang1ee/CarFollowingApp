@@ -147,7 +147,6 @@ public class LoginActivity extends Activity {
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
-
 //            User user = new User();
 //            user.setUsername(etUsername.getText().toString());
 //            user.setPassword(etPassword.getText().toString());
@@ -173,6 +172,13 @@ public class LoginActivity extends Activity {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
             JSONObject fin;
             try {
+            	if (result == "JSON_EXCEPTION") {
+                    showToast("JSON Error");
+                } else if (result == "RUNTIME_EXCEPTION") {
+                    showToast("Connection Error");
+                } else if (result == "ERROR") {
+                    showToast("Error");
+                }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
                 String message;

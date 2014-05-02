@@ -113,6 +113,7 @@ public class FollowActivity extends MapActivity {
 
     private class FollowTask extends AsyncTask<FollowActivity, Void, String> {
         private FollowActivity fActivity;
+        
         @Override
         protected String doInBackground(FollowActivity... followActivities) {
             fActivity = followActivities[0];
@@ -139,7 +140,7 @@ public class FollowActivity extends MapActivity {
                 if (result == "JSON_EXCEPTION") {
                     handleError("JSON Error");
                 } else if (result == "RUNTIME_EXCEPTION") {
-                    handleError("Connection Error");
+                    showToast("Connection Error");
                 } else if (result == "ERROR") {
                     handleError("Error");
                 }
@@ -160,7 +161,7 @@ public class FollowActivity extends MapActivity {
                         }, frequency);
                         break;
                     case AUTHENTICATION_FAILED:
-                        showToast("Authentication failed.");
+                        handleError("Authentication failed.");
                         break;
                     case NO_SUCH_BROADCASTER:
                         showToast("Broadcaster does not exist.");
@@ -217,11 +218,11 @@ public class FollowActivity extends MapActivity {
             JSONObject fin;
             try {
                 if (result == "JSON_EXCEPTION") {
-                    showToast("JSON Error");
+                    handleError("JSON Error");
                 } else if (result == "RUNTIME_EXCEPTION") {
                     showToast("Connection Error");
                 } else if (result == "ERROR") {
-                    showToast("Error");
+                    handleError("Error");
                 }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
@@ -229,13 +230,13 @@ public class FollowActivity extends MapActivity {
                     case SUCCESS:
                         break;
                     case AUTHENTICATION_FAILED:
-                        showToast("User does not exist.");
+                        handleError("Authentication failed.");
                         break;
                     case NO_SUCH_BROADCASTER_USERNAME:
-                        showToast("Username and password do not match.");
+                        showToast("No such broadcaster username.");
                         break;
                     case USER_NOT_BROADCASTING:
-                        showToast("Broadcaster does not exist.");
+                        showToast("User not braodcasting.");
                         break;
                     default:
                         showToast("Unknown errCode.");
@@ -264,6 +265,7 @@ public class FollowActivity extends MapActivity {
     	private FollowActivity fActivity;
     	protected double debugLatitude = 37.0;
         protected double debugLongitude = -122.0;
+        private boolean finishActivity = true;
         
         protected static final int SUCCESS = 1;
         protected static final int AUTHENTICATION_FAILED = -1;
@@ -376,6 +378,7 @@ public class FollowActivity extends MapActivity {
     			obj = Singleton.getInstance().makeHTTPPOSTRequest(Constants.BASE_SERVER_URL + broadcastActionURL, postData);
     		} catch (RuntimeException e) {
     			fActivity.setErrorText("Connection Error");
+    			finishActivity = false;
         		publishProgress(fActivity);
     			return GET_LOC_FAIL;
     		}
@@ -434,7 +437,11 @@ public class FollowActivity extends MapActivity {
         	FollowActivity fActivity = followActivties[0];
         	
         	if (fActivity.progressSuccessful == false) {
-        		fActivity.handleError(fActivity.errorText);
+        		if (finishActivity) {
+        			fActivity.handleError(fActivity.errorText);
+        		} else {
+        			fActivity.handleError(fActivity.errorText);
+        		}
         		return;
         	}
         	Location currentLocation = fActivity.currentLocation;

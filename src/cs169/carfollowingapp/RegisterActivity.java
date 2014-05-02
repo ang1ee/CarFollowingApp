@@ -73,6 +73,15 @@ public class RegisterActivity extends Activity {
         });
     }
 
+    // Displays toast showing the text argument.
+ 	protected void showToast(CharSequence text) {
+ 	    Context context = getApplicationContext();
+ 	    int duration = Toast.LENGTH_SHORT;
+ 	    
+ 	    Toast toast = Toast.makeText(context, text, duration);
+ 	    toast.show();
+ 	}
+    
     //Responsible for sending out the Post request on a different thread.
     //Takes the Username and Password information from the text field
     //to send it out to the server for add or login.
@@ -103,6 +112,13 @@ public class RegisterActivity extends Activity {
             //Toast.makeText(getBaseContext(),result, Toast.LENGTH_LONG).show();
             JSONObject fin;
             try {
+            	if (result == "JSON_EXCEPTION") {
+                    showToast("JSON Error");
+                } else if (result == "RUNTIME_EXCEPTION") {
+                    showToast("Connection Error");
+                } else if (result == "ERROR") {
+                    showToast("Error");
+                }
                 fin = new JSONObject(result);
                 errCode = fin.getInt("status code");
                 String message = "";
