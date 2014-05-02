@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -173,7 +175,21 @@ public class BroadcastActivity extends MapActivity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        
+        String msg;
+        AlertDialog.Builder builder;
+        int id = item.getItemId();
+        if (id == R.id.action_help) {
+            builder = new AlertDialog.Builder(this);
+            msg = "You are broadcasting your location!\n\nOn the map, you're location is indicated by the reddish-orange marker.  Check the legend to map color to username for your followers by hitting the top-left icon.\n\nWhen you're done broadcasting, hit Stop Broadcasting!";
+            builder.setMessage(msg)
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+            return true;
+        }
         // Handle your other action bar items
         return super.onOptionsItemSelected(item);
     }
@@ -189,7 +205,7 @@ public class BroadcastActivity extends MapActivity {
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.follow, menu);
+        getMenuInflater().inflate(R.menu.broadcast, menu);
         return true;
     }
 
