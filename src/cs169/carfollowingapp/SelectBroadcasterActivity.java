@@ -107,7 +107,7 @@ public class SelectBroadcasterActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_help) {
             builder = new AlertDialog.Builder(this);
-            msg = "Step 1: Type in the username of the user you would like to follow\n\nStep 1.5: Alternatively, select a username from the list of recently followed users.\n\nStep 2: Hit Follow! When the broadcaster accepts your request, you will be automatically moved to the follow page.";
+            msg = "Step 1: Type in the username of the user you would like to follow and a request message, if desired.\n\nStep 1.5: Alternatively, select a username from the list of recently followed users.\n\nStep 2: Hit Follow! When the broadcaster accepts your request, you will be automatically moved to the follow page.";
             builder.setMessage(msg)
                     .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {

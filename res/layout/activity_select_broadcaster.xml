@@ -18,16 +18,23 @@
     <EditText android:id="@+id/input_message"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/input_username"
-	    android:layout_width="wrap_content"
+	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:hint="@string/input_hint_message"
 	    android:contentDescription="message" />
-    <ListView
-        android:id="@+id/broadcaster_history_list"
-        android:layout_below="@id/input_message"
+    <RelativeLayout
+        android:id="@+id/imageLayout"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
-        android:layout_centerVertical="true"/>
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:layout_below="@id/input_message">
+        <ListView
+            android:id="@+id/broadcaster_history_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
