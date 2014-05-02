@@ -552,7 +552,7 @@ public class FollowActivity extends MapActivity {
         		if (finishActivity) {
         			fActivity.handleError(fActivity.errorText);
         		} else {
-        			fActivity.handleError(fActivity.errorText);
+        			fActivity.showToast(fActivity.errorText);
         		}
         		finishActivity = true;
         		return;
