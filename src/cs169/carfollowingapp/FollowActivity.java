@@ -474,7 +474,7 @@ public class FollowActivity extends MapActivity {
                         showToast("No such broadcaster username.");
                         break;
                     case USER_NOT_BROADCASTING:
-                        showToast("User not braodcasting.");
+                        showToast("User not broadcasting.");
                         break;
                     default:
                         showToast("Unknown errCode.");
