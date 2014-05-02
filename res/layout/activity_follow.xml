@@ -16,16 +16,10 @@
         >
 	    <Button
 	        android:layout_gravity="center_horizontal"   
-			android:layout_width="wrap_content"
+			android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:text="@string/stop_following"
 	        android:onClick="stopFollowing" />
-	    <Button
-	        android:layout_gravity="center_horizontal"
-	       	android:layout_width="wrap_content"
-	       	android:layout_height="wrap_content"
-	       	android:text="@string/update"
-	       	android:onClick="update" /> 
     </LinearLayout>
     <fragment
         class="com.google.android.gms.maps.SupportMapFragment"

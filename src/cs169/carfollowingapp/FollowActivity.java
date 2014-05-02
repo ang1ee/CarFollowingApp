@@ -106,7 +106,7 @@ public class FollowActivity extends MapActivity {
                 return true;
             case R.id.action_help:
                 builder = new AlertDialog.Builder(this);
-                msg = "You are now following a broadcaster!\n\nA corresponding marker will indicate your position and the broadcaster's position, and a path to follow to get to the broadcaster.\n\nWhenever you want to see the rest of the path to the broadcaster, hit Update to update the line!";
+                msg = "You are now following a broadcaster!\n\nThe red-orange marker indicates your position.  Follow the blue path to reach the broadcaster's location.\n\nSwipe from the leftmost side to see the street-wise directions.\n\nHit update to manually call for a new path and set of directions!";
                 builder.setMessage(msg)
                         .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -388,11 +388,6 @@ public class FollowActivity extends MapActivity {
     public void stopFollowing(View view) {
     	handleCleanup();
     	new CancelTask().execute(cancelUrl);
-    }
-    
-    public void update(View view) {
-        this.update = true;
-        showToast("Request Processed");
     }
 
     /* Finds the current location of the application user, who is currently broadcasting,
