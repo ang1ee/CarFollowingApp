@@ -26,8 +26,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -259,7 +261,9 @@ public class FollowActivity extends MapActivity {
                     case SUCCESS:
                         coord = new LatLng(fin.getDouble("latitude"), fin.getDouble("longitude"));
                         if (broadcaster == null) {
-                            broadcaster = fActivity.plot(coord, false);
+                            MarkerOptions marcOpt = new MarkerOptions().position(coord);
+                            marcOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                            broadcaster = map.addMarker(marcOpt);
                         } else {
                             broadcaster.setPosition(coord);
                         }
