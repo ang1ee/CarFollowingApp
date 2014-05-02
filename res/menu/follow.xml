@@ -1,9 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_update"
+        android:orderInCategory="90"
+        android:showAsAction="ifRoom"
+        android:title="Update"/>
+    <item
+        android:id="@+id/action_help"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
-
+        android:showAsAction="ifRoom"
+        android:title="Help"/>
 </menu>

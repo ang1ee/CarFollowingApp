@@ -1,12 +1,17 @@
 
 package cs169.carfollowingapp;
 
+import android.animation.AnimatorSet;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -36,9 +41,42 @@ public class FrontPageActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.front_page, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.front_page, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        String msg;
+        AlertDialog.Builder builder;
+        switch (item.getItemId()) {
+            case R.id.action_info:
+                builder = new AlertDialog.Builder(this);
+                msg = "Caravan is an application made to streamline the experience of driving as a group!  One user can broadcast his location and have other his friends follow him.\n\nUsers can track each others locations and navigate toward the main broadcaster!";
+                builder.setMessage(msg)
+                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
+                return true;
+            case R.id.action_help:
+                builder = new AlertDialog.Builder(this);
+                msg = "Select Broadcast if you wish the broadcast your location.\n\nSelect Follow if you wish to follow another broadcasting user.";
+                builder.setMessage(msg)
+                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
     
     public void broadcast(View view) {

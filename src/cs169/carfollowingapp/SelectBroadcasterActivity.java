@@ -92,7 +92,6 @@ public class SelectBroadcasterActivity extends Activity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.select_broadcaster, menu);
         return true;
@@ -102,9 +101,20 @@ public class SelectBroadcasterActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // as you specify a parent activity in AndroidManifest.xml
+        String msg;
+        AlertDialog.Builder builder;
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_help) {
+            builder = new AlertDialog.Builder(this);
+            msg = "Step 1: Type in the username of the user you would like to follow\n\nStep 1.5: Alternatively, select a username from the list of recently followed users.\n\nStep 2: Hit Follow! When the broadcaster accepts your request, you will be automatically moved to the follow page.";
+            builder.setMessage(msg)
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
             return true;
         }
         return super.onOptionsItemSelected(item);

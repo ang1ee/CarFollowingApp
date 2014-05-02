@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -20,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -87,6 +90,32 @@ public class FollowActivity extends MapActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.follow, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        String msg;
+        AlertDialog.Builder builder;
+        switch (item.getItemId()) {
+            case R.id.action_update:
+                this.update = true;
+                showToast("Request Processed");
+                return true;
+            case R.id.action_help:
+                builder = new AlertDialog.Builder(this);
+                msg = "You are now following a broadcaster!\n\nA corresponding marker will indicate your position and the broadcaster's position, and a path to follow to get to the broadcaster.\n\nWhenever you want to see the rest of the path to the broadcaster, hit Update to update the line!";
+                builder.setMessage(msg)
+                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
