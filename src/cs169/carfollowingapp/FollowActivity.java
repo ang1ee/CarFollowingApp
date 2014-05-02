@@ -449,6 +449,7 @@ public class FollowActivity extends MapActivity {
             
             if (currentLocation == null) {
             	fActivity.setErrorText("Cannot get current location");
+            	finishActivity = false;
             	publishProgress(fActivity);
     		    return GET_LOC_FAIL;
             }
